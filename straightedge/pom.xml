@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>straightedge</groupId>
+    <artifactId>straightedge</artifactId>
+    <version>0.3</version>
+    <packaging>jar</packaging>
+    <name>straightedge</name>
+    <description>
+        Includes 2 main parts:
+        - Path finding through 2D polygons using the A star algorithm and navigation-mesh generation
+        Field of vision / shadows / line of sight / lighting. 
+        The basic polygon and point classes are the KPolygon and KPoint.
+        KPolygon contains a list of KPoints for vertices as well as a center (centroid), area, and radius (circular bound or distance from center to furthest point).
+        KPolygon was born out of the need for a more game-oriented and flexible polygon class than the Path2D class in the standard Java library. KPolygon implements java.awt.geom.Shape so it can be easily drawn and filled by Java2D's Graphics2D object.
+        - This API provides path-finding and field-of-vision. For other complex geometric operations such as buffering (fattening and shrinking) and constructive area geometry (intersections and unions) it is recommended to use the excellent Java Topology Suite (JTS). The standard Java2D library also provides the Area class which can be used for some constructive area geometry operations. Note that there is a utility class PolygonConverter that can quickly convert KPolygons to JTS polygons and vice versa.
+    </description>
+    <url>https://github.com/rpax/straightedge</url>
+    <licenses>
+        <license>
+            <name>New BSD License</name>
+            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Keith Woodward</name>
+            <email>keith...@gmail.com</email>
+        </developer>
+        <developer>Rafael Pax</developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:rpax/straightedge.git</connection>
+        <developerConnection>scm:git:git@github.com:rpax/straightedge.git</developerConnection>
+        <url>git@github.com:rpax/straightedge.git</url>
+    </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.11</version>
+        </dependency>
+    </dependencies>
+</project>
