@@ -28,7 +28,9 @@
             <name>Keith Woodward</name>
             <email>keith...@gmail.com</email>
         </developer>
-        <developer>Rafael Pax</developer>
+        <developer>
+            <name>Rafael Pax</name>
+        </developer>
     </developers>
     <scm>
         <connection>scm:git:git@github.com:rpax/straightedge.git</connection>
