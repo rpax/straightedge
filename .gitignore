@@ -1,1 +1,6 @@
 /straightedge/target/
+/.project
+/target/
+/.classpath
+/.settings/
+/bin/
