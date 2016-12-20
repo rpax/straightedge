@@ -169,11 +169,11 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 			MouseEvent e = (MouseEvent)awtEvent;
 			if (e.getID() == MouseEvent.MOUSE_MOVED){
 				lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-				lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+				lastMousePointInWorldCoords.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 			}else if (e.getID() == MouseEvent.MOUSE_PRESSED){
 				if (altKeyDown == false){
 					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 					if (e.getButton() == MouseEvent.BUTTON1){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 						leftMouseButtonDown = true;
@@ -184,30 +184,30 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 				}else{
 					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
 					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoordsExclViewMove.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
-					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;
+					viewCenterInWorldCoords.z -= lastMousePointInWorldCoordsExclViewMove.z - lastMousePointInWorldCoords.z;
 				}
 			}else if (e.getID() == MouseEvent.MOUSE_DRAGGED){
 				if (altKeyDown == false){
 					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 					if (leftMouseButtonDown){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 					}
 				}else{
 					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
 					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoordsExclViewMove.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
-					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;
+					viewCenterInWorldCoords.z -= lastMousePointInWorldCoordsExclViewMove.z - lastMousePointInWorldCoords.z;
 				}
 			}else if (e.getID() == MouseEvent.MOUSE_RELEASED){
 				if (altKeyDown == false){
 					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 					if (e.getButton() == MouseEvent.BUTTON1){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 						leftMouseButtonDown = false;
@@ -218,10 +218,10 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 				}else{
 					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
 					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoordsExclViewMove.z = ((e.getY() - viewCenterInScreenCoords.z) / view.scaleFactor + viewCenterInWorldCoords.z);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
-					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;
+					viewCenterInWorldCoords.z -= lastMousePointInWorldCoordsExclViewMove.z - lastMousePointInWorldCoords.z;
 				}
 			}else if (e.getID() == MouseEvent.MOUSE_WHEEL){
 				MouseWheelEvent mwe = (MouseWheelEvent)awtEvent;

@@ -58,7 +58,7 @@ public class WorldKochSnowflake extends World{
 				char c = instr.charAt(i);
 				if (c == ('F') || c == ('L') || c == ('R')){
 					p.x += Math.cos(angle)*dist;
-					p.y += Math.sin(angle)*dist;
+					p.z += Math.sin(angle)*dist;
 					subsetPolygons.add(KPolygon.createRectOblique(p, oldP, width));
 					oldP = p.copy();
 				}else if (c == ('+')){
@@ -72,7 +72,7 @@ public class WorldKochSnowflake extends World{
 			KPoint centerBounds = bounds.getCenter();
 			for (int i = 0; i < subsetPolygons.size(); i++){
 				KPolygon poly = subsetPolygons.get(i);
-				poly.translate(center.x-centerBounds.x, center.y-centerBounds.y);
+				poly.translate(center.x-centerBounds.x, center.z-centerBounds.z);
 				allPolygons.add(poly);
 			}
 		}
@@ -83,7 +83,7 @@ public class WorldKochSnowflake extends World{
 		KPoint centerBounds = bounds.getCenter();
 		for (int i = 0; i < allPolygons.size(); i++){
 			KPolygon poly = allPolygons.get(i);
-			poly.translate(center.x-centerBounds.x, center.y-centerBounds.y);
+			poly.translate(center.x-centerBounds.x, center.z-centerBounds.z);
 			if (screenPoly.contains(poly)){
 				finalPolygons.add(poly);
 			}

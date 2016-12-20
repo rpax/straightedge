@@ -52,7 +52,7 @@ public class ConvexHull {
 		Coordinate[] coordinateArray = new Coordinate[array.size()];
 		for (int i = 0; i < array.size(); i++){
 			KPoint p = array.get(i);
-			coordinateArray[i] = new Coordinate(p.x, p.y);
+			coordinateArray[i] = new Coordinate(p.x, p.z);
 		}
 		com.vividsolutions.jts.algorithm.ConvexHull convexHull = new com.vividsolutions.jts.algorithm.ConvexHull(coordinateArray, new GeometryFactory());
 		Geometry geometry = convexHull.getConvexHull();

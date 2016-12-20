@@ -157,8 +157,8 @@ public class Bullet{
 					}
 
 					int jPlus = (j+1 == points.size() ? 0 : j+1);
-					if (KPoint.linesIntersect(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y)){
-						KPoint intersection = KPoint.getLineLineIntersection(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y);
+					if (KPoint.linesIntersect(oldX, oldY, x, y, points.get(j).x, points.get(j).z, points.get(jPlus).x, points.get(jPlus).z)){
+						KPoint intersection = KPoint.getLineLineIntersection(oldX, oldY, x, y, points.get(j).x, points.get(j).z, points.get(jPlus).x, points.get(jPlus).z);
 						if (intersection == null){
 							continue;
 						}
@@ -213,17 +213,17 @@ public class Bullet{
 					KPoint surface = closestOccluderIntersection.occluderImpl.getPolygon().points.get(closestOccluderIntersection.occluderSideJ).copy();
 
 					incident.x -= closestOccluderIntersection.intersection.x;
-					incident.y -= closestOccluderIntersection.intersection.y;
+					incident.z -= closestOccluderIntersection.intersection.z;
 					surface.x -= closestOccluderIntersection.intersection.x;
-					surface.y -= closestOccluderIntersection.intersection.y;
+					surface.z -= closestOccluderIntersection.intersection.z;
 
-					double surfaceLength = Math.sqrt(surface.x*surface.x + surface.y*surface.y);
+					double surfaceLength = Math.sqrt(surface.x*surface.x + surface.z*surface.z);
 					// normalise the surface:
 					surface.x /= surfaceLength;
-					surface.y /= surfaceLength;
-					double dotproduct = incident.x * surface.x + incident.y * surface.y;
-					KPoint incidentProjectedOntoSurface = new KPoint(surface.x * dotproduct, surface.y * dotproduct);
-					KPoint reflect = new KPoint(incident.x - 2*incidentProjectedOntoSurface.x, incident.y - 2*incidentProjectedOntoSurface.y);
+					surface.z /= surfaceLength;
+					double dotproduct = incident.x * surface.x + incident.z * surface.z;
+					KPoint incidentProjectedOntoSurface = new KPoint(surface.x * dotproduct, surface.z * dotproduct);
+					KPoint reflect = new KPoint(incident.x - 2*incidentProjectedOntoSurface.x, incident.z - 2*incidentProjectedOntoSurface.z);
 //					System.out.println(this.getClass().getSimpleName()+": incident == "+incident);
 //					System.out.println(this.getClass().getSimpleName()+": surface == "+surface);
 //					//System.out.println(this.getClass().getSimpleName()+": normal == "+normal);
@@ -234,7 +234,7 @@ public class Bullet{
 
 
 					x = closestOccluderIntersection.intersection.x;
-					y = closestOccluderIntersection.intersection.y;
+					y = closestOccluderIntersection.intersection.z;
 					speedX = Math.cos(angle) * speed;
 					speedY = Math.sin(angle) * speed;
 					oldX = x;

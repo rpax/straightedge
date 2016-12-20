@@ -73,7 +73,7 @@ public class PathBlockingObstacleImpl implements PathBlockingObstacle{
 				KNodeOfObstacle node = nodes.get(j);
 				KPoint outerPolygonPoint = getOuterPolygon().getPoint(j);
 				node.getPoint().x = outerPolygonPoint.x;
-				node.getPoint().y = outerPolygonPoint.y;
+				node.getPoint().z = outerPolygonPoint.z;
 			}
 		}
 	}

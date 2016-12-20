@@ -82,7 +82,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		tiles = new Tile[numRows][numCols];
 		this.tileWidthAndHeight = tileWidthAndHeight;
 		this.botLeft = botLeft.copy();
-		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
+		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.z + numCols*tileWidthAndHeight);
 		bloated = false;
 		for (int i = 0; i < numRows; i++){
 			for (int j = 0; j < numCols; j++){
@@ -93,9 +93,9 @@ public class TileArrayIntersections<T extends Occluder> {
 
 	public TileArrayIntersections(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
 		double minX = botLeft.x;
-		double minY = botLeft.y;
+		double minY = botLeft.z;
 		double maxX = approxTopRight.x;
-		double maxY = approxTopRight.y;
+		double maxY = approxTopRight.z;
 		this.numRows = (int)Math.ceil((maxX - minX)/tileWidthAndHeight);
 		this.numCols = (int)Math.ceil((maxY - minY)/tileWidthAndHeight);
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
@@ -156,8 +156,8 @@ public class TileArrayIntersections<T extends Occluder> {
 			boolean outsideBounds = false;
 			double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 			double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
-			double botRowIndex = ((c.y - r) - botLeft.y)/tileWidthAndHeight;
-			double topRowIndex = ((c.y + r) - botLeft.y)/tileWidthAndHeight;
+			double botRowIndex = ((c.z - r) - botLeft.z)/tileWidthAndHeight;
+			double topRowIndex = ((c.z + r) - botLeft.z)/tileWidthAndHeight;
 	//		System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex);
 			if (botRowIndex < 0){
 				botRowIndex = 0;
@@ -221,7 +221,7 @@ public class TileArrayIntersections<T extends Occluder> {
 				VPOccluderOccluderIntersection obstacleIntersectionSightPoint = occluderIntersectionPoints.get(i);
 				KPoint p = obstacleIntersectionSightPoint.getPoint();
 				int colIndex = (int)Math.floor((p.x - botLeft.x)/tileWidthAndHeight);
-				int rowIndex = (int)Math.floor((p.y - botLeft.y)/tileWidthAndHeight);
+				int rowIndex = (int)Math.floor((p.z - botLeft.z)/tileWidthAndHeight);
 				if (rowIndex < 0){
 					rowIndex = 0;
 				}else if (rowIndex >= getNumRows()){
@@ -243,8 +243,8 @@ public class TileArrayIntersections<T extends Occluder> {
 		double r = t.getPolygon().getRadius();
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((c.y - r) - botLeft.y)/tileWidthAndHeight;
-		double topRowIndex = ((c.y + r) - botLeft.y)/tileWidthAndHeight;
+		double botRowIndex = ((c.z - r) - botLeft.z)/tileWidthAndHeight;
+		double topRowIndex = ((c.z + r) - botLeft.z)/tileWidthAndHeight;
 
 		if (botRowIndex < 0){
 			botRowIndex = 0;
@@ -322,7 +322,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		return removed;
 	}
 	public ArrayList<T> getAllWithin(KPoint point, double radius){
-		return getAllWithin(point.x, point.y, radius);
+		return getAllWithin(point.x, point.z, radius);
 	}
 
 	//	CodeTimer ct = new CodeTimer(this.getClass().getSimpleName()+": getAllWithin");
@@ -335,8 +335,8 @@ public class TileArrayIntersections<T extends Occluder> {
 
 		double leftColIndex = ((x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((y - r) - botLeft.y)/tileWidthAndHeight;
-		double topRowIndex = ((y + r) - botLeft.y)/tileWidthAndHeight;
+		double botRowIndex = ((y - r) - botLeft.z)/tileWidthAndHeight;
+		double topRowIndex = ((y + r) - botLeft.z)/tileWidthAndHeight;
 //		System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex);
 
 //		ct.click("index checks");
@@ -380,7 +380,7 @@ public class TileArrayIntersections<T extends Occluder> {
 				}
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
 					nearbyObstacles.add(t);
 					polygon.setTileArraySearchStatus(true, tracker);
 				}
@@ -391,7 +391,7 @@ public class TileArrayIntersections<T extends Occluder> {
 				KPoint polygonCenter = polygon.getCenter();
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
 					nearbyObstacles.add(t);
 				}
 			}
@@ -410,7 +410,7 @@ public class TileArrayIntersections<T extends Occluder> {
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
 						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
 							nearbyObstacles.add(t);
 							polygon.setTileArraySearchStatus(true, tracker);
 						}
@@ -422,7 +422,7 @@ public class TileArrayIntersections<T extends Occluder> {
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
 						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
 							nearbyObstacles.add(t);
 						}
 					}
@@ -447,8 +447,8 @@ public class TileArrayIntersections<T extends Occluder> {
 		double r = radius;
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((c.y - r) - botLeft.y)/tileWidthAndHeight;
-		double topRowIndex = ((c.y + r) - botLeft.y)/tileWidthAndHeight;
+		double botRowIndex = ((c.z - r) - botLeft.z)/tileWidthAndHeight;
+		double topRowIndex = ((c.z + r) - botLeft.z)/tileWidthAndHeight;
 
 		if (botRowIndex < 0){
 			botRowIndex = 0;

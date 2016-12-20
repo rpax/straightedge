@@ -63,8 +63,8 @@ public class AABB{
 			this.p = p;
 			this.p2 = p2;
 		}else{
-			this.p = new KPoint(p.x, p.y);
-			this.p2 = new KPoint(p2.x, p2.y);
+			this.p = new KPoint(p.x, p.z);
+			this.p2 = new KPoint(p2.x, p2.z);
 		}
 	}
 	public AABB(KPoint p, KPoint p2){
@@ -90,7 +90,7 @@ public class AABB{
 		return rect;
     }
 	public static AABB createFromDiagonal(KPoint p, KPoint p2) {
-		return createFromDiagonal(p.x, p.y, p2.x, p2.y);
+		return createFromDiagonal(p.x, p.z, p2.x, p2.z);
     }
 	public static AABB createFromXYWH(double x, double y, double w, double h) {
 		AABB rect = new AABB();
@@ -115,7 +115,7 @@ public class AABB{
 		setY2(y2);
     }
 	public void setFromDiagonal(KPoint p, KPoint p2) {
-		setFromDiagonal(p.x, p.y, p2.x, p2.y);
+		setFromDiagonal(p.x, p.z, p2.x, p2.z);
     }
 	public void setFromXYWH(double x, double y, double w, double h) {
 		if (w < 0) {
@@ -132,7 +132,7 @@ public class AABB{
 		setY2(y+h);
     }
 	public void setFromXYWH(KPoint p, double w, double h) {
-		setFromXYWH(p.x, p.y, w, h);
+		setFromXYWH(p.x, p.z, w, h);
     }
 
 	public KPoint getBotLeft(){
@@ -143,7 +143,7 @@ public class AABB{
 	}
 
 	public double h() {
-		return p2.y - p.y;
+		return p2.z - p.z;
 	}
 	public double w() {
 		return p2.x - p.x;
@@ -152,13 +152,13 @@ public class AABB{
 		return p.x;
 	}
 	public double y() {
-		return p.y;
+		return p.z;
 	}
 	public double x2() {
 		return p2.x;
 	}
 	public double y2() {
-		return p2.y;
+		return p2.z;
 	}
 
 	public double getHeight() {
@@ -169,7 +169,7 @@ public class AABB{
 	}
 
 	public void setH(double h) {
-		p2.y = p.y + h;
+		p2.z = p.z + h;
 	}
 	public void setW(double w) {
 		p2.x = p.x + w;
@@ -184,11 +184,11 @@ public class AABB{
 	}
 
 	public double getY() {
-		return p.y;
+		return p.z;
 	}
 
 	public void setY(double y) {
-		p.y = y;
+		p.z = y;
 	}
 
 	public double getX2() {
@@ -200,11 +200,11 @@ public class AABB{
 	}
 
 	public double getY2() {
-		return p2.y;
+		return p2.z;
 	}
 
 	public void setY2(double y) {
-		p2.y = y;
+		p2.z = y;
 	}
 
 	public AABB copy(){
@@ -212,7 +212,7 @@ public class AABB{
 	}
 
 	public String toString(){
-		return ""+p.x+", "+p.y+",  "+p2.x+", "+p2.y;
+		return ""+p.x+", "+p.z+",  "+p2.x+", "+p2.z;
 	}
 
 	public KPoint getCenter(){
@@ -222,11 +222,11 @@ public class AABB{
 		return (p.x + p2.x)/2;
 	}
 	public double getCenterY(){
-		return (p.y + p2.y)/2;
+		return (p.z + p2.z)/2;
 	}
 	public void setCenter(KPoint c){
 		setCenterX(c.x);
-		setCenterY(c.y);
+		setCenterY(c.z);
 	}
 	public void setCenterX(double newCentreX){
 		double w = w();
@@ -235,8 +235,8 @@ public class AABB{
 	}
 	public void setCenterY(double newCentreY){
 		double h = h();
-		p.y = newCentreY - h/2;
-		p2.y = newCentreY + h/2;
+		p.z = newCentreY - h/2;
+		p2.z = newCentreY + h/2;
 	}
 
 	// this assumes that there is an intersection. b1 is moving in 'direction' and b2 is stationary
@@ -246,9 +246,9 @@ public class AABB{
 		}else if (direction == LEFT){
 			return b1.p.x - (b2.p2.x);
 		}else if (direction == DOWN){
-			return b2.p.y - (b1.p2.y);
+			return b2.p.z - (b1.p2.z);
 		}else if (direction == UP){
-			return b1.p.y - (b2.p2.y);
+			return b1.p.z - (b2.p2.z);
 		}
 		return -1f;
 	}
@@ -262,15 +262,15 @@ public class AABB{
 		double cx = getCenterX();
 		double cy = getCenterY();
 		if (directionThisBoxIsFacing == RIGHT){
-			if (isBetween(p.y, b2.p.y, b2.p2.y) || isBetween(p2.y, b2.p.y, b2.p2.y) ||
-					isBetween(b2.p.y, p.y, p2.y) || isBetween(b2.p2.y, p.y, p2.y)){
+			if (isBetween(p.z, b2.p.z, b2.p2.z) || isBetween(p2.z, b2.p.z, b2.p2.z) ||
+					isBetween(b2.p.z, p.z, p2.z) || isBetween(b2.p2.z, p.z, p2.z)){
 				if (cx < b2.getCenterX()){
 					return true;
 				}
 			}
 		}else if (directionThisBoxIsFacing == LEFT){
-			if (isBetween(p.y, b2.p.y, b2.p2.y) || isBetween(p2.y, b2.p.y, b2.p2.y) ||
-					isBetween(b2.p.y, p.y, p2.y) || isBetween(b2.p2.y, p.y, p2.y)){
+			if (isBetween(p.z, b2.p.z, b2.p2.z) || isBetween(p2.z, b2.p.z, b2.p2.z) ||
+					isBetween(b2.p.z, p.z, p2.z) || isBetween(b2.p2.z, p.z, p2.z)){
 				if (cx > b2.getCenterX()){
 					return true;
 				}
@@ -294,20 +294,20 @@ public class AABB{
 	}
 
 	public boolean contains(KPoint p){
-		return contains(p.x, p.y);
+		return contains(p.x, p.z);
 	}
 	public boolean contains(double px, double py) {
 		return (px >= p.x &&
-			py >= p.y &&
+			py >= p.z &&
 			px <= p2.x &&
-			py <= p2.y);
+			py <= p2.z);
     }
 	public boolean intersects(AABB box) {
-		return intersects(box.p.x, box.p.y, box.p2.x, box.p2.y);
+		return intersects(box.p.x, box.p.z, box.p2.x, box.p2.z);
 	}
 
     public boolean intersects(double x, double y, double x2, double y2) {
-		return intersects(p.x, p.y, p2.x, p2.y, x, y, x2, y2);
+		return intersects(p.x, p.z, p2.x, p2.z, x, y, x2, y2);
     }
 
 	public static boolean intersects(double leftX, double botY, double rightX, double topY,
@@ -319,9 +319,9 @@ public class AABB{
     }
 	public boolean contains(double x, double y, double x2, double y2) {
 		return (p.x <= x &&
-				p.y <= y &&
+				p.z <= y &&
 				p2.x >= x2 &&
-				p2.y >= y2);
+				p2.z >= y2);
 	}
 	
 	public static void union(AABB src1, AABB src2, AABB dest) {
@@ -352,19 +352,19 @@ public class AABB{
 		if (p2.x < p.x) {
 			return false;
 		}
-		if (p2.y < p.y) {
+		if (p2.z < p.z) {
 			return false;
 		}
 		return true;
 	}
 
 	public Rectangle2D.Double getRectangle2D(){
-		Rectangle2D.Double rect = new Rectangle2D.Double(p.x, p.y, w(), h());
+		Rectangle2D.Double rect = new Rectangle2D.Double(p.x, p.z, w(), h());
 		return rect;
 	}
 
 	public static AABB bufferAndCopy(AABB aabb, double bufferAmount){
-		AABB newAABB = new AABB(aabb.p.x + bufferAmount, aabb.p.y + bufferAmount, aabb.p2.x + bufferAmount, aabb.p2.y + bufferAmount);
+		AABB newAABB = new AABB(aabb.p.x + bufferAmount, aabb.p.z + bufferAmount, aabb.p2.x + bufferAmount, aabb.p2.z + bufferAmount);
 		return newAABB;
 	}
 	public AABB bufferAndCopy(double bufferAmount){
@@ -435,8 +435,8 @@ public class AABB{
 			double r = polygonHolder.getPolygon().getRadius();
 			double leftX = c.x - r;
 			double rightX = c.x + r;
-			double botY = c.y - r;
-			double topY = c.y + r;
+			double botY = c.z - r;
+			double topY = c.z + r;
 			if (leftX < minX){
 				minX = leftX;
 			}

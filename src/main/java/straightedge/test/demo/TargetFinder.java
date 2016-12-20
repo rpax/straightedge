@@ -75,10 +75,10 @@ public class TargetFinder{
 		KPoint absoluteTarget = new KPoint();
 		if (targetType == TARGET_FIXED){
 			absoluteTarget.x = target.x;
-			absoluteTarget.y = target.y;
+			absoluteTarget.z = target.z;
 		} else if (targetType == TARGET_RELATIVE){
 			absoluteTarget.x = target.x + targetUser.getPos().x;
-			absoluteTarget.y = target.y + targetUser.getPos().y;
+			absoluteTarget.z = target.z + targetUser.getPos().z;
 			KPoint movedAbsoluteTarget = getNearestPointOutsideOfObstacles(absoluteTarget);
 			absoluteTarget.setCoords(movedAbsoluteTarget);
 		} else if (targetType == TARGET_PLAYER){
@@ -141,7 +141,7 @@ public class TargetFinder{
 	public void setFixedTarget(double targetX, double targetY, boolean calcPathNow) {
 		targetType = TARGET_FIXED;
 		target.x = targetX;
-		target.y = targetY;
+		target.z = targetY;
 		KPoint movedTarget = getNearestPointOutsideOfObstacles(target);
 		target.setCoords(movedTarget);
 		if (calcPathNow){
@@ -149,19 +149,19 @@ public class TargetFinder{
 		}
 	}
 	public void setFixedTarget(KPoint p, boolean calcPathNow) {
-		setFixedTarget(p.x, p.y, calcPathNow);
+		setFixedTarget(p.x, p.z, calcPathNow);
 	}
 
 	public void setRelativeTarget(double targetX, double targetY, boolean calcPathNow) {
 		targetType = TARGET_RELATIVE;
 		target.x = targetX;
-		target.y = targetY;
+		target.z = targetY;
 		if (calcPathNow){
 			calcPath();
 		}
 	}
 	public void setRelativeTarget(KPoint p, boolean calcPathNow) {
-		setRelativeTarget(p.x, p.y, calcPathNow);
+		setRelativeTarget(p.x, p.z, calcPathNow);
 	}
 
 	public void setTargetPlayer(TargetUser targetPlayerToFollow, boolean calcPathNow) {
@@ -186,7 +186,7 @@ public class TargetFinder{
 					KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
 					if (p != null){
 						movedPoint.x = p.x;
-						movedPoint.y = p.y;
+						movedPoint.z = p.z;
 					}
 					assert point != null;
 				}

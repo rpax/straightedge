@@ -118,7 +118,7 @@ public class View {
 		Graphics2D g = (Graphics2D)image.getGraphics();
 
 		viewCenterInScreenCoords.x = (getWidth() / 2.0);
-		viewCenterInScreenCoords.y = (getHeight() / 2.0);
+		viewCenterInScreenCoords.z = (getHeight() / 2.0);
 		double scaledW = getWidth() / scaleFactor;
 		double scaledH = getHeight() / scaleFactor;
 
@@ -126,10 +126,10 @@ public class View {
 		if (hasRendered == false){
 			hasRendered = true;
 			viewCenterInWorldCoords.x = viewCenterInScreenCoords.x;
-			viewCenterInWorldCoords.y = viewCenterInScreenCoords.y;
+			viewCenterInWorldCoords.z = viewCenterInScreenCoords.z;
 		}
 		double viewRectInWorldCoordsX = viewCenterInWorldCoords.x - scaledW / 2.0;
-		double viewRectInWorldCoordsY = viewCenterInWorldCoords.y - scaledH / 2.0;
+		double viewRectInWorldCoordsY = viewCenterInWorldCoords.z - scaledH / 2.0;
 		double viewRectInWorldCoordsW = scaledW;
 		double viewRectInWorldCoordsH = scaledH;
 		viewRectInWorldCoords.setFromXYWH(viewRectInWorldCoordsX, viewRectInWorldCoordsY, viewRectInWorldCoordsW, viewRectInWorldCoordsH);
@@ -158,19 +158,19 @@ public class View {
 		{
 			// Make the worldViewAT
 			worldViewAT = new AffineTransform(originalAT);
-			worldViewAT.translate(viewCenterInScreenCoords.x, viewCenterInScreenCoords.y);
+			worldViewAT.translate(viewCenterInScreenCoords.x, viewCenterInScreenCoords.z);
 			if (scaleFactor != 1){
 				worldViewAT.scale(scaleFactor, scaleFactor);
 			}
-			worldViewAT.translate(-viewCenterInWorldCoords.x, -viewCenterInWorldCoords.y);
+			worldViewAT.translate(-viewCenterInWorldCoords.x, -viewCenterInWorldCoords.z);
 
 			// Make the worldViewATRounded
 			worldViewATRounded = new AffineTransform(originalAT);
-			worldViewATRounded.translate(viewCenterInScreenCoords.x, viewCenterInScreenCoords.y);
+			worldViewATRounded.translate(viewCenterInScreenCoords.x, viewCenterInScreenCoords.z);
 			if (scaleFactor != 1){
 				worldViewATRounded.scale(scaleFactor, scaleFactor);
 			}
-			worldViewATRounded.translate(-viewCenterInWorldCoords.x, -viewCenterInWorldCoords.y);
+			worldViewATRounded.translate(-viewCenterInWorldCoords.x, -viewCenterInWorldCoords.z);
 			// This does the rounding:
 			double[] roundedMatrix = new double[6];
 			worldViewATRounded.getMatrix(roundedMatrix);
@@ -249,7 +249,7 @@ public class View {
 					for (int j = 0; j < allObstacles.get(i).getNodes().size(); j++) {
 						KNode currentNode = allObstacles.get(i).getNodes().get(j);
 						for (KNode n : currentNode.getConnectedNodes()) {
-							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().y, n.getPoint().getX(), n.getPoint().getY()));
+							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getY()));
 						}
 					}
 				}
@@ -257,11 +257,11 @@ public class View {
 				g.setColor(Color.BLUE);
 				KPoint startPoint = pathFinder.startPointDebug;
 				for (KNode n : pathFinder.startNodeTempReachableNodesDebug) {
-					g.draw(new Line2D.Double(startPoint.x, startPoint.y, n.getPoint().getX(), n.getPoint().getY()));
+					g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getY()));
 				}
 				KPoint endPoint = pathFinder.endPointDebug;
 				for (KNode n : pathFinder.endNodeTempReachableNodesDebug) {
-					g.draw(new Line2D.Double(endPoint.x, endPoint.y, n.getPoint().getX(), n.getPoint().getY()));
+					g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getY()));
 				}
 			}else{
 				player.targetFinder.pathFinder.debug = false;
@@ -269,7 +269,7 @@ public class View {
 
 			g.setColor(Color.MAGENTA);
 			float r = (float)(1/scaleFactor);
-			g.fill(new Ellipse2D.Double(eventHandler.lastMousePointInWorldCoords.x - r, eventHandler.lastMousePointInWorldCoords.y - r, 2*r, 2*r));
+			g.fill(new Ellipse2D.Double(eventHandler.lastMousePointInWorldCoords.x - r, eventHandler.lastMousePointInWorldCoords.z - r, 2*r, 2*r));
 
 			{
 				Player p = player;
@@ -314,14 +314,14 @@ public class View {
 				r = 3;
 				g.draw(player.polygon);
 				g.setColor(Color.BLACK);
-				g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 			}
 			for (int i = 0; i < enemies.size(); i++){
 				Player p = enemies.get(i);
 				g.setColor(Color.RED);
 				g.draw(p.polygon);
 				g.setColor(Color.BLACK);
-				g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 				//g.fill(new Ellipse2D.Double(enemy.getPos().x - r, enemy.getPos().y - r, 2*r, 2*r));
 			}
 
@@ -360,14 +360,14 @@ public class View {
 					g.setClip(intersectionPath2D);
 
 					AffineTransform oldAT = g.getTransform();
-					g.translate(p.cache.getEye().x, p.cache.getEye().y);
+					g.translate(p.cache.getEye().x, p.cache.getEye().z);
 					g.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-					g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+					g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 					Image vi = p.ai.getImage();
 					g.drawImage(vi, 0, 0, null);
 					g.setTransform(oldAT);
 					g.setColor(Color.BLACK);
-					g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+					g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 					g.setClip(oldClip);
 				}
 			}
@@ -384,15 +384,15 @@ public class View {
 					g.setClip(p.cache.visiblePolygon);
 				}
 				AffineTransform oldAT = g.getTransform();
-				g.translate(p.cache.getEye().x, p.cache.getEye().y);
+				g.translate(p.cache.getEye().x, p.cache.getEye().z);
 				g.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 				Image vi = p.ai.getImage();
 				g.drawImage(vi, 0, 0, null);
 				g.setTransform(oldAT);
 				g.setClip(oldClip);
 				g.setColor(Color.BLACK);
-				g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 			}
 
 			g.setClip(player.cache.visiblePolygon);
@@ -438,15 +438,15 @@ public class View {
 					g.setClip(p.cache.getVisiblePolygon());
 				}
 				AffineTransform oldAT = g.getTransform();
-				g.translate(p.cache.getEye().x, p.cache.getEye().y);
+				g.translate(p.cache.getEye().x, p.cache.getEye().z);
 				g.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 				Image vi = p.ai.getImage();
 				g.drawImage(vi, 0, 0, null);
 				g.setTransform(oldAT);
 				g.setClip(oldClip);
 				g.setColor(Color.BLACK);
-				g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 			}
 
 			float g4 = 0.1f;
@@ -504,14 +504,14 @@ public class View {
 					g.setClip(intersectionPath2D);
 
 					AffineTransform oldAT = g.getTransform();
-					g.translate(p.cache.getEye().x, p.cache.getEye().y);
+					g.translate(p.cache.getEye().x, p.cache.getEye().z);
 					g.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-					g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+					g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 					Image vi = p.ai.getImage();
 					g.drawImage(vi, 0, 0, null);
 					g.setTransform(oldAT);
 					g.setColor(Color.BLACK);
-					g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+					g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 					g.setClip(oldClip);
 				}
 			}
@@ -539,15 +539,15 @@ public class View {
 					graphics.setClip(p.cache.visiblePolygon);
 				}
 				AffineTransform oldAT = graphics.getTransform();
-				graphics.translate(p.cache.getEye().x, p.cache.getEye().y);
+				graphics.translate(p.cache.getEye().x, p.cache.getEye().z);
 				graphics.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-				graphics.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+				graphics.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 				Image vi = p.ai2.getImage();
 				graphics.drawImage(vi, 0, 0, null);
 				graphics.setTransform(oldAT);
 				graphics.setClip(oldClip);
 				graphics.setColor(Color.BLACK);
-				graphics.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				graphics.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 			}
 			g.setTransform(originalAT);
 			g.drawImage(shadowImage.getImage(),0,0,null);
@@ -593,14 +593,14 @@ public class View {
 				g.setClip(p.cache.visiblePolygon);
 
 				AffineTransform oldAT = g.getTransform();
-				g.translate(p.cache.getEye().x, p.cache.getEye().y);
+				g.translate(p.cache.getEye().x, p.cache.getEye().z);
 				g.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+				g.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 				Image vi = p.ai.getImage();
 				g.drawImage(vi, 0, 0, null);
 				g.setTransform(oldAT);
 				g.setColor(Color.BLACK);
-				g.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				g.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 				g.setClip(oldClip);
 			}
 
@@ -627,15 +627,15 @@ public class View {
 					graphics.setClip(p.cache.visiblePolygon);
 				}
 				AffineTransform oldAT = graphics.getTransform();
-				graphics.translate(p.cache.getEye().x, p.cache.getEye().y);
+				graphics.translate(p.cache.getEye().x, p.cache.getEye().z);
 				graphics.rotate(p.cache.getBoundaryPolygonRotationAroundEye());
-				graphics.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().y);
+				graphics.translate(p.originalBoundaryPolygonAABB.getX() - p.cache.getOriginalEye().x, p.originalBoundaryPolygonAABB.getY() - p.cache.getOriginalEye().z);
 				Image vi = p.ai2.getImage();
 				graphics.drawImage(vi, 0, 0, null);
 				graphics.setTransform(oldAT);
 				graphics.setClip(oldClip);
 				graphics.setColor(Color.BLACK);
-				graphics.draw(new Line2D.Double(p.pos.x, p.pos.y, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.y+Math.sin(p.gun.angle)*p.gun.length));
+				graphics.draw(new Line2D.Double(p.pos.x, p.pos.z, p.pos.x+Math.cos(p.gun.angle)*p.gun.length, p.pos.z+Math.sin(p.gun.angle)*p.gun.length));
 			}
 			g.setTransform(originalAT);
 			g.drawImage(shadowImage.getImage(),0,0,null);
@@ -701,11 +701,11 @@ public class View {
 	}
 	public double getWorldCoordFromViewPaneCoordY(double y){
 		Player player = main.world.player;
-		double my = ((y - viewCenterInScreenCoords.y) / scaleFactor + player.getPos().getY());
+		double my = ((y - viewCenterInScreenCoords.z) / scaleFactor + player.getPos().getY());
 		return my;
 	}
 	public KPoint getWorldPointFromViewPanePoint(KPoint viewPanePoint){
-		return new KPoint(getWorldCoordFromViewPaneCoordX(viewPanePoint.x), getWorldCoordFromViewPaneCoordY(viewPanePoint.y));
+		return new KPoint(getWorldCoordFromViewPaneCoordX(viewPanePoint.x), getWorldCoordFromViewPaneCoordY(viewPanePoint.z));
 	}
 
 	public double getViewPaneCoordFromWorldCoordX(double x){
@@ -715,11 +715,11 @@ public class View {
 	}
 	public double getViewPaneCoordFromWorldCoordY(double y){
 		Player player = main.world.player;
-		double my = (y - player.getPos().getY())*scaleFactor + viewCenterInScreenCoords.y;
+		double my = (y - player.getPos().getY())*scaleFactor + viewCenterInScreenCoords.z;
 		return my;
 	}
 	public KPoint getViewPanePointFromWorldPoint(KPoint viewPanePoint){
-		return new KPoint(getViewPaneCoordFromWorldCoordX(viewPanePoint.x), getViewPaneCoordFromWorldCoordY(viewPanePoint.y));
+		return new KPoint(getViewPaneCoordFromWorldCoordX(viewPanePoint.x), getViewPaneCoordFromWorldCoordY(viewPanePoint.z));
 	}
 
 

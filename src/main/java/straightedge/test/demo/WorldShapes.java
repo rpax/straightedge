@@ -27,8 +27,8 @@ public class WorldShapes extends World{
 		ArrayList<KPolygon> polygons = new ArrayList<KPolygon>();
 		// make some rectangles
 		for (int i = 0; i < 2; i++){
-			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
-			KPoint p2 = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
+			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
+			KPoint p2 = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
 			float width = 20 + 20*random.nextFloat();
 			KPolygon rect = KPolygon.createRectOblique(p, p2, width);
 			polygons.add(rect);
@@ -36,8 +36,8 @@ public class WorldShapes extends World{
 
 		// make some rectangles
 		for (int i = 0; i < 2; i++){
-			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
-			KPoint p2 = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
+			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
+			KPoint p2 = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
 			float width = 20 + 20*random.nextFloat();
 			KPolygon rect = KPolygon.createRectOblique(p, p2, width);
 			polygons.add(rect);
@@ -66,7 +66,7 @@ public class WorldShapes extends World{
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			//poly.translate(20 + (float)random.nextFloat()*aabb.getWidth(), 20 + (float)random.nextFloat()*aabb.getHeight());
-			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
+			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
 			poly.translateTo(p);
 			polygons.add(poly);
 		}

@@ -78,20 +78,20 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		}
 	}
 	public void translate(KPoint translation){
-		translate(translation.x, translation.y);
+		translate(translation.x, translation.z);
 	}
 
 	public void translateTo(double x, double y){
 		KPoint center = this.getExteriorPolygon().getCenter();
 		double xIncrement = x - center.x;
-		double yIncrement = y - center.y;
+		double yIncrement = y - center.z;
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			polygon.translate(xIncrement, yIncrement);
 		}
 	}
 	public void translateTo(KPoint newCentre){
-		translateTo(newCentre.x, newCentre.y);
+		translateTo(newCentre.x, newCentre.z);
 	}
 	public void translateToOrigin(){
 		translateTo(0, 0);
@@ -99,10 +99,10 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 
 	public void rotate(double angle) {
 		KPoint center = this.getExteriorPolygon().getCenter();
-		rotate(angle, center.x, center.y);
+		rotate(angle, center.x, center.z);
 	}
 	public void rotate(double angle, KPoint axle) {
-		rotate(angle, axle.x, axle.y);
+		rotate(angle, axle.x, axle.z);
 	}
 	public void rotate(double angle, double x, double y) {
 		for (int i = 0; i < polygons.size(); i++){
@@ -119,17 +119,17 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 	}
 	public void scale(double multiplierX, double multiplierY){
 		KPoint center = getExteriorPolygon().getCenter();
-		scale(multiplierX, multiplierY, center.x, center.y);
+		scale(multiplierX, multiplierY, center.x, center.z);
 	}
 	public void scale(double multiplierX, double multiplierY, KPoint p){
-		scale(multiplierX, multiplierY, p.x, p.y);
+		scale(multiplierX, multiplierY, p.x, p.z);
 	}
 	public void scale(double multiplier){
 		KPoint center = getExteriorPolygon().getCenter();
-		scale(multiplier, multiplier, center.x, center.y);
+		scale(multiplier, multiplier, center.x, center.z);
 	}
 	public void scale(double multiplier, KPoint p){
-		scale(multiplier, multiplier, p.x, p.y);
+		scale(multiplier, multiplier, p.x, p.z);
 	}
 
 	public KPolygon getExteriorPolygon() {
@@ -186,7 +186,7 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		return contains(p.getX(), p.getY());
 	}
 	public boolean contains(KPoint p){
-		return contains(p.x, p.y);
+		return contains(p.x, p.z);
 	}
 	public boolean contains(double x, double y){
 		if (getExteriorPolygon().contains(x, y) == true){
@@ -196,9 +196,9 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 				KPoint pointIBefore = (points.size() != 0 ? points.get(points.size() - 1) : null);
 				for (int i = 0; i < points.size(); i++) {
 					KPoint pointI = points.get(i);
-					if (((pointIBefore.y <= y && y < pointI.y)
-							|| (pointI.y <= y && y < pointIBefore.y))
-							&& x < ((pointI.x - pointIBefore.x)/(pointI.y - pointIBefore.y)*(y - pointIBefore.y) + pointIBefore.x)) {
+					if (((pointIBefore.z <= y && y < pointI.z)
+							|| (pointI.z <= y && y < pointIBefore.z))
+							&& x < ((pointI.x - pointIBefore.x)/(pointI.z - pointIBefore.z)*(y - pointIBefore.z) + pointIBefore.x)) {
 						crossings++;
 					}
 					pointIBefore = pointI;
@@ -280,11 +280,11 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 				if (affine != null){
 					float[] singlePointSetFloat = new float[2];
 					singlePointSetFloat[0] = (float)currentPoint.x;
-					singlePointSetFloat[1] = (float)currentPoint.y;
+					singlePointSetFloat[1] = (float)currentPoint.z;
 					affine.transform(singlePointSetFloat, 0, coords, 0, 1);
 				} else{
 					coords[0] = (float)currentPoint.x;
-					coords[1] = (float)currentPoint.y;
+					coords[1] = (float)currentPoint.z;
 				}
 			}
 			return type;
@@ -295,11 +295,11 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
 					singlePointSetDouble[0] = currentPoint.x;
-					singlePointSetDouble[1] = currentPoint.y;
+					singlePointSetDouble[1] = currentPoint.z;
 					affine.transform(singlePointSetDouble, 0, coords, 0, 1);
 				} else{
 					coords[0] = currentPoint.x;
-					coords[1] = currentPoint.y;
+					coords[1] = currentPoint.z;
 				}
 			}
 			return type;

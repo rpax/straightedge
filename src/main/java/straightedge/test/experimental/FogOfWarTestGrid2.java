@@ -189,7 +189,7 @@ public class FogOfWarTestGrid2 {
 					MouseEvent e = (MouseEvent)awtEvent;
 					if (e.getID() == MouseEvent.MOUSE_MOVED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.y = e.getY();
+						lastMouseMovePoint.z = e.getY();
 					}
 				}else if (awtEvent instanceof ComponentEvent){
 					ComponentEvent e = (ComponentEvent)awtEvent;
@@ -211,7 +211,7 @@ public class FogOfWarTestGrid2 {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
+		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
 		performanceCache.boundaryPolygon.translateTo(performanceCache.eye);
 		visionFinder.calc(performanceCache, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), occluders);
 		visiblePolygon = performanceCache.visiblePolygon;
@@ -249,8 +249,8 @@ public class FogOfWarTestGrid2 {
 			KPoint botLeft = cells[0][0].getPoint();//new KPoint(0,0);
 			double leftColIndex = ((c.x - r) - botLeft.x)/cellWidthAndHeight;
 			double rightColIndex = ((c.x + r) - botLeft.x)/cellWidthAndHeight;
-			double botRowIndex = ((c.y - r) - botLeft.y)/cellWidthAndHeight;
-			double topRowIndex = ((c.y + r) - botLeft.y)/cellWidthAndHeight;
+			double botRowIndex = ((c.z - r) - botLeft.z)/cellWidthAndHeight;
+			double topRowIndex = ((c.z + r) - botLeft.z)/cellWidthAndHeight;
 			//System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex);
 			if (botRowIndex < 0){
 				botRowIndex = 0;
@@ -361,7 +361,7 @@ public class FogOfWarTestGrid2 {
 							}
 							KPoint p = cell.getPoint();
 							int r = (int)(cellWidthAndHeight/2f);
-							g.fill(new Ellipse2D.Double(p.x - r, p.y - r, 2*r, 2*r));
+							g.fill(new Ellipse2D.Double(p.x - r, p.z - r, 2*r, 2*r));
 							//g.fillRect((int)(p.x - r), (int)(p.y - r), 2*r, 2*r);
 						}
 					}
@@ -370,7 +370,7 @@ public class FogOfWarTestGrid2 {
 
 			g.setColor(Color.MAGENTA);
 			float r = 1f;
-			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.y - r, 2*r, 2*r));
+			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.z - r, 2*r, 2*r));
 
 			g.setColor(Color.BLACK);
 			g.fillRect(0, 0, 80, 30);

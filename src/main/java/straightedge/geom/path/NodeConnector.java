@@ -570,7 +570,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 
 	protected int getYIndicator(KPoint p, KPolygon poly){
 		int yIndicator;
-		double relY = poly.getCenter().y - p.getY();
+		double relY = poly.getCenter().z - p.getY();
 		if (relY - poly.getRadius() > 0){
 			yIndicator = 1;
 		}else if (relY + poly.getRadius() < 0){
@@ -922,16 +922,16 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 
 			//double p2MinusToP2RCCW = p.c(p2Minus, p2);
 			double p2LessP2MinusX = p2.x - p2Minus.x;
-			double p2LessP2MinusY = p2.y - p2Minus.y;
+			double p2LessP2MinusY = p2.z - p2Minus.z;
 			double pLessP2MinusX = p.x - p2Minus.x;
-			double pLessP2MinusY = p.y - p2Minus.y;
+			double pLessP2MinusY = p.z - p2Minus.z;
 			double p2MinusToP2RCCW = pLessP2MinusY * p2LessP2MinusX - pLessP2MinusX * p2LessP2MinusY;
 
 			//double p2ToP2PlusRCCW = p.c(p2, p2Plus);
 			double pLessP2X = p.x - p2.x;
-			double pLessP2Y = p.y - p2.y;
+			double pLessP2Y = p.z - p2.z;
 			double p2PlusLessP2X = p2Plus.x - p2.x;
-			double p2PlusLessP2Y = p2Plus.y - p2.y;
+			double p2PlusLessP2Y = p2Plus.z - p2.z;
 			double p2ToP2PlusRCCW = pLessP2Y * p2PlusLessP2X - pLessP2X * p2PlusLessP2Y;
 
 			if (p2MinusToP2RCCW * p2ToP2PlusRCCW > 0){

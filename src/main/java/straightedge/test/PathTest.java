@@ -125,7 +125,7 @@ public class PathTest {
 
 				g.setColor(Color.RED);
 				double r = 5;
-				g.fill(new Ellipse2D.Double(player.pos.x - r, player.pos.y - r, 2*r, 2*r));
+				g.fill(new Ellipse2D.Double(player.pos.x - r, player.pos.z - r, 2*r, 2*r));
 			}
 		};
 
@@ -133,7 +133,7 @@ public class PathTest {
 		renderComponent.addMouseMotionListener(new MouseMotionAdapter(){
 			public void mouseMoved(MouseEvent e){
 				lastMouseMovePoint.x = e.getX();
-				lastMouseMovePoint.y = e.getY();
+				lastMouseMovePoint.z = e.getY();
 			}
 		});
 		frame.setVisible(true);
@@ -184,12 +184,12 @@ public class PathTest {
 				currentTargetPoint = pathPoints.get(i);
 				KPoint oldPos = new KPoint();
 				oldPos.x = pos.x;
-				oldPos.y = pos.y;
-				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
+				oldPos.z = pos.z;
+				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.z, pos.x, pos.z);
 				double timeUntilTargetReached = distUntilTargetReached/speed;
 				assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 				double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
-				double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
+				double yCoordToWorkOutAngle = currentTargetPoint.z - pos.z;
 				if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
 					double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 					moveAngle = (float)dirAngle;
@@ -201,7 +201,7 @@ public class PathTest {
 				}
 				if (secondsLeft >= timeUntilTargetReached){
 					pos.x = currentTargetPoint.x;
-					pos.y = currentTargetPoint.y;
+					pos.z = currentTargetPoint.z;
 					speedX = 0f;
 					speedY = 0f;
 					secondsLeft -= timeUntilTargetReached;
@@ -211,7 +211,7 @@ public class PathTest {
 					i--;
 				}else{
 					pos.x = (float)(oldPos.x + secondsLeft * speedX);
-					pos.y = (float)(oldPos.y + secondsLeft * speedY);
+					pos.z = (float)(oldPos.z + secondsLeft * speedY);
 					secondsLeft = 0;
 					break;
 				}
@@ -232,7 +232,7 @@ public class PathTest {
 						KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
 						if (p != null){
 							movedPoint.x = p.x;
-							movedPoint.y = p.y;
+							movedPoint.z = p.z;
 						}
 						assert point != null;
 					}

@@ -198,7 +198,7 @@ public class FogOfWarTest {
 					MouseEvent e = (MouseEvent)awtEvent;
 					if (e.getID() == MouseEvent.MOUSE_MOVED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.y = e.getY();
+						lastMouseMovePoint.z = e.getY();
 					}
 				}else if (awtEvent instanceof ComponentEvent){
 					ComponentEvent e = (ComponentEvent)awtEvent;
@@ -220,7 +220,7 @@ public class FogOfWarTest {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
+		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
 		performanceCache.boundaryPolygon.translateTo(performanceCache.eye);
 		visionFinder.calc(performanceCache, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), occluders);
 		visiblePolygon = performanceCache.visiblePolygon;
@@ -316,7 +316,7 @@ public class FogOfWarTest {
 
 			g.setColor(Color.MAGENTA);
 			float r = 1f;
-			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.y - r, 2*r, 2*r));
+			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.z - r, 2*r, 2*r));
 
 			g.setColor(Color.BLACK);
 			g.fillRect(0, 0, 80, 30);

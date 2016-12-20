@@ -142,7 +142,7 @@ public class World {
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			//poly.translate(20 + (float)random.nextFloat()*aabb.getWidth(), 20 + (float)random.nextFloat()*aabb.getHeight());
-			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
+			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.z + random.nextFloat()*innerAABB.getHeight());
 			poly.translateTo(p);
 			polygons.add(poly);
 		}
@@ -269,9 +269,9 @@ public class World {
 		KPoint topRight = this.obstaclesAABB.getTopRight();
 		double worldEdgeDistance = 1000;
 		AABB worldBounds = AABB.createFromDiagonal(botLeft.x - worldEdgeDistance,
-											botLeft.y - worldEdgeDistance,
+											botLeft.z - worldEdgeDistance,
 											topRight.x + worldEdgeDistance,
-											topRight.y + worldEdgeDistance);
+											topRight.z + worldEdgeDistance);
 		for (int i = 0; i < bullets.size(); i++){
 			Bullet bullet = bullets.get(i);
 			bullet.doMove(seconds, startTime);
@@ -354,7 +354,7 @@ public class World {
 					KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
 					if (p != null){
 						movedPoint.x = p.x;
-						movedPoint.y = p.y;
+						movedPoint.z = p.z;
 					}
 					assert point != null;
 				}
