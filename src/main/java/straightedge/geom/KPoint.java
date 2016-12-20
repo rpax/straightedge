@@ -57,11 +57,11 @@ public class KPoint{
 		this.x = x;
 	}
 
-	public double getY() {
+	public double getZ() {
 		return z;
 	}
 
-	public void setY(double y) {
+	public void setZ(double y) {
 		this.z = y;
 	}
 

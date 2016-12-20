@@ -249,7 +249,7 @@ public class View {
 					for (int j = 0; j < allObstacles.get(i).getNodes().size(); j++) {
 						KNode currentNode = allObstacles.get(i).getNodes().get(j);
 						for (KNode n : currentNode.getConnectedNodes()) {
-							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getY()));
+							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getZ()));
 						}
 					}
 				}
@@ -257,11 +257,11 @@ public class View {
 				g.setColor(Color.BLUE);
 				KPoint startPoint = pathFinder.startPointDebug;
 				for (KNode n : pathFinder.startNodeTempReachableNodesDebug) {
-					g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getY()));
+					g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
 				}
 				KPoint endPoint = pathFinder.endPointDebug;
 				for (KNode n : pathFinder.endNodeTempReachableNodesDebug) {
-					g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getY()));
+					g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
 				}
 			}else{
 				player.targetFinder.pathFinder.debug = false;
@@ -279,15 +279,15 @@ public class View {
 					KPoint currentPoint = p.getPos();
 					for (int j = 0; j < points.size(); j++) {
 						KPoint nextPoint = points.get(j);
-						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
+						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
 						float d = 5f;
-						g.draw(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
+						g.draw(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
 						currentPoint = nextPoint;
 					}
 				}
 				KPoint targetPoint = p.targetFinder.getAbsoluteTarget();
 				float d = 7f;
-				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getY() - d / 2f, d, d));
+				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getZ() - d / 2f, d, d));
 			}
 			g.setColor(Color.PINK.darker());
 			for (int i = 0; i < enemies.size(); i++){
@@ -297,15 +297,15 @@ public class View {
 					KPoint currentPoint = p.getPos();
 					for (int j = 0; j < points.size(); j++) {
 						KPoint nextPoint = points.get(j);
-						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
+						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
 						float d = 5f;
-						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
+						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
 						currentPoint = nextPoint;
 					}
 				}
 				KPoint targetPoint = p.targetFinder.getAbsoluteTarget();
 				float d = 7f;
-				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getY() - d / 2f, d, d));
+				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getZ() - d / 2f, d, d));
 			}
 
 			{
@@ -701,7 +701,7 @@ public class View {
 	}
 	public double getWorldCoordFromViewPaneCoordY(double y){
 		Player player = main.world.player;
-		double my = ((y - viewCenterInScreenCoords.z) / scaleFactor + player.getPos().getY());
+		double my = ((y - viewCenterInScreenCoords.z) / scaleFactor + player.getPos().getZ());
 		return my;
 	}
 	public KPoint getWorldPointFromViewPanePoint(KPoint viewPanePoint){
@@ -715,7 +715,7 @@ public class View {
 	}
 	public double getViewPaneCoordFromWorldCoordY(double y){
 		Player player = main.world.player;
-		double my = (y - player.getPos().getY())*scaleFactor + viewCenterInScreenCoords.z;
+		double my = (y - player.getPos().getZ())*scaleFactor + viewCenterInScreenCoords.z;
 		return my;
 	}
 	public KPoint getViewPanePointFromWorldPoint(KPoint viewPanePoint){

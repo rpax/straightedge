@@ -129,7 +129,7 @@ public class ViewPane extends JComponent {
 		float scaledHeight = getHeight() / scaleFactor;
 
 		double playerViewX = getPlayer().getPos().getX();
-		double playerViewY = getPlayer().getPos().getY();
+		double playerViewY = getPlayer().getPos().getZ();
 
 		viewRectInWorldCoords.x = (float) (playerViewX - scaledWidth / 2f - xOffset / scaleFactor);
 		viewRectInWorldCoords.y = (float) (playerViewY - scaledHeight / 2f - yOffset / scaleFactor);
@@ -298,9 +298,9 @@ public class ViewPane extends JComponent {
 			KPoint currentPoint = p.getPos();
 			for (int j = 0; j < p.getPathPoints().size(); j++) {
 				KPoint nextPoint = p.getPathPoints().get(j);
-				g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
+				g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
 				float d = 5f;
-				g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
+				g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
 				currentPoint = nextPoint;
 			}
 			//int numNodes = getPathNodes().size();
@@ -343,7 +343,7 @@ public class ViewPane extends JComponent {
 		g.setStroke(oldStroke);
 //		g.setColor(Color.WHITE.darker());
 		g.setColor(Color.MAGENTA.darker());
-		g.translate(p.pos.getX(), p.pos.getY());
+		g.translate(p.pos.getX(), p.pos.getZ());
 		g.rotate(p.getLookAngle());
 		g.fill(p.polygon);
 		g.setColor(Color.YELLOW);
@@ -367,7 +367,7 @@ public class ViewPane extends JComponent {
 					for (int j = 0; j < obstacles.get(i).getNodes().size(); j++) {
 						KNode currentNode = obstacles.get(i).getNodes().get(j);
 						for (KNode n : currentNode.getConnectedNodes()) {
-							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getY()));
+							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getZ()));
 						}
 					}
 				}
@@ -377,11 +377,11 @@ public class ViewPane extends JComponent {
 			g.setColor(Color.BLUE);
 			KPoint startPoint = p.getPathFinder().startPointDebug;
 			for (KNode n : p.getPathFinder().startNodeTempReachableNodesDebug) {
-				g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getY()));
+				g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
 			}
 			KPoint endPoint = p.getPathFinder().endPointDebug;
 			for (KNode n : p.getPathFinder().endNodeTempReachableNodesDebug) {
-				g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getY()));
+				g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
 			}
 
 //			// draw the node numbers

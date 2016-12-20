@@ -570,7 +570,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 
 	protected int getYIndicator(KPoint p, KPolygon poly){
 		int yIndicator;
-		double relY = poly.getCenter().z - p.getY();
+		double relY = poly.getCenter().z - p.getZ();
 		if (relY - poly.getRadius() > 0){
 			yIndicator = 1;
 		}else if (relY + poly.getRadius() < 0){

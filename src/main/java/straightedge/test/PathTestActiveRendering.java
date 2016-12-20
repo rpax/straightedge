@@ -388,9 +388,9 @@ public class PathTestActiveRendering {
 				KPoint currentPoint = player.pos;
 				for (int j = 0; j < player.pathData.points.size(); j++) {
 					KPoint nextPoint = player.pathData.points.get(j);
-					g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
+					g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
 					float d = 5f;
-					g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
+					g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
 					currentPoint = nextPoint;
 				}
 			}

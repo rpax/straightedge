@@ -632,7 +632,7 @@ public class VisionFinder {
 
 	protected int getYIndicator(KPolygon poly, KPoint p2){
 		int yIndicator;
-		double relY = poly.getCenter().z - p2.getY();
+		double relY = poly.getCenter().z - p2.getZ();
 		if (relY - poly.getRadius() > 0){
 			yIndicator = 1;
 		}else if (relY + poly.getRadius() < 0){
