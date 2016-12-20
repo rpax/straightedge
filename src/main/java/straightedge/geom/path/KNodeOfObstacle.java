@@ -33,6 +33,8 @@ package straightedge.geom.path;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  *
  * @author Keith Woodward
@@ -52,7 +54,7 @@ public class KNodeOfObstacle extends KNode{
 	public KNodeOfObstacle(){
 	}
 	public KNodeOfObstacle(PathBlockingObstacle obstacle, int pointNum){
-		super(obstacle.getOuterPolygon().getPoint(pointNum).copy());
+		super(obstacle.getOuterPolygon().getPoint(pointNum).clone());
 		this.obstacle = obstacle;
 		this.pointNum = pointNum;
 		calcConcave();
@@ -79,17 +81,17 @@ public class KNodeOfObstacle extends KNode{
 		KPolygon polygon = obstacle.getOuterPolygon();
 		int pointBeforeNum = (pointNum-1 < 0 ? polygon.getPoints().size()-1 : pointNum-1);
 		int pointAfterNum = (pointNum+1 >= polygon.getPoints().size() ? 0 : pointNum+1);
-		KPoint pointBefore = polygon.getPoint(pointBeforeNum);
-		KPoint pointAfter = polygon.getPoint(pointAfterNum);
+		Vector2f pointBefore = polygon.getPoint(pointBeforeNum);
+		Vector2f pointAfter = polygon.getPoint(pointAfterNum);
 		if (polygon.isCounterClockWise()){
-			if (point.relCCW(pointBefore, pointAfter) > 0){
+			if (Vector2fUtils.relCCW(pointBefore, pointAfter,point.x,point.y) > 0){
 				concave = true;
 			}else{
 				concave = false;
 			}
 
 		}else{
-			if (point.relCCW(pointBefore, pointAfter) < 0){
+			if (Vector2fUtils.relCCW(pointBefore, pointAfter,point.x,point.y) < 0){
 				concave = true;
 			}else{
 				concave = false;

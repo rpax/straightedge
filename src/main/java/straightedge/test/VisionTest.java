@@ -5,13 +5,26 @@
 
 package straightedge.test;
 
-import straightedge.geom.*;
-import straightedge.geom.vision.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.vision.OccluderImpl;
+import straightedge.geom.vision.VisionData;
+import straightedge.geom.vision.VisionFinder;
 
 /**
  * A simple demo of field-of-vision calculation.
@@ -28,10 +41,10 @@ public class VisionTest {
 
 	VisionFinder visionFinder;
 	VisionData visionData = null;
-	double smallAmount = 0.0001;
+	float smallAmount = 0.0001f;
 
 	ArrayList<OccluderImpl> occluders;
-	KPoint lastMouseMovePoint = new KPoint(100, 100);
+	Vector2f lastMouseMovePoint = new Vector2f(100, 100);
 
 	public VisionTest(){
 		// Make the window
@@ -44,7 +57,7 @@ public class VisionTest {
 		occluders = new ArrayList<OccluderImpl>();
 		float pillarH = 20;
 		float pillarW = 5;
-		KPoint centerOfSpiral = new KPoint(250, 250);
+		Vector2f centerOfSpiral = new Vector2f(250, 250);
 		int numPillars = 40;
 		double angleIncrement = Math.PI*2f/(numPillars);
 		float rBig = 150;
@@ -52,7 +65,7 @@ public class VisionTest {
 		for (int k = 0; k < numPillars; k++){
 			double x = rBig*Math.cos(currentAngle);
 			double y = rBig*Math.sin(currentAngle);
-			KPoint center = new KPoint((float)x, (float)y);
+			Vector2f center = new Vector2f((float)x, (float)y);
 			KPolygon poly = KPolygon.createRectOblique(0,0, pillarH,0, pillarW);
 			poly.rotate((float)currentAngle);
 			poly.translateTo(center);
@@ -67,7 +80,7 @@ public class VisionTest {
 		KPolygon boundaryPolygon = KPolygon.createRegularPolygon(numPoints, radius);
 		// Make the eye which is like the light-source
 		// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-		KPoint eye = new KPoint(smallAmount, smallAmount);
+		Vector2f eye = new Vector2f(smallAmount, smallAmount);
 		// The VisionData just contains the eye and boundary polygon,
 		// and also the results of the VisionFinder calculations.
 		visionData = new VisionData(eye, boundaryPolygon);
@@ -78,7 +91,7 @@ public class VisionTest {
 				// Move the eye and boundaryPolygon to wherever they need to be.
 				// By making the eye slightly offset from its integer coordinate by smallAmount,
 				// it will prevent problems caused by collinearity.
-				visionData.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
+				visionData.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
 				visionData.boundaryPolygon.translateTo(visionData.eye);
 				visionFinder.calc(visionData, occluders);
 				/* Note that the above line is the slow way to calculate the visiblePolygon since the

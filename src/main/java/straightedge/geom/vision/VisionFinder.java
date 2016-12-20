@@ -34,6 +34,8 @@ import straightedge.geom.*;
 import straightedge.geom.util.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 
 /**
  *
@@ -44,24 +46,24 @@ public class VisionFinder {
 	public ArrayList<VPOccluderOccluderIntersection> occluderIntersectionPoints = new ArrayList<VPOccluderOccluderIntersection>();
 	public ArrayList<VPOccluderBoundaryIntersection> boundaryOccluderIntersectionPoints = new ArrayList<VPOccluderBoundaryIntersection>();
 
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, List<? extends Occluder> allOccluders){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, List<? extends Occluder> allOccluders){
 		return calc(eye, boundaryPolygon, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), allOccluders);
 	}
 	public VisionData calc(VisionData cache, List<? extends Occluder> allOccluders){
 		return calc(cache, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), allOccluders);
 	}
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections, ArrayList<? extends Occluder> movingOccluders){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections, ArrayList<? extends Occluder> movingOccluders){
 		List<? extends Occluder> fixedOccluders = fixedOccludersTileArrayIntersections.getAllWithin(boundaryPolygon.getCenter(), boundaryPolygon.getRadius());
 		List<VPOccluderOccluderIntersection> fixedOccludersIntersectionPoints = fixedOccludersTileArrayIntersections.getIntersectionsWithinAtLeast(boundaryPolygon.getCenter(), boundaryPolygon.getRadius());
 		return calc(eye, boundaryPolygon, fixedOccluders, fixedOccludersIntersectionPoints, movingOccluders);
 	}
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, TileBagIntersections<? extends Occluder> fixedOccludersTileBagIntersections, ArrayList<? extends Occluder> movingOccluders){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, TileBagIntersections<? extends Occluder> fixedOccludersTileBagIntersections, ArrayList<? extends Occluder> movingOccluders){
 		return calc(eye, boundaryPolygon, fixedOccludersTileBagIntersections.getTileArray(), movingOccluders);
 	}
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, TileBagIntersections<? extends Occluder> fixedOccludersTileBagIntersections){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, TileBagIntersections<? extends Occluder> fixedOccludersTileBagIntersections){
 		return calc(eye, boundaryPolygon, fixedOccludersTileBagIntersections.getTileArray(), new ArrayList<Occluder>(0));
 	}
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections){
 		return calc(eye, boundaryPolygon, fixedOccludersTileArrayIntersections, new ArrayList<Occluder>(0));
 	}
 	public VisionData calc(VisionData cache, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections, List<? extends Occluder> movingOccluders){
@@ -79,7 +81,7 @@ public class VisionFinder {
 	public VisionData calc(VisionData cache, TileArrayIntersections<? extends Occluder> fixedOccludersTileArrayIntersections){
 		return calc(cache, fixedOccludersTileArrayIntersections, new ArrayList<Occluder>(0));
 	}
-	public VisionData calc(KPoint eye, KPolygon boundaryPolygon, List<? extends Occluder> fixedOccluders, List<VPOccluderOccluderIntersection> fixedOccludersIntersectionPoints, List<? extends Occluder> movingOccluders){
+	public VisionData calc(Vector2f eye, KPolygon boundaryPolygon, List<? extends Occluder> fixedOccluders, List<VPOccluderOccluderIntersection> fixedOccludersIntersectionPoints, List<? extends Occluder> movingOccluders){
 		VisionData cache = new VisionData(eye, boundaryPolygon);
 		return calc(cache, fixedOccluders, fixedOccludersIntersectionPoints, movingOccluders);
 	}
@@ -89,7 +91,7 @@ public class VisionFinder {
 //		codeTimer.setEnabled(true);
 //	}
 	public VisionData calc(VisionData cache, List<? extends Occluder> fixedOccluders, List<VPOccluderOccluderIntersection> fixedOccludersIntersectionPoints, List<? extends Occluder> movingOccluders){
-		KPoint eye = cache.eye;
+		Vector2f eye = cache.eye;
 		KPolygon boundaryPolygon = cache.boundaryPolygon;
 		cache.visiblePoints = null;
 		cache.visiblePolygon = null;
@@ -102,7 +104,7 @@ public class VisionFinder {
 		//double[] boundaryPolygonPointAngles = cache.boundaryPolygonPointAngles;
 		//double boundaryPolygonRotationAroundEye = cache.getBoundaryPolygonRotationAroundEye();
 
-		ArrayList<KPoint> boundaryPolygonPoints = boundaryPolygon.getPoints();
+		ArrayList<Vector2f> boundaryPolygonPoints = boundaryPolygon.getPoints();
 		ArrayList<VisiblePoint> visiblePoints = new ArrayList<VisiblePoint>(boundaryPolygonPoints.size());	// size is likely to be boundaryPolygon.size() or more.
 //		codeTimer.click("polygonAndDists clear");
 		polygonAndDists.clear();
@@ -152,12 +154,12 @@ public class VisionFinder {
 				continue;
 			}
 			KPolygon polygon = polygonAndDist.getPolygon();
-			ArrayList<KPoint> points = polygon.getPoints();
+			ArrayList<Vector2f> points = polygon.getPoints();
 			boolean allPointsInsideBoundaryPolygon = (polygonAndDist.getDistEyeToCenterLessRadius() + 2*polygon.getRadius()) < minEyeToBoundaryPolygonPointDist;
 			PointLoop:
 			for (int j = 0; j < points.size(); j++){
-				KPoint p = points.get(j);
-				double eyeToPDistSq = eye.distanceSq(p);
+				Vector2f p = points.get(j);
+				double eyeToPDistSq = eye.distanceSquared(p);
 				// Only add occluder points if they're inside the boundaryPolygon and they're unobstructed.
 				if (allPointsInsideBoundaryPolygon == false){
 					// The polygon points may not all be inside the boundaryPolygon so need to check that this point is using the contains method.
@@ -176,7 +178,7 @@ public class VisionFinder {
 					if (j == m || j == nextM){
 						continue;
 					}
-					if (KPoint.linesIntersect(p, eye, points.get(m), points.get(nextM))){
+					if (Vector2fUtils.linesIntersect(p, eye, points.get(m), points.get(nextM))){
 						continue PointLoop;
 					}
 				}
@@ -219,9 +221,9 @@ public class VisionFinder {
 		boundaryOccluderIntersectionPoints.clear();
 		{
 			for (int j = 0; j < boundaryPolygonPoints.size(); j++){
-				KPoint p = boundaryPolygonPoints.get(j);
+				Vector2f p = boundaryPolygonPoints.get(j);
 				int jPlus = (j+1 >= boundaryPolygonPoints.size() ? 0 : j+1);
-				KPoint p2 = boundaryPolygonPoints.get(jPlus);
+				Vector2f p2 = boundaryPolygonPoints.get(jPlus);
 
 				int xIndicator = getXIndicator(p, p2, eye);
 				int yIndicator = getYIndicator(p, p2, eye);
@@ -237,13 +239,13 @@ public class VisionFinder {
 						// intersection is not possible, so skip to next occluder.
 						continue;
 					}
-					ArrayList<KPoint> points = polygon.getPoints();
+					ArrayList<Vector2f> points = polygon.getPoints();
 					for (int i = 0; i < points.size(); i++){
 						int nextI = (i+1 >= points.size() ? 0 : i+1);
-						KPoint p3 = points.get(i);
-						KPoint p4 = points.get(nextI);
-						if (KPoint.linesIntersect(p, p2, p3, p4)){
-							KPoint intersection = KPoint.getLineLineIntersection(p, p2, p3, p4);
+						Vector2f p3 = points.get(i);
+						Vector2f p4 = points.get(nextI);
+						if (Vector2fUtils.linesIntersect(p, p2, p3, p4)){
+							Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, p2, p3, p4);
 							if (intersection != null){
 								boundaryOccluderIntersectionPoints.add(new VPOccluderBoundaryIntersection(intersection, polygonAndDist.getOccluder(), i));
 							}
@@ -257,22 +259,22 @@ public class VisionFinder {
 		OuterLoop:
 		for (int j = 0; j < boundaryOccluderIntersectionPoints.size(); j++){
 			VPOccluderBoundaryIntersection visiblePoint = boundaryOccluderIntersectionPoints.get(j);
-			KPoint p = visiblePoint.getPoint();
+			Vector2f p = visiblePoint.getPoint();
 			// see if the occluder that makes this visiblePoint intersection occludes this point from the eye.
-			ArrayList<KPoint> points = visiblePoint.getPolygon().getPoints();
+			ArrayList<Vector2f> points = visiblePoint.getPolygon().getPoints();
 			for (int m = 0; m < points.size(); m++){
 				int nextM = (m+1 >= points.size() ? 0 : m+1);
 				if (visiblePoint.getPolygonPointNum() == m){
 					continue;
 				}
-				if (KPoint.linesIntersect(p, eye, points.get(m), points.get(nextM))){
+				if (Vector2fUtils.linesIntersect(p, eye, points.get(m), points.get(nextM))){
 					continue OuterLoop;
 				}
 			}
 			int xIndicator = getXIndicator(p, eye);
 			int yIndicator = getYIndicator(p, eye);
 			// see if any other occluders cause an obstruction
-			double eyeToPDistSq = eye.distanceSq(p);
+			double eyeToPDistSq = eye.distanceSquared(p);
 			for (int k = 0; k < polygonAndDists.size(); k++){
 				OccluderDistAndQuad polygonAndDist2 = polygonAndDists.get(k);
 				KPolygon polygon2 = polygonAndDists.get(k).getPolygon();
@@ -303,9 +305,9 @@ public class VisionFinder {
 				continue;
 			}
 			for (int j = 0; j < polygon.getPoints().size(); j++){
-				KPoint p = polygon.getPoints().get(j);
+				Vector2f p = polygon.getPoints().get(j);
 				int jPlus = (j+1 >= polygon.getPoints().size() ? 0 : j+1);
-				KPoint p2 = polygon.getPoints().get(jPlus);
+				Vector2f p2 = polygon.getPoints().get(jPlus);
 				// first intersect with other movingPolygons
 				for (int k = i+1; k < movingOccluders.size(); k++){
 					Occluder occluder2 = movingOccluders.get(k);
@@ -314,11 +316,11 @@ public class VisionFinder {
 						// intersection is not possible, so skip to next occluder.
 						continue;
 					}
-					ArrayList<KPoint> points = polygon2.getPoints();
+					ArrayList<Vector2f> points = polygon2.getPoints();
 					for (int m = 0; m < points.size(); m++){
 						int nextM = (m+1 >= points.size() ? 0 : m+1);
-						if (KPoint.linesIntersect(p, p2, points.get(m),points.get(nextM))){
-							KPoint intersection = KPoint.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
+						if (Vector2fUtils.linesIntersect(p, p2, points.get(m),points.get(nextM))){
+							Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
 							if (intersection != null){
 								occluderIntersectionPoints.add(new VPOccluderOccluderIntersection(intersection, occluder, j, occluder2, m));
 							}
@@ -333,11 +335,11 @@ public class VisionFinder {
 						// intersection is not possible, so skip to next occluder.
 						continue;
 					}
-					ArrayList<KPoint> points = polygon2.getPoints();
+					ArrayList<Vector2f> points = polygon2.getPoints();
 					for (int m = 0; m < points.size(); m++){
 						int nextM = (m+1 >= points.size() ? 0 : m+1);
-						if (KPoint.linesIntersect(p, p2, points.get(m),points.get(nextM))){
-							KPoint intersection = KPoint.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
+						if (Vector2fUtils.linesIntersect(p, p2, points.get(m),points.get(nextM))){
+							Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
 							if (intersection != null){
 								occluderIntersectionPoints.add(new VPOccluderOccluderIntersection(intersection, occluder, j, occluder2, m));
 							}
@@ -351,9 +353,9 @@ public class VisionFinder {
 		OuterLoop:
 		for (int j = 0; j < occluderIntersectionPoints.size(); j++){
 			VPOccluderOccluderIntersection visiblePoint = occluderIntersectionPoints.get(j);
-			KPoint p = visiblePoint.getPoint();
+			Vector2f p = visiblePoint.getPoint();
 			// it's not guaranteed that the occluder intersection points are actually inside the boundaryPolygon so must check this.
-			double eyeToPDistSq = eye.distanceSq(p);
+			double eyeToPDistSq = eye.distanceSquared(p);
 			if (eyeToPDistSq > maxEyeToBoundaryPolygonPointDistSq){
 				continue;
 			}else if (eyeToPDistSq >= minEyeToBoundaryPolygonPointDistSq){
@@ -367,24 +369,24 @@ public class VisionFinder {
 				OccluderDistAndQuad polygonAndDist = polygonAndDists.get(k);
 				KPolygon polygon = polygonAndDist.getPolygon();
 				if (visiblePoint.getPolygon() == polygon){
-					ArrayList<KPoint> points = polygon.getPoints();
+					ArrayList<Vector2f> points = polygon.getPoints();
 					for (int m = 0; m < points.size(); m++){
 						int nextM = (m+1 >= points.size() ? 0 : m+1);
 						if (visiblePoint.getPolygonPointNum() == m){
 							continue;
 						}
-						if (KPoint.linesIntersect(p, eye, points.get(m), points.get(nextM))){
+						if (Vector2fUtils.linesIntersect(p, eye, points.get(m), points.get(nextM))){
 							continue OuterLoop;
 						}
 					}
 				}else if (visiblePoint.getPolygon2() == polygon){
-					ArrayList<KPoint> points = polygon.getPoints();
+					ArrayList<Vector2f> points = polygon.getPoints();
 					for (int m = 0; m < points.size(); m++){
 						int nextM = (m+1 >= points.size() ? 0 : m+1);
 						if (visiblePoint.getPolygonPointNum2() == m){
 							continue;
 						}
-						if (KPoint.linesIntersect(p, eye, points.get(m), points.get(nextM))){
+						if (Vector2fUtils.linesIntersect(p, eye, points.get(m), points.get(nextM))){
 							continue OuterLoop;
 						}
 					}
@@ -408,7 +410,7 @@ public class VisionFinder {
 		// Add all points on the boundaryPolygon if they're unobstructed.
 		OuterLoop:
 		for (int j = 0; j < boundaryPolygonPoints.size(); j++){
-			KPoint p = boundaryPolygonPoints.get(j);
+			Vector2f p = boundaryPolygonPoints.get(j);
 			int xIndicator = getXIndicator(p, eye);
 			int yIndicator = getYIndicator(p, eye);
 			for (int k = 0; k < polygonAndDists.size(); k++){
@@ -436,19 +438,19 @@ public class VisionFinder {
 			if (visiblePoints.get(j).getType() == VisiblePoint.OCCLUDER){
 				// see if the the points on the polygon on either side of this one are on the same side so a shadow can be cast
 				VPOccluder sp = (VPOccluder)visiblePoints.get(j);
-				KPoint p = sp.getPoint();
+				Vector2f p = sp.getPoint();
 				KPolygon polygon = sp.getPolygon();
 				int pNum = sp.getPolygonPointNum();
 				int pNumPlus = (pNum+1 >= polygon.getPoints().size() ? 0 : pNum+1);
-				KPoint pPlus = polygon.getPoints().get(pNumPlus);
+				Vector2f pPlus = polygon.getPoints().get(pNumPlus);
 				int pNumMinus = (pNum-1 < 0 ? polygon.getPoints().size()-1 : pNum-1);
-				KPoint pMinus = polygon.getPoints().get(pNumMinus);
-				int pPlusRCCW = pPlus.relCCW(eye, p);
-				int pMinusRCCW = pMinus.relCCW(eye, p);
+				Vector2f pMinus = polygon.getPoints().get(pNumMinus);
+				int pPlusRCCW = Vector2fUtils.relCCW(eye, p,pPlus.x,pPlus.y);
+				int pMinusRCCW = Vector2fUtils.relCCW(eye, p,pMinus.x,pMinus.y);
 				if (pPlusRCCW == pMinusRCCW){
 					double pToEyeDist = p.distance(eye);
-					KPoint endOfRayPoint = eye.createPointToward(p, pToEyeDist + boundaryPolygon.getRadius()*2);	//p.createPointFromAngle(angleRelativeToEye, getOriginalSightPolygon().getRadius()*2);
-					KPoint closestIntersectionPoint = null;
+					Vector2f endOfRayPoint = Vector2fUtils.createPointToward(eye,p, pToEyeDist + boundaryPolygon.getRadius()*2);	//p.createPointFromAngle(angleRelativeToEye, getOriginalSightPolygon().getRadius()*2);
+					Vector2f closestIntersectionPoint = null;
 					double closestDist = Double.MAX_VALUE;
 					Occluder closestOccluder = null;
 					int closestObstPolygonEdgeIndex = -1;
@@ -476,15 +478,15 @@ public class VisionFinder {
 							// intersection is not possible, so skip to next occluder.
 							continue;
 						}
-						ArrayList<KPoint> points = polygon2.getPoints();
+						ArrayList<Vector2f> points = polygon2.getPoints();
 						for (int m = 0; m < points.size(); m++){
 							int mPlus = (m+1 >= points.size() ? 0 : m+1);
 							if (polygon == polygon2 && (pNum == m || pNum == mPlus)){
 								continue;
 							}
 
-							if (KPoint.linesIntersect(p, endOfRayPoint, points.get(m), points.get(mPlus))){
-								KPoint intersection = KPoint.getLineLineIntersection(p, endOfRayPoint, points.get(m), points.get(mPlus));
+							if (Vector2fUtils.linesIntersect(p, endOfRayPoint, points.get(m), points.get(mPlus))){
+								Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, endOfRayPoint, points.get(m), points.get(mPlus));
 								if (intersection != null){
 									double dist = eye.distance(intersection);
 									if (dist < closestDist){
@@ -501,7 +503,7 @@ public class VisionFinder {
 					int closestBoundaryPolygonEdgeIndex = -1;
 					// also see if the closest intersection is with the boundaryPolygon
 					if (closestIntersectionPoint == null || closestDist > minEyeToBoundaryPolygonPointDist){
-						ArrayList<KPoint> points = boundaryPolygon.getPoints();
+						ArrayList<Vector2f> points = boundaryPolygon.getPoints();
 						for (int m = 0; m < points.size(); m++){
 							if (xIndicator*boundaryPolygonXIndicators[m] == -1 || yIndicator*boundaryPolygonYIndicators[m] == -1){
 								// intersection is not possible since the boundaryPolygon points and
@@ -509,9 +511,9 @@ public class VisionFinder {
 								continue;
 							}
 							int mPlus = (m+1 >= points.size() ? 0 : m+1);
-							if (KPoint.linesIntersect(p, endOfRayPoint, points.get(m), points.get(mPlus))){
+							if (Vector2fUtils.linesIntersect(p, endOfRayPoint, points.get(m), points.get(mPlus))){
 //								atLeastOneIntersection = true;
-								KPoint intersection = KPoint.getLineLineIntersection(p, endOfRayPoint, points.get(m), points.get(mPlus));
+								Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, endOfRayPoint, points.get(m), points.get(mPlus));
 								if (intersection != null){
 									double dist = eye.distance(intersection);
 									if (dist < closestDist){
@@ -603,9 +605,9 @@ public class VisionFinder {
 
 	public KPolygon createPolygonFromVisiblePoints(ArrayList<VisiblePoint> visiblePoints){
 		KPolygon visiblePolygon;
-		ArrayList<KPoint> pointList = new ArrayList<KPoint>(visiblePoints.size());
+		ArrayList<Vector2f> pointList = new ArrayList<Vector2f>(visiblePoints.size());
 		for (int i = 0; i < visiblePoints.size(); i++){
-			pointList.add(visiblePoints.get(i).getPoint().copy());
+			pointList.add(visiblePoints.get(i).getPoint().clone());
 		}
 		if (pointList.size() >= 3){
 			// should check that points do not make intersecting lines
@@ -617,7 +619,7 @@ public class VisionFinder {
 		return visiblePolygon;
 	}
 
-	protected int getXIndicator(KPolygon poly, KPoint p2){
+	protected int getXIndicator(KPolygon poly, Vector2f p2){
 		int xIndicator;
 		double relX = poly.getCenter().x - p2.getX();
 		if (relX - poly.getRadius() > 0){
@@ -630,7 +632,7 @@ public class VisionFinder {
 		return xIndicator;
 	}
 
-	protected int getYIndicator(KPolygon poly, KPoint p2){
+	protected int getYIndicator(KPolygon poly, Vector2f p2){
 		int yIndicator;
 		double relY = poly.getCenter().y - p2.getY();
 		if (relY - poly.getRadius() > 0){
@@ -643,7 +645,7 @@ public class VisionFinder {
 		return yIndicator;
 	}
 	// p2 is the eye
-	protected int getXIndicator(KPoint p0, KPoint p1, KPoint p2){
+	protected int getXIndicator(Vector2f p0, Vector2f p1, Vector2f p2){
 		int xIndicator;
 		double relX0 = p0.x - p2.x;
 		double relX1 = p1.x - p2.x;
@@ -656,7 +658,7 @@ public class VisionFinder {
 		}
 		return xIndicator;
 	}
-	protected int getYIndicator(KPoint p0, KPoint p1, KPoint p2){
+	protected int getYIndicator(Vector2f p0, Vector2f p1, Vector2f p2){
 		int yIndicator;
 		double relY0 = p0.y - p2.y;
 		double relY1 = p1.y - p2.y;
@@ -669,7 +671,7 @@ public class VisionFinder {
 		}
 		return yIndicator;
 	}
-	protected int getXIndicator(KPoint p, KPoint p2){
+	protected int getXIndicator(Vector2f p, Vector2f p2){
 		int xIndicator;
 		double relX = p.x - p2.x;
 		if (relX > 0){
@@ -682,7 +684,7 @@ public class VisionFinder {
 		return xIndicator;
 	}
 
-	protected int getYIndicator(KPoint p, KPoint p2){
+	protected int getYIndicator(Vector2f p, Vector2f p2){
 		int yIndicator;
 		double relY = p.y - p2.y;
 		if (relY > 0){

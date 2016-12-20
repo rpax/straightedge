@@ -33,9 +33,11 @@ package straightedge.geom.vision;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 public class VisionData{
 	// The inputs to the VisionFinder.calc method
-	public KPoint eye;
+	public Vector2f eye;
 	public KPolygon boundaryPolygon;
 
 	// The last calculated results of the VisionFinder.calc method
@@ -58,28 +60,28 @@ public class VisionData{
 	protected VisionData(){
 	}
 
-	public VisionData(KPoint eye, KPolygon boundaryPolygon){
+	public VisionData(Vector2f eye, KPolygon boundaryPolygon){
 		reset(eye, boundaryPolygon);
 	}
-	public void reset(KPoint eye, KPolygon boundaryPolygon){
+	public void reset(Vector2f eye, KPolygon boundaryPolygon){
 		this.eye = eye;
 		this.boundaryPolygon = boundaryPolygon;
 		visiblePoints = null;
 		visiblePolygon = null;
 
-		ArrayList<KPoint> boundaryPolygonPoints = boundaryPolygon.getPoints();
+		ArrayList<Vector2f> boundaryPolygonPoints = boundaryPolygon.getPoints();
 //		if (boundaryPolygonPointAngles == null || boundaryPolygonPointAngles.length != boundaryPolygonPoints.size()){
 //			boundaryPolygonPointAngles = new double[boundaryPolygonPoints.size()];
 //		}
 		//sightPolygonPointToEyeDists = new float[points.size()];
 		for (int i = 0; i < boundaryPolygonPoints.size(); i++){
 			int iPlus = (i+1 >= boundaryPolygonPoints.size() ? 0 : i+1);
-			double distSq = eye.distanceSq(boundaryPolygonPoints.get(i));
+			double distSq = eye.distanceSquared(boundaryPolygonPoints.get(i));
 			//sightPolygonPointToEyeDists[i] = dist;
 			if (distSq > maxEyeToBoundaryPolygonPointDistSq){
 				maxEyeToBoundaryPolygonPointDistSq = distSq;
 			}
-			double ptSegDistSq = eye.ptSegDistSq(boundaryPolygonPoints.get(i), boundaryPolygonPoints.get(iPlus));
+			double ptSegDistSq = Vector2fUtils.ptSegDistSq(eye,boundaryPolygonPoints.get(i), boundaryPolygonPoints.get(iPlus));
 			if (ptSegDistSq < minEyeToBoundaryPolygonPointDistSq){
 				minEyeToBoundaryPolygonPointDistSq = ptSegDistSq;
 			}
@@ -103,7 +105,7 @@ public class VisionData{
 		return boundaryPolygon;
 	}
 
-	public KPoint getEye() {
+	public Vector2f getEye() {
 		return eye;
 	}
 

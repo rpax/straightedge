@@ -30,6 +30,8 @@
  */
 package straightedge.geom.vision;
 
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.*;
 
 public abstract class VisiblePoint implements Comparable{
@@ -40,7 +42,7 @@ public abstract class VisiblePoint implements Comparable{
 	public static int SHADOW_ON_OCCLUDER = 4;
 	public static int SHADOW_ON_BOUNDARY = 5;
 
-	KPoint point;
+	Vector2f point;
 
 	// These are used in the compareTo method to sort the points around the eye.
 	// This method is a bit quicker than using the slow trig functions to find the angle.
@@ -50,11 +52,11 @@ public abstract class VisiblePoint implements Comparable{
 	public VisiblePoint(){
 
 	}
-	public VisiblePoint(KPoint point){
+	public VisiblePoint(Vector2f point){
 		this.point = point;
 	}
 
-	public void preSortCalcs(KPoint eye){
+	public void preSortCalcs(Vector2f eye){
 		double relX = point.x - eye.x;
 		double relY = point.y - eye.y;
 //		if (relX >= 0){
@@ -80,7 +82,7 @@ public abstract class VisiblePoint implements Comparable{
 
 	abstract public int getType();
 
-	public KPoint getPoint(){
+	public Vector2f getPoint(){
 		return point;
 	}
 

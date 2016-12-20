@@ -33,11 +33,12 @@ package straightedge.geom;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
 
 /**
  *
@@ -71,64 +72,64 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		return new KMultiPolygon(newPolygons);
 	}
 
-	public void translate(double x, double y) {
+	public void translate(float x, float y) {
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			polygon.translate(x, y);
 		}
 	}
-	public void translate(KPoint translation){
+	public void translate(Vector2f translation){
 		translate(translation.x, translation.y);
 	}
 
-	public void translateTo(double x, double y){
-		KPoint center = this.getExteriorPolygon().getCenter();
-		double xIncrement = x - center.x;
-		double yIncrement = y - center.y;
+	public void translateTo(float x, float y){
+		Vector2f center = this.getExteriorPolygon().getCenter();
+		float xIncrement = x - center.x;
+		float yIncrement = y - center.y;
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			polygon.translate(xIncrement, yIncrement);
 		}
 	}
-	public void translateTo(KPoint newCentre){
+	public void translateTo(Vector2f newCentre){
 		translateTo(newCentre.x, newCentre.y);
 	}
 	public void translateToOrigin(){
 		translateTo(0, 0);
 	}
 
-	public void rotate(double angle) {
-		KPoint center = this.getExteriorPolygon().getCenter();
+	public void rotate(float angle) {
+		Vector2f center = this.getExteriorPolygon().getCenter();
 		rotate(angle, center.x, center.y);
 	}
-	public void rotate(double angle, KPoint axle) {
+	public void rotate(float angle, Vector2f axle) {
 		rotate(angle, axle.x, axle.y);
 	}
-	public void rotate(double angle, double x, double y) {
+	public void rotate(float angle, float x, float y) {
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			polygon.rotate(angle, x, y);
 		}
 	}
 
-	public void scale(double xMultiplier, double yMultiplier, double x, double y){
+	public void scale(float xMultiplier, float yMultiplier, float x, float y){
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			polygon.scale(xMultiplier, yMultiplier, x, y);
 		}
 	}
-	public void scale(double multiplierX, double multiplierY){
-		KPoint center = getExteriorPolygon().getCenter();
+	public void scale(float multiplierX, float multiplierY){
+		Vector2f center = getExteriorPolygon().getCenter();
 		scale(multiplierX, multiplierY, center.x, center.y);
 	}
-	public void scale(double multiplierX, double multiplierY, KPoint p){
+	public void scale(float multiplierX, float multiplierY, Vector2f p){
 		scale(multiplierX, multiplierY, p.x, p.y);
 	}
-	public void scale(double multiplier){
-		KPoint center = getExteriorPolygon().getCenter();
+	public void scale(float multiplier){
+		Vector2f center = getExteriorPolygon().getCenter();
 		scale(multiplier, multiplier, center.x, center.y);
 	}
-	public void scale(double multiplier, KPoint p){
+	public void scale(float multiplier, Vector2f p){
 		scale(multiplier, multiplier, p.x, p.y);
 	}
 
@@ -185,17 +186,17 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 	public boolean contains(Point2D p){
 		return contains(p.getX(), p.getY());
 	}
-	public boolean contains(KPoint p){
+	public boolean contains(Vector2f p){
 		return contains(p.x, p.y);
 	}
 	public boolean contains(double x, double y){
 		if (getExteriorPolygon().contains(x, y) == true){
 			int crossings = 0;
 			for (int h = 1; h < polygons.size(); h++){
-				ArrayList<KPoint> points = polygons.get(h).getPoints();
-				KPoint pointIBefore = (points.size() != 0 ? points.get(points.size() - 1) : null);
+				ArrayList<Vector2f> points = polygons.get(h).getPoints();
+				Vector2f pointIBefore = (points.size() != 0 ? points.get(points.size() - 1) : null);
 				for (int i = 0; i < points.size(); i++) {
-					KPoint pointI = points.get(i);
+					Vector2f pointI = points.get(i);
 					if (((pointIBefore.y <= y && y < pointI.y)
 							|| (pointI.y <= y && y < pointIBefore.y))
 							&& x < ((pointI.x - pointIBefore.x)/(pointI.y - pointIBefore.y)*(y - pointIBefore.y) + pointIBefore.x)) {
@@ -226,11 +227,11 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		int index = 0;
 		int polygonNum = 0;
 		KPolygon currentPolygon;
-		KPoint currentPoint;
+		Vector2f currentPoint;
 		KMultiPolygon multiPolygon;
 		AffineTransform affine;
 
-		double[] singlePointSetDouble = new double[2];
+		float[] singlePointSetDouble = new float[2];
 
 		KMultiPolygonIterator(KMultiPolygon kPolygon) {
 			this(kPolygon, null);
@@ -274,7 +275,7 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 			}
 		}
 
-		public int currentSegment(float[] coords){
+		public int currentSegment(double[] coords){
 			assignPointAndType();
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
@@ -290,7 +291,7 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 			return type;
 		}
 
-		public int currentSegment(double[] coords){
+		public int currentSegment(float[] coords){
 			assignPointAndType();
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
@@ -316,7 +317,7 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		{
 			System.out.println("For shape:");
 			PathIterator pathIterator = shape.getPathIterator(null);
-			double[] coords = new double[6];
+			float[] coords = new float[6];
 			while (pathIterator.isDone() == false){
 				int type = pathIterator.currentSegment(coords);
 				if (type == PathIterator.SEG_MOVETO){
@@ -334,7 +335,7 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 		{
 			System.out.println("For multiPoly:");
 			PathIterator pathIterator = multiPoly.getPathIterator(null);
-			double[] coords = new double[6];
+			float[] coords = new float[6];
 			while (pathIterator.isDone() == false){
 				int type = pathIterator.currentSegment(coords);
 				if (type == PathIterator.SEG_MOVETO){
@@ -365,9 +366,9 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 //	Path2D.Double path = new Path2D.Double();
 //				path.setWindingRule(Path2D.WIND_EVEN_ODD);
 //				{
-//					double x = 0;
-//					double y = 0;
-//					double d = 400;
+//					float x = 0;
+//					float y = 0;
+//					float d = 400;
 //					path.moveTo(x, y);
 //					path.lineTo(x+d, y+0);
 //					path.lineTo(x+d, y+d);
@@ -375,9 +376,9 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 //					path.closePath();
 //				}
 //				{
-//					double x = 50;
-//					double y = 50;
-//					double d = 300;
+//					float x = 50;
+//					float y = 50;
+//					float d = 300;
 //					path.moveTo(x, y);
 //					path.lineTo(x+d, y+0);
 //					path.lineTo(x+d, y+d);
@@ -385,9 +386,9 @@ public class KMultiPolygon implements Shape, PolygonHolder{
 //					path.closePath();
 //				}
 //				{
-//					double x = 100;
-//					double y = 100;
-//					double d = 200;
+//					float x = 100;
+//					float y = 100;
+//					float d = 200;
 //					path.moveTo(x, y);
 //					path.lineTo(x+d, y+0);
 //					path.lineTo(x+d, y+d);

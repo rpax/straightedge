@@ -5,13 +5,27 @@
 
 package straightedge.test;
 
-import straightedge.geom.*;
-import straightedge.geom.path.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
+import straightedge.geom.path.NodeConnector;
+import straightedge.geom.path.PathBlockingObstacleImpl;
+import straightedge.geom.path.PathData;
+import straightedge.geom.path.PathFinder;
 
 /**
  * A simple demo of path-finding.
@@ -32,7 +46,7 @@ public class PathTest {
 	PathFinder pathFinder;
 
 	Player player;
-	KPoint lastMouseMovePoint = new KPoint(100, 100);
+	Vector2f lastMouseMovePoint = new Vector2f(100, 100);
 
 	long lastSystemTimeNanos = System.nanoTime();
 
@@ -47,7 +61,7 @@ public class PathTest {
 		stationaryObstacles = new ArrayList<PathBlockingObstacleImpl>();
 		for (int i = 0; i < 4; i++){
 			for (int j = 0; j < 4; j++){
-				ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+				ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 				int numPoints = 6;
 				double angleIncrement = Math.PI*2f/(numPoints*2);
 				float rBig = 50;
@@ -56,11 +70,11 @@ public class PathTest {
 				for (int k = 0; k < numPoints; k++){
 					double x = rBig*Math.cos(currentAngle);
 					double y = rBig*Math.sin(currentAngle);
-					pointList.add(new KPoint((float)x, (float)y));
+					pointList.add(new Vector2f((float)x, (float)y));
 					currentAngle += angleIncrement;
 					x = rSmall*Math.cos(currentAngle);
 					y = rSmall*Math.sin(currentAngle);
-					pointList.add(new KPoint((float)x, (float)y));
+					pointList.add(new Vector2f((float)x, (float)y));
 					currentAngle += angleIncrement;
 				}
 				KPolygon poly = new KPolygon(pointList);
@@ -81,8 +95,8 @@ public class PathTest {
 		// Initialise the PathFinder
 		pathFinder = new PathFinder();
 		player = new Player();
-		player.pos = new KPoint(100, 100);
-		player.target = player.pos.copy();
+		player.pos = new Vector2f(100, 100);
+		player.target = player.pos.clone();
 
 		final JComponent renderComponent = new JComponent(){
 			// This method is called every time the repaintThread does renderComponent.repaint().
@@ -111,11 +125,11 @@ public class PathTest {
 				}
 				// render the player's path:
 				g.setColor(Color.LIGHT_GRAY);
-				ArrayList<KPoint> pathPoints = player.pathData.points;
+				ArrayList<Vector2f> pathPoints = player.pathData.points;
 				if (pathPoints.size() > 0) {
-					KPoint currentPoint = player.pos;
+					Vector2f currentPoint = player.pos;
 					for (int j = 0; j < pathPoints.size(); j++) {
-						KPoint nextPoint = pathPoints.get(j);
+						Vector2f nextPoint = pathPoints.get(j);
 						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 						float d = 5f;
 						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
@@ -152,16 +166,16 @@ public class PathTest {
 	}
 
 	public class Player{
-		KPoint pos;
-		KPoint target;
-		KPoint targetAdjusted;
+		Vector2f pos;
+		Vector2f target;
+		Vector2f targetAdjusted;
 		float maxConnectionDistanceFromPlayerToObstacles;
 		PathData pathData;
 		float speed;
 		float speedX;
 		float speedY;
 		float moveAngle;
-		KPoint currentTargetPoint = null;
+		Vector2f currentTargetPoint = null;
 
 		public Player(){
 			maxConnectionDistanceFromPlayerToObstacles = PathTest.this.maxConnectionDistanceBetweenObstacles;
@@ -179,19 +193,19 @@ public class PathTest {
 			}
 			// Update the player's position as it travels from point to point along the path.
 			double secondsLeft = seconds;
-			ArrayList<KPoint> pathPoints = player.pathData.points;
+			ArrayList<Vector2f> pathPoints = player.pathData.points;
 			for (int i = 0; i < pathPoints.size(); i++){
 				currentTargetPoint = pathPoints.get(i);
-				KPoint oldPos = new KPoint();
+				Vector2f oldPos = new Vector2f();
 				oldPos.x = pos.x;
 				oldPos.y = pos.y;
-				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
+				double distUntilTargetReached = Vector2fUtils.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 				double timeUntilTargetReached = distUntilTargetReached/speed;
 				assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 				double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
 				double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 				if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-					double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+					double dirAngle = Vector2fUtils.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 					moveAngle = (float)dirAngle;
 					speedX = (float)Math.cos(moveAngle) * speed;
 					speedY = (float)Math.sin(moveAngle) * speed;
@@ -218,10 +232,10 @@ public class PathTest {
 			}
 		}
 
-		public KPoint getNearestPointOutsideOfObstacles(KPoint point){
+		public Vector2f getNearestPointOutsideOfObstacles(Vector2f point){
 			// check that the target point isn't inside any obstacles.
 			// if so, move it.
-			KPoint movedPoint = point.copy();
+			Vector2f movedPoint = point.clone();
 			boolean targetIsInsideObstacle = false;
 			int count = 0;
 			while (true){
@@ -229,7 +243,7 @@ public class PathTest {
 					if (obst.getOuterPolygon().contains(movedPoint)){
 						targetIsInsideObstacle = true;
 						KPolygon poly = obst.getOuterPolygon();
-						KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
+						Vector2f p = poly.getBoundaryPointClosestTo(movedPoint);
 						if (p != null){
 							movedPoint.x = p.x;
 							movedPoint.y = p.y;

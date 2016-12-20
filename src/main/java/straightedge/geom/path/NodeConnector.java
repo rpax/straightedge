@@ -30,10 +30,17 @@
  */
 package straightedge.geom.path;
 
-import straightedge.geom.*;
-import straightedge.geom.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
+import straightedge.geom.util.TileArray;
 import straightedge.geom.util.TileArray.Tile;
-import java.util.*;
+import straightedge.geom.util.TileBag;
 
 /**
  *
@@ -84,7 +91,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 //		ct.click("obstAndDists.clear");
 		obstAndDists.clear();
 //		ct.click("obstAndDists.add");
-		KPoint p = node.getPoint();
+		Vector2f p = node.getPoint();
 		for (int n = 0; n < obstaclesToIntersect.size(); n++){
 			PathBlockingObstacle obst = obstaclesToIntersect.get(n);
 			double dist = node.getPoint().distance(obst.getInnerPolygon().getCenter()) - obst.getInnerPolygon().getRadius();
@@ -141,7 +148,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 						node2.getContained() == KNodeOfObstacle.TRUE_VALUE){
 					continue;
 				}
-				KPoint p2 = node2.getPoint();
+				Vector2f p2 = node2.getPoint();
 				double nodeToNode2Dist = p.distance(p2);
 				if (nodeToNode2Dist > maxConnectionDistance){
 					continue;
@@ -224,7 +231,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				continue;
 			}
 			for (KNodeOfObstacle node : nearByObstacle.getNodes()){
-				if (poly.getCenter().distanceSq(node.getPoint()) <= poly.getRadiusSq()){
+				if (poly.getCenter().distanceSquared(node.getPoint()) <= poly.getRadiusSq()){
 					boolean contained = poly.contains(node.getPoint());
 					if (contained){
 						node.setContained(KNodeOfObstacle.TRUE_VALUE);
@@ -277,7 +284,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				continue;
 			}
 			for (KNodeOfObstacle node : nearByObstacle.getNodes()){
-				if (poly.getCenter().distanceSq(node.getPoint()) <= poly.getRadiusSq()){
+				if (poly.getCenter().distanceSquared(node.getPoint()) <= poly.getRadiusSq()){
 					boolean contained = poly.contains(node.getPoint());
 					if (contained){
 						node.setContained(KNodeOfObstacle.TRUE_VALUE);
@@ -345,12 +352,12 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		// Then remove the last startNode in the list to avoid doubling up.
 		while (nodeList.size() > 0){
 			KNodeOfObstacle currentNode = nodeList.get(nodeList.size()-1);
-			KPoint p1 = currentNode.getPoint();
+			Vector2f p1 = currentNode.getPoint();
 			otherNodesToConnect.clear();
 			for (int i = 0; i < nodeList.size()-1; i++){
 				KNodeOfObstacle otherNode = nodeList.get(i);
-				KPoint p2 = otherNode.getPoint();
-				if (p1.distanceSq(p2) < maxConnectionDistanceSq){
+				Vector2f p2 = otherNode.getPoint();
+				if (p1.distanceSquared(p2) < maxConnectionDistanceSq){
 					if (poly.intersectionPossible(p1, p2) == true){
 						// it's possible that the nodes might be connected since the obstacle was removed.
 						otherNodesToConnect.add(otherNode);
@@ -413,7 +420,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				node.setContained(KNodeOfObstacle.FALSE_VALUE);
 			}
 		}
-		KPoint p = node.getPoint();
+		Vector2f p = node.getPoint();
 
 		// Test the startNode for a straight line to otherNodes.
 		NodeLoop:
@@ -484,7 +491,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		if (node.getContained() == KNodeOfObstacle.UNKNOWN_VALUE){
 			// Calculate if the startNode is contained and cache the result.
 			// This speeds up this method and the 'makeReachableNodesFor' method significantly.
-			KPoint point = node.getPoint();
+			Vector2f point = node.getPoint();
 			for (int i = 0; i < obstaclesToIntersect.size(); i++){
 				PathBlockingObstacle obst = obstaclesToIntersect.get(i);
 				if (obst == node.getObstacle()){
@@ -519,7 +526,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		if (isConnectionPossibleAndUseful(node, node2) == false){
 			return;
 		}
-		KPoint midPoint = node.getPoint().midPoint(node2.getPoint());
+		Vector2f midPoint = Vector2fUtils.midPoint(node.getPoint(),node2.getPoint());
 		double nodeToNode2Dist = node.getPoint().distance(node2.getPoint());
 		double halfNodeToNode2Dist = nodeToNode2Dist/2f;
 		// Need to test if line from startNode to node2 intersects any obstacles
@@ -555,7 +562,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		}
 	}
 
-	protected int getXIndicator(KPoint p, KPolygon poly){
+	protected int getXIndicator(Vector2f p, KPolygon poly){
 		int xIndicator;
 		double relX = poly.getCenter().x - p.getX();
 		if (relX - poly.getRadius() > 0){
@@ -568,7 +575,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		return xIndicator;
 	}
 
-	protected int getYIndicator(KPoint p, KPolygon poly){
+	protected int getYIndicator(Vector2f p, KPolygon poly){
 		int yIndicator;
 		double relY = poly.getCenter().y - p.getY();
 		if (relY - poly.getRadius() > 0){
@@ -632,7 +639,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 //		//obstDistAndQuads.clear();
 ////		codeTimer.click("add");
 //		// add the obstacles to obstDistAndQuads
-//		KPoint p = node.getPoint();
+//		Vector2f p = node.getPoint();
 //
 //		if (calcCache.iteration == 0){
 //			for (int n = 0; n < obstaclesToIntersect.size(); n++){
@@ -677,12 +684,12 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 //				if (isConnectionPossibleAndUseful(node, node2, calcCache.m, testOb2Nodes) == false){
 //					continue;
 //				}
-//				KPoint p2 = node2.getPoint();
+//				Vector2f p2 = node2.getPoint();
 ////				KNodeOfObstacle node2Minus = testOb2Nodes.get(m-1 < 0 ? testOb2Nodes.size()-1 : m-1);
 ////				KNodeOfObstacle node2Plus = testOb2Nodes.get(m+1 >= testOb2Nodes.size() ? 0 : m+1);
-////				KPoint p2Minus = node2Minus.getPoint();
-////				KPoint p2 = node2.getPoint();
-////				KPoint p2Plus = node2Plus.getPoint();
+////				Vector2f p2Minus = node2Minus.getPoint();
+////				Vector2f p2 = node2.getPoint();
+////				Vector2f p2Plus = node2Plus.getPoint();
 ////				int p2MinusToP2RCCW = p.relCCW(p2Minus, p2);
 ////				int p2ToP2PlusRCCW = p.relCCW(p2, p2Plus);
 ////				if (p2MinusToP2RCCW * p2ToP2PlusRCCW == 1){
@@ -758,7 +765,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 		obstDistAndQuads.clear();
 //		codeTimer.click("add");
 		// add the obstacles to obstDistAndQuads
-		KPoint p = node.getPoint();
+		Vector2f p = node.getPoint();
 		for (int n = 0; n < obstaclesToIntersect.size(); n++){
 			KPolygon poly = obstaclesToIntersect.get(n).getInnerPolygon();
 			double distEyeToCenterLessRadius = p.distance(poly.getCenter()) - poly.getRadius();
@@ -800,12 +807,12 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				if (isConnectionPossibleAndUseful(node, node2, m, testOb2Nodes) == false){
 					continue;
 				}
-				KPoint p2 = node2.getPoint();
+				Vector2f p2 = node2.getPoint();
 //				KNodeOfObstacle node2Minus = testOb2Nodes.get(m-1 < 0 ? testOb2Nodes.size()-1 : m-1);
 //				KNodeOfObstacle node2Plus = testOb2Nodes.get(m+1 >= testOb2Nodes.size() ? 0 : m+1);
-//				KPoint p2Minus = node2Minus.getPoint();
-//				KPoint p2 = node2.getPoint();
-//				KPoint p2Plus = node2Plus.getPoint();
+//				Vector2f p2Minus = node2Minus.getPoint();
+//				Vector2f p2 = node2.getPoint();
+//				Vector2f p2Plus = node2Plus.getPoint();
 //				int p2MinusToP2RCCW = p.relCCW(p2Minus, p2);
 //				int p2ToP2PlusRCCW = p.relCCW(p2, p2Plus);
 //				if (p2MinusToP2RCCW * p2ToP2PlusRCCW == 1){
@@ -815,7 +822,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				// Need to test if line from startNode to node2 intersects any
 				// obstacles (including testOb2 itself).
 				// Should check closest obst first, and obst whose points were found to be reachable
-				double nodeToNode2DistSq = p.distanceSq(p2);
+				double nodeToNode2DistSq = p.distanceSquared(p2);
 				if (nodeToNode2DistSq > maxConnectionDistanceSq){
 					continue;
 				}
@@ -909,16 +916,16 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 
 	double smallAmount = 0.0001;
 	protected boolean isConnectionPossibleAndUseful(KNode node, KNodeOfObstacle node2, int node2PointNum, ArrayList<KNodeOfObstacle> node2List){
-		KPoint p = node.getPoint();
-		KPoint p2 = node2.getPoint();
+		Vector2f p = node.getPoint();
+		Vector2f p2 = node2.getPoint();
 		// test if startNode is in the reject region of node2's obstacle
 		{
 			// Only connect the nodes if the connection will be useful.
 			// See the comment in the method makeReachableNodes for a full explanation.
 			KNode node2Minus = node2List.get(node2PointNum-1 < 0 ? node2List.size()-1 : node2PointNum-1);
 			KNode node2Plus = node2List.get(node2PointNum+1 >= node2List.size() ? 0 : node2PointNum+1);
-			KPoint p2Minus = node2Minus.getPoint();
-			KPoint p2Plus = node2Plus.getPoint();
+			Vector2f p2Minus = node2Minus.getPoint();
+			Vector2f p2Plus = node2Plus.getPoint();
 
 			//double p2MinusToP2RCCW = p.c(p2Minus, p2);
 			double p2LessP2MinusX = p2.x - p2Minus.x;
@@ -949,7 +956,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 				// actually useful is a much bigger problem than returning true
 				// and sacrificing some performance.
 
-//				double p2MinusToP2LineDistSq = p.ptLineDistSq(p2Minus, p2);
+//				double p2MinusToP2LineDistSq = Vector2fUtils.ptLineDistSq(p,p2Minus, p2);
 //				if (p2MinusToP2LineDistSq < smallAmount){
 //					return true;
 //				}
@@ -967,7 +974,7 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 					}
 				}
 
-//				double p2ToP2PlusLineDistSq = p.ptLineDistSq(p2, p2Plus);
+//				double p2ToP2PlusLineDistSq = Vector2fUtils.ptLineDistSq(p,p2, p2Plus);
 //				if (p2ToP2PlusLineDistSq < smallAmount){
 //					return true;
 //				}
@@ -997,30 +1004,30 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 	}
 
 	protected boolean isConnectionPossibleAndUseful(KNodeOfObstacle node, int nodePointNum, ArrayList<KNodeOfObstacle> nodeList, KNodeOfObstacle node2, int node2PointNum, ArrayList<KNodeOfObstacle> node2List){
-		KPoint p = node.getPoint();
-		KPoint p2 = node2.getPoint();
+		Vector2f p = node.getPoint();
+		Vector2f p2 = node2.getPoint();
 		// test if startNode is in the reject region of node2's obstacle
 		{
 			// Only connect the nodes if the connection will be useful.
 			// See the comment in the method makeReachableNodes for a full explanation.
 			KNode node2Minus = node2List.get(node2PointNum-1 < 0 ? node2List.size()-1 : node2PointNum-1);
 			KNode node2Plus = node2List.get(node2PointNum+1 >= node2List.size() ? 0 : node2PointNum+1);
-			KPoint p2Minus = node2Minus.getPoint();
-			KPoint p2Plus = node2Plus.getPoint();
+			Vector2f p2Minus = node2Minus.getPoint();
+			Vector2f p2Plus = node2Plus.getPoint();
 
-			double p2MinusToP2RCCW = p.relCCWDouble(p2Minus, p2);
-			double p2ToP2PlusRCCW = p.relCCWDouble(p2, p2Plus);
+			double p2MinusToP2RCCW = Vector2fUtils.relCCWDouble(p2Minus, p2,p.x,p.y);
+			double p2ToP2PlusRCCW = Vector2fUtils.relCCWDouble(p2, p2Plus,p.x,p.y);
 			if (p2MinusToP2RCCW * p2ToP2PlusRCCW > 0){
 				// To avoid floating point error problems we should only return false
 				// if p is well away from the lines. If it's close, then return
 				// true just to be safe. Returning false when the connection is
 				// actually useful is a much bigger problem than returning true
 				// and sacrificing some performance.
-				double p2MinusToP2LineDistSq = p.ptLineDistSq(p2Minus, p2);
+				double p2MinusToP2LineDistSq = Vector2fUtils.ptLineDistSq(p,p2Minus, p2);
 				if (p2MinusToP2LineDistSq < smallAmount){
 					return true;
 				}
-				double p2ToP2PlusLineDistSq = p.ptLineDistSq(p2, p2Plus);
+				double p2ToP2PlusLineDistSq = Vector2fUtils.ptLineDistSq(p,p2, p2Plus);
 				if (p2ToP2PlusLineDistSq < smallAmount){
 					return true;
 				}
@@ -1036,22 +1043,22 @@ public class NodeConnector<T extends PathBlockingObstacle>{
 			// See the comment in the method makeReachableNodes for a full explanation.
 			KNode nodeMinus = nodeList.get(nodePointNum-1 < 0 ? nodeList.size()-1 : nodePointNum-1);
 			KNode nodePlus = nodeList.get(nodePointNum+1 >= nodeList.size() ? 0 : nodePointNum+1);
-			KPoint pMinus = nodeMinus.getPoint();
-			//KPoint p2 = node2.getPoint();
-			KPoint pPlus = nodePlus.getPoint();
-			double pMinusToPRCCW = p2.relCCWDouble(pMinus, p);
-			double pToPPlusRCCW = p2.relCCWDouble(p, pPlus);
+			Vector2f pMinus = nodeMinus.getPoint();
+			//Vector2f p2 = node2.getPoint();
+			Vector2f pPlus = nodePlus.getPoint();
+			double pMinusToPRCCW = Vector2fUtils.relCCWDouble(pMinus, p,p2.x,p2.y);
+			double pToPPlusRCCW = Vector2fUtils.relCCWDouble(p, pPlus,p2.x,p2.y);
 			if (pMinusToPRCCW * pToPPlusRCCW > 0){
 				// To avoid floating point error problems we should only return false
 				// if p is well away from the lines. If it's close, then return
 				// true just to be safe. Returning false when the connection is
 				// actually useful is a much bigger problem than returning true
 				// and sacrificing some performance.
-				double pMinusToPLineDistSq = p2.ptLineDistSq(pMinus, p);
+				double pMinusToPLineDistSq = Vector2fUtils.ptLineDistSq(p2,pMinus, p);
 				if (pMinusToPLineDistSq < smallAmount){
 					return true;
 				}
-				double pToPPlusLineDistSq = p2.ptLineDistSq(p, pPlus);
+				double pToPPlusLineDistSq = Vector2fUtils.ptLineDistSq(p2,p, pPlus);
 				if (pToPPlusLineDistSq < smallAmount){
 					return true;
 				}

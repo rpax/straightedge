@@ -34,12 +34,14 @@ import straightedge.geom.util.Tracker;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  *
  * @author Keith Woodward
  */
 public class KNode implements Comparable{
-	public KPoint point;
+	public Vector2f point;
 	public ArrayList<KNode> connectedNodes;
 	public KNode parent;
 	public double distToParent;
@@ -62,7 +64,7 @@ public class KNode implements Comparable{
 		gCost = G_COST_NOT_CALCULATED_FLAG;
 	}
 
-	public KNode(KPoint point){
+	public KNode(Vector2f point){
 		this();
 		this.point = point;
 	}
@@ -77,11 +79,11 @@ public class KNode implements Comparable{
 		parent = null;
 	}
 
-	public KPoint getPoint() {
+	public Vector2f getPoint() {
 		return point;
 	}
 
-	public void setPoint(KPoint p) {
+	public void setPoint(Vector2f p) {
 		this.point = p;
 	}
 

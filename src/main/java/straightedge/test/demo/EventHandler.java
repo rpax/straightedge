@@ -30,12 +30,21 @@
  */
 package straightedge.test.demo;
 
-import straightedge.geom.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
+import java.awt.AWTEvent;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import com.jme3.math.Vector2f;
 
 /**
  *
@@ -43,7 +52,7 @@ import javax.imageio.ImageIO;
  */
 public class EventHandler implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener, WindowListener{
 	AWTEventCache eventCache;
-	KPoint lastMousePointInWorldCoords;
+	Vector2f lastMousePointInWorldCoords;
 	PlayersCurrentDirection playersCurrentDirection;
 
 	public Main main;
@@ -56,7 +65,7 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 		Container parentFrameOrApplet = main.getParentFrameOrApplet();
 
 		eventCache = new AWTEventCache();
-		lastMousePointInWorldCoords = new KPoint();
+		lastMousePointInWorldCoords = new Vector2f();
 		playersCurrentDirection = new PlayersCurrentDirection();
 
 		if (main instanceof MainFrame){
@@ -158,8 +167,8 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 	public void processEvent(AWTEventWrapper awtEventWrapper){
 		View view = main.view;
 		Loop loop = main.loop;
-		KPoint viewCenterInScreenCoords = view.viewCenterInScreenCoords;
-		KPoint viewCenterInWorldCoords = view.viewCenterInWorldCoords;
+		Vector2f viewCenterInScreenCoords = view.viewCenterInScreenCoords;
+		Vector2f viewCenterInWorldCoords = view.viewCenterInWorldCoords;
 		final World world = main.world;
 		Player player = world.player;
 
@@ -168,12 +177,12 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 		if (awtEvent instanceof MouseEvent){
 			MouseEvent e = (MouseEvent)awtEvent;
 			if (e.getID() == MouseEvent.MOUSE_MOVED){
-				lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-				lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+				lastMousePointInWorldCoords.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+				lastMousePointInWorldCoords.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 			}else if (e.getID() == MouseEvent.MOUSE_PRESSED){
 				if (altKeyDown == false){
-					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoords.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 					if (e.getButton() == MouseEvent.BUTTON1){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 						leftMouseButtonDown = true;
@@ -182,32 +191,32 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 						rightMouseButtonDown = true;
 					}
 				}else{
-					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
-					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					Vector2f lastMousePointInWorldCoordsExclViewMove = new Vector2f();
+					lastMousePointInWorldCoordsExclViewMove.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoordsExclViewMove.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
 					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;
 				}
 			}else if (e.getID() == MouseEvent.MOUSE_DRAGGED){
 				if (altKeyDown == false){
-					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoords.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 					if (leftMouseButtonDown){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 					}
 				}else{
-					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
-					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					Vector2f lastMousePointInWorldCoordsExclViewMove = new Vector2f();
+					lastMousePointInWorldCoordsExclViewMove.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoordsExclViewMove.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
 					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;
 				}
 			}else if (e.getID() == MouseEvent.MOUSE_RELEASED){
 				if (altKeyDown == false){
-					lastMousePointInWorldCoords.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoords.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					lastMousePointInWorldCoords.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoords.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 					if (e.getButton() == MouseEvent.BUTTON1){
 						player.targetFinder.setFixedTarget(lastMousePointInWorldCoords, true);
 						leftMouseButtonDown = false;
@@ -216,9 +225,9 @@ public class EventHandler implements KeyListener, MouseListener, MouseMotionList
 						rightMouseButtonDown = false;
 					}
 				}else{
-					KPoint lastMousePointInWorldCoordsExclViewMove = new KPoint();
-					lastMousePointInWorldCoordsExclViewMove.x = ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
-					lastMousePointInWorldCoordsExclViewMove.y = ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
+					Vector2f lastMousePointInWorldCoordsExclViewMove = new Vector2f();
+					lastMousePointInWorldCoordsExclViewMove.x = (float) ((e.getX() - viewCenterInScreenCoords.x) / view.scaleFactor + viewCenterInWorldCoords.x);
+					lastMousePointInWorldCoordsExclViewMove.y = (float) ((e.getY() - viewCenterInScreenCoords.y) / view.scaleFactor + viewCenterInWorldCoords.y);
 
 					viewCenterInWorldCoords.x -= lastMousePointInWorldCoordsExclViewMove.x - lastMousePointInWorldCoords.x;
 					viewCenterInWorldCoords.y -= lastMousePointInWorldCoordsExclViewMove.y - lastMousePointInWorldCoords.y;

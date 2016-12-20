@@ -33,6 +33,8 @@ package straightedge.geom.util;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  * Used to store and retrieve 2D objects.
  * Contains a table that's used to
@@ -61,24 +63,24 @@ public class TileArray<T extends PolygonHolder>{
 	public Tile[][] tiles; // rows, columns
 	public float tileWidthAndHeight;
 	// Euclidean coordinates are assumed with positive X axis to the right and positive y axis up.
-	public KPoint botLeft;
-	public KPoint topRight;
+	public Vector2f botLeft;
+	public Vector2f topRight;
 	// if bloated == true then an object has been added that lies outside of the rectangle bounded by botRight and topLeft.
 	public boolean bloated;
 
 	Tracker tracker = new Tracker();
 
-	public TileArray(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	public TileArray(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
 	}
 
-	protected void init(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	protected void init(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		this.numRows = numRows;
 		this.numCols = numCols;
 		tiles = new Tile[numRows][numCols];
 		this.tileWidthAndHeight = tileWidthAndHeight;
-		this.botLeft = botLeft.copy();
-		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
+		this.botLeft = botLeft.clone();
+		topRight = new Vector2f(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
 		bloated = false;
 		for (int i = 0; i < numRows; i++){
 			for (int j = 0; j < numCols; j++){
@@ -87,7 +89,7 @@ public class TileArray<T extends PolygonHolder>{
 		}
 	}
 
-	public TileArray(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
+	public TileArray(Vector2f botLeft, Vector2f approxTopRight, float tileWidthAndHeight){
 		double minX = botLeft.x;
 		double minY = botLeft.y;
 		double maxX = approxTopRight.x;
@@ -110,7 +112,7 @@ public class TileArray<T extends PolygonHolder>{
 	}
 
 	public void add(T t){
-		KPoint c = t.getPolygon().getCenter();
+		Vector2f c = t.getPolygon().getCenter();
 		double r = t.getPolygon().getRadius();
 		boolean outsideBounds = false;
 
@@ -178,7 +180,7 @@ public class TileArray<T extends PolygonHolder>{
 
 	
 	public boolean remove(T t){
-		KPoint c = t.getPolygon().getCenter();
+		Vector2f c = t.getPolygon().getCenter();
 		double r = t.getPolygon().getRadius();
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
@@ -244,7 +246,7 @@ public class TileArray<T extends PolygonHolder>{
 		return removed;
 	}
 
-	public ArrayList<T> getAllWithin(KPoint point, double radius){
+	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 		return getAllWithin(point.x, point.y, radius);
 	}
 
@@ -297,13 +299,13 @@ public class TileArray<T extends PolygonHolder>{
 			for (int i = 0; i < tile.getSharedObstacles().size(); i++){
 				T t = (T)tile.getSharedObstacles().get(i);
 				KPolygon polygon = t.getPolygon();
-				KPoint polygonCenter = polygon.getCenter();
+				Vector2f polygonCenter = polygon.getCenter();
 				if (polygon.isTileArraySearchStatusAdded(tracker) == true){
 					continue;
 				}
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 					polygon.setTileArraySearchStatus(true, tracker);
 				}
@@ -311,10 +313,10 @@ public class TileArray<T extends PolygonHolder>{
 			for (int i = 0; i < tile.getContainedObstacles().size(); i++){
 				T t = (T)tile.getContainedObstacles().get(i);
 				KPolygon polygon = t.getPolygon();
-				KPoint polygonCenter = polygon.getCenter();
+				Vector2f polygonCenter = polygon.getCenter();
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 				}
 			}
@@ -332,8 +334,8 @@ public class TileArray<T extends PolygonHolder>{
 						}
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
-						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						Vector2f polygonCenter = polygon.getCenter();
+						if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 							polygon.setTileArraySearchStatus(true, tracker);
 						}
@@ -344,8 +346,8 @@ public class TileArray<T extends PolygonHolder>{
 						KPolygon polygon = t.getPolygon();
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
-						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						Vector2f polygonCenter = polygon.getCenter();
+						if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 						}
 					}
@@ -356,10 +358,10 @@ public class TileArray<T extends PolygonHolder>{
 //		ct.lastClick();
 		return nearbyObstacles;
 	}
-//	public ArrayList<T> getAllWithin(KPoint point, double radius){
+//	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 ////		ct.click("create ArrayList");
 //		ArrayList<T> nearbyObstacles = new ArrayList<T>();
-//		KPoint c = point;
+//		Vector2f c = point;
 //		double r = radius;
 //
 ////		ct.click("index calcs");
@@ -464,10 +466,10 @@ public class TileArray<T extends PolygonHolder>{
 
 ////	CodeTimer ct = new CodeTimer(this.getClass().getSimpleName()+": getAllWithin");
 //	public CIdentityHashSet<T> nearbySharedPolygonsSet = new CIdentityHashSet<T>();
-//	public ArrayList<T> getAllWithin(KPoint point, double radius){
+//	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 ////		ct.click("create ArrayList");
 //		ArrayList<T> nearbyObstacles = new ArrayList<T>();
-//		KPoint c = point;
+//		Vector2f c = point;
 //		double r = radius;
 //
 ////		ct.click("index calcs");
@@ -591,7 +593,7 @@ public class TileArray<T extends PolygonHolder>{
 		return numCols;
 	}
 
-	public KPoint getBotLeft() {
+	public Vector2f getBotLeft() {
 		return botLeft;
 	}
 
@@ -607,7 +609,7 @@ public class TileArray<T extends PolygonHolder>{
 		return tiles;
 	}
 
-	public KPoint getTopRight() {
+	public Vector2f getTopRight() {
 		return topRight;
 	}
 
@@ -637,10 +639,10 @@ public class TileArray<T extends PolygonHolder>{
 
 
 	public static void main(String[] args){
-		double w = 1000;
-		double h = 1000;
-		KPoint botLeft = new KPoint(0, 0);
-		KPoint topRight = new KPoint(w, h);
+		float w = 1000;
+		float h = 1000;
+		Vector2f botLeft = new Vector2f(0, 0);
+		Vector2f topRight = new Vector2f(w, h);
 		TileArray<KPolygon> tileArray = new TileArray<KPolygon>(botLeft, topRight, 100);
 //		System.out.println(TileArray.class.getSimpleName()+": tileArray == "+tileArray);
 		int numRects = 10;
@@ -648,14 +650,14 @@ public class TileArray<T extends PolygonHolder>{
 		ArrayList<KPolygon> allPolygons = new ArrayList<KPolygon>();
 		Random rand = new Random(0);
 		for (int i = 0; i < numRects; i++){
-			ArrayList<KPoint> points = new ArrayList<KPoint>();
+			ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 			float width = 25;
 			float height = 25;
-			KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
-			points.add(new KPoint(point.x, point.y));
-			points.add(new KPoint(point.x, point.y + height));
-			points.add(new KPoint(point.x + width, point.y + height));
-			points.add(new KPoint(point.x + width, point.y));
+			Vector2f point = new Vector2f(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
+			points.add(new Vector2f(point.x, point.y));
+			points.add(new Vector2f(point.x, point.y + height));
+			points.add(new Vector2f(point.x + width, point.y + height));
+			points.add(new Vector2f(point.x + width, point.y));
 			KPolygon poly = new KPolygon(points);
 			poly.rotate(rand.nextFloat());
 			tileArray.add(poly);
@@ -663,11 +665,11 @@ public class TileArray<T extends PolygonHolder>{
 		}
 
 		for (int i = 0; i < numPolygons; i++){
-			ArrayList<KPoint> points = new ArrayList<KPoint>();
+			ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 			int numPoints = 3 + rand.nextInt(10);
 			double radius = rand.nextFloat()*200;
 			KPolygon poly = KPolygon.createRegularPolygon(numPoints, radius);
-			KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
+			Vector2f point = new Vector2f(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
 			poly.translateTo(point);
 			poly.rotate(rand.nextFloat());
 			tileArray.add(poly);
@@ -676,7 +678,7 @@ public class TileArray<T extends PolygonHolder>{
 
 		System.out.println(TileArray.class.getSimpleName()+": tileArray == "+tileArray);
 
-		KPoint c = new KPoint(500, 500);
+		Vector2f c = new Vector2f(500, 500);
 		double r = rand.nextFloat()*300;
 		ArrayList<KPolygon> polygons = tileArray.getAllWithin(c, r);
 

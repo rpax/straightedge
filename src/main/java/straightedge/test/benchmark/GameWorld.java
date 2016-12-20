@@ -37,6 +37,8 @@ import straightedge.geom.*;
 import straightedge.geom.vision.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  * The model.
  * @author Keith Woodward
@@ -68,8 +70,8 @@ public class GameWorld {
 		CollinearOverlapChecker coc = new CollinearOverlapChecker();
 		coc.fixCollinearOverlaps(originalPolygons);
 		codeTimer.click("init");
-		occluderTileArray = new TileArrayIntersections(new KPoint(0, 0), new KPoint(1000, 1000), tileWidthAndHeight);
-		TileArray<PathBlockingObstacleImpl> tileArray = new TileArray<PathBlockingObstacleImpl>(new KPoint(0, 0), new KPoint(1000, 1000), tileWidthAndHeight);
+		occluderTileArray = new TileArrayIntersections(new Vector2f(0, 0), new Vector2f(1000, 1000), tileWidthAndHeight);
+		TileArray<PathBlockingObstacleImpl> tileArray = new TileArray<PathBlockingObstacleImpl>(new Vector2f(0, 0), new Vector2f(1000, 1000), tileWidthAndHeight);
 		TileBag tileBag = new TileBag(tileArray, new Bag());
 		obstacleManager = new ObstacleManager<PathBlockingObstacleImpl>(tileBag, maxConnectionDist);
 		codeTimer.click("create and add");

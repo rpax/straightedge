@@ -33,6 +33,9 @@ package straightedge.test.benchmark;
 import straightedge.geom.*;
 import straightedge.geom.path.*;
 import java.util.*;
+
+import com.jme3.math.Vector2f;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.geom.*;
@@ -46,12 +49,12 @@ public class ObstacleWorld extends GameWorld{
 		ArrayList<KPolygon> allPolys = new ArrayList<KPolygon>();
 		for (int i = 0; i < 5; i++){
 			for (int j = 0; j < 5; j++){
-				ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-				pointList.add(new KPoint(0, 0));
-				pointList.add(new KPoint(15, 5));
-				pointList.add(new KPoint(30, 0));
-				pointList.add(new KPoint(30, 30));
-				pointList.add(new KPoint(0, 30));
+				ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
+				pointList.add(new Vector2f(0, 0));
+				pointList.add(new Vector2f(15, 5));
+				pointList.add(new Vector2f(30, 0));
+				pointList.add(new Vector2f(30, 30));
+				pointList.add(new Vector2f(0, 30));
 				KPolygon poly = new KPolygon(pointList);
 				assert poly.isCounterClockWise();
 				poly.translate(90 + 45*i, 50 + 45*j);
@@ -62,7 +65,7 @@ public class ObstacleWorld extends GameWorld{
 
 		for (int i = 0; i < 5; i++){
 			for (int j = 0; j < 5; j++){
-				ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+				ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 				int numPoints = 6;
 				double angleIncrement = Math.PI*2f/(numPoints*2);
 				float rBig = 22;
@@ -71,11 +74,11 @@ public class ObstacleWorld extends GameWorld{
 				for (int k = 0; k < numPoints; k++){
 					double x = rBig*Math.cos(currentAngle);
 					double y = rBig*Math.sin(currentAngle);
-					pointList.add(new KPoint((float)x, (float)y));
+					pointList.add(new Vector2f((float)x, (float)y));
 					currentAngle += angleIncrement;
 					x = rSmall*Math.cos(currentAngle);
 					y = rSmall*Math.sin(currentAngle);
-					pointList.add(new KPoint((float)x, (float)y));
+					pointList.add(new Vector2f((float)x, (float)y));
 					currentAngle += angleIncrement;
 				}
 				KPolygon poly = new KPolygon(pointList);
@@ -87,15 +90,15 @@ public class ObstacleWorld extends GameWorld{
 		}
 
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-			pointList.add(new KPoint(5, 25));
-			pointList.add(new KPoint(25, 25));
-			pointList.add(new KPoint(25, 5));
-			pointList.add(new KPoint(5, 0));
-			pointList.add(new KPoint(30, 0));
-			pointList.add(new KPoint(30, 30));
-			pointList.add(new KPoint(0, 30));
-			pointList.add(new KPoint(0, 0));
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
+			pointList.add(new Vector2f(5, 25));
+			pointList.add(new Vector2f(25, 25));
+			pointList.add(new Vector2f(25, 5));
+			pointList.add(new Vector2f(5, 0));
+			pointList.add(new Vector2f(30, 0));
+			pointList.add(new Vector2f(30, 30));
+			pointList.add(new Vector2f(0, 30));
+			pointList.add(new Vector2f(0, 0));
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			poly.translate(100, 350);
@@ -103,17 +106,17 @@ public class ObstacleWorld extends GameWorld{
 			allPolys.add(poly);
 		}
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 
-			pointList.add(new KPoint(5, 25));
-			pointList.add(new KPoint(25, 25));
-			pointList.add(new KPoint(25, 5));
-			pointList.add(new KPoint(5, 0));
-			pointList.add(new KPoint(30, 0));
-			pointList.add(new KPoint(30, 30));
-			pointList.add(new KPoint(0, 30));
-			pointList.add(new KPoint(0, 25));
-			pointList.add(new KPoint(10, 5));
+			pointList.add(new Vector2f(5, 25));
+			pointList.add(new Vector2f(25, 25));
+			pointList.add(new Vector2f(25, 5));
+			pointList.add(new Vector2f(5, 0));
+			pointList.add(new Vector2f(30, 0));
+			pointList.add(new Vector2f(30, 30));
+			pointList.add(new Vector2f(0, 30));
+			pointList.add(new Vector2f(0, 25));
+			pointList.add(new Vector2f(10, 5));
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			poly.translate(100, 550);
@@ -121,12 +124,12 @@ public class ObstacleWorld extends GameWorld{
 			allPolys.add(poly);
 		}
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-			pointList.add(new KPoint(0, 0));
-			pointList.add(new KPoint(15, 5));
-			pointList.add(new KPoint(30, 0));
-			pointList.add(new KPoint(30, 30));
-			pointList.add(new KPoint(0, 30));
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
+			pointList.add(new Vector2f(0, 0));
+			pointList.add(new Vector2f(15, 5));
+			pointList.add(new Vector2f(30, 0));
+			pointList.add(new Vector2f(30, 30));
+			pointList.add(new Vector2f(0, 30));
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			poly.scale(3);
@@ -134,12 +137,12 @@ public class ObstacleWorld extends GameWorld{
 			allPolys.add(poly);
 		}
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-			pointList.add(new KPoint(0, 0));
-			pointList.add(new KPoint(15, 5));
-			pointList.add(new KPoint(30, 0));
-			pointList.add(new KPoint(30, 30));
-			pointList.add(new KPoint(0, 30));
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
+			pointList.add(new Vector2f(0, 0));
+			pointList.add(new Vector2f(15, 5));
+			pointList.add(new Vector2f(30, 0));
+			pointList.add(new Vector2f(30, 30));
+			pointList.add(new Vector2f(0, 30));
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			poly.scale(3);
@@ -148,7 +151,7 @@ public class ObstacleWorld extends GameWorld{
 			allPolys.add(poly);
 		}
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 			int numPoints = 6;
 			double angleIncrement = Math.PI*2f/(numPoints*2);
 			float rBig = 22;
@@ -157,11 +160,11 @@ public class ObstacleWorld extends GameWorld{
 			for (int i = 0; i < numPoints; i++){
 				double x = rBig*Math.cos(currentAngle);
 				double y = rBig*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 				x = rSmall*Math.cos(currentAngle);
 				y = rSmall*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 			}
 			KPolygon poly = new KPolygon(pointList);

@@ -30,12 +30,31 @@
  */
 package straightedge.test.benchmark;
 
-import straightedge.geom.*;
-import straightedge.test.benchmark.event.*;
-import straightedge.geom.path.*;
-import straightedge.geom.vision.*;
-import java.util.*;
-import java.awt.event.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
+import straightedge.geom.path.KNode;
+import straightedge.geom.path.PathBlockingObstacleImpl;
+import straightedge.geom.path.PathData;
+import straightedge.geom.path.PathFinder;
+import straightedge.geom.vision.OccluderImpl;
+import straightedge.geom.vision.VisionDataRotation;
+import straightedge.geom.vision.VisionFinder;
+import straightedge.test.benchmark.event.AWTEventCache;
+import straightedge.test.benchmark.event.AWTEventWrapper;
+import straightedge.test.benchmark.event.PlayerEvent;
+import straightedge.test.benchmark.event.PlayerEventCache;
+import straightedge.test.benchmark.event.PlayerKeyEvent;
+import straightedge.test.benchmark.event.PlayerMouseEvent;
+import straightedge.test.benchmark.event.PlayerMouseWheelEvent;
+import straightedge.test.benchmark.event.PlayerStatusEvent;
 
 /**
  *
@@ -44,8 +63,8 @@ import java.awt.event.*;
 public class Player implements Monster{
 	PathFinder pathFinder;
 	PathData pathData;
-	KPoint pos;
-	KPoint target;
+	Vector2f pos;
+	Vector2f target;
 	boolean recalcPathOnEveryUpdate;
 	float maxConnectionDist;
 	boolean calcPathNeeded;
@@ -74,8 +93,8 @@ public class Player implements Monster{
 		stationaryAngleTarget = lookAngle;
 		rotationSpeed = (float)(2.5f*Math.PI);
 		speed = 120;
-		pos = new KPoint(298,302);
-		target = new KPoint(580, 1);
+		pos = new Vector2f(298,302);
+		target = new Vector2f(580, 1);
 		pathData = new PathData();
 		recalcPathOnEveryUpdate = true;
 		maxConnectionDist = 300;
@@ -83,18 +102,18 @@ public class Player implements Monster{
 		
 		
 		{
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-			pointList.add(new KPoint(0, 0));
-			pointList.add(new KPoint(-5, 6));
-			pointList.add(new KPoint(10, 0));
-			pointList.add(new KPoint(-5, -6));
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
+			pointList.add(new Vector2f(0, 0));
+			pointList.add(new Vector2f(-5, 6));
+			pointList.add(new Vector2f(10, 0));
+			pointList.add(new Vector2f(-5, -6));
 			polygon = new KPolygon(pointList);
 			polygon.translateToOrigin();
 		}
 
 		{
 			KPolygon originalBoundaryPolygon = KPolygon.createRegularPolygon(20, 300);
-			KPoint originalEye = new KPoint(0, 0);
+			Vector2f originalEye = new Vector2f(0, 0);
 			visionData = new VisionDataRotation(originalEye, originalBoundaryPolygon);
 			visionFinder = new VisionFinder();
 		}
@@ -155,9 +174,9 @@ public class Player implements Monster{
 
 	}
 	KPolygon editableRect = null;
-	KPoint lastMousePress;
-	KPoint lastMouseDragOrRelease;
-	KPoint lastMouseMove;
+	Vector2f lastMousePress;
+	Vector2f lastMouseDragOrRelease;
+	Vector2f lastMouseMove;
 	public void processEvent(PlayerEvent playerEvent){
 		if (playerEvent.getType() == AWTEventWrapper.MOUSE_PRESS || 
 				playerEvent.getType() == AWTEventWrapper.MOUSE_RELEASE ||
@@ -192,7 +211,7 @@ public class Player implements Monster{
 				}
 			}
 
-			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
+			stationaryAngleTarget = Vector2fUtils.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
 
 			if (rightMousePressed || rightMouseDragged || rightMouseReleased){
 				// insert an obstacle or take one away
@@ -200,15 +219,15 @@ public class Player implements Monster{
 				float worldY = ev.getAbsoluteY();
 				int width = 20;
 				if (rightMousePressed){
-					lastMousePress = new KPoint(worldX, worldY);
+					lastMousePress = new Vector2f(worldX, worldY);
 					editableRect = null;
 					return;
 				}else if (rightMouseDragged){
-					lastMouseDragOrRelease = new KPoint(worldX, worldY);
+					lastMouseDragOrRelease = new Vector2f(worldX, worldY);
 					editableRect = KPolygon.createRectOblique(lastMousePress, lastMouseDragOrRelease, width);
 					return;
 				}else if (rightMouseReleased){
-					lastMouseDragOrRelease = new KPoint(worldX, worldY);
+					lastMouseDragOrRelease = new Vector2f(worldX, worldY);
 					if (lastMousePress.distance(lastMouseDragOrRelease) > 4){
 						// only add an obstacle if it isn't a slither.
 						editableRect = KPolygon.createRectOblique(lastMousePress, lastMouseDragOrRelease, width);
@@ -247,7 +266,7 @@ public class Player implements Monster{
 			}else if (leftMousePressed || leftMouseDragged || leftMouseReleased){
 				float worldX = ev.getAbsoluteX();
 				float worldY = ev.getAbsoluteY();
-				target = new KPoint(worldX, worldY);
+				target = new Vector2f(worldX, worldY);
 				// check that the target point isn't inside any obstacles.
 				// if so, move it.
 				boolean targetIsInsideObstacle = false;
@@ -257,7 +276,7 @@ public class Player implements Monster{
 						if (obst.getOuterPolygon().contains(target)){
 							targetIsInsideObstacle = true;
 							KPolygon poly = obst.getOuterPolygon();
-							KPoint p = poly.getBoundaryPointClosestTo(target);
+							Vector2f p = poly.getBoundaryPointClosestTo(target);
 							if (p != null){
 								target = p;
 							}
@@ -273,16 +292,16 @@ public class Player implements Monster{
 			}
 		}else if (playerEvent.getType() == AWTEventWrapper.MOUSE_MOVE){
 			PlayerMouseEvent ev = (PlayerMouseEvent)playerEvent;
-			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
+			stationaryAngleTarget = (float)Vector2fUtils.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
 			float worldX = ev.getAbsoluteX();
 			float worldY = ev.getAbsoluteY();
-			lastMouseMove = new KPoint(worldX, worldY);
-//			float relCCW = m.relativeCCW(pos, new KPoint(pos.x+1, pos.y));
+			lastMouseMove = new Vector2f(worldX, worldY);
+//			float relCCW = m.relativeCCW(pos, new Vector2f(pos.x+1, pos.y));
 //			System.out.println(this.getClass().getSimpleName()+": relCCW == "+relCCW);
 		}else if (playerEvent.getType() == PlayerKeyEvent.KEY_PRESS){
 			PlayerKeyEvent ke = (PlayerKeyEvent)playerEvent;
 			if (ke.getKeyCode() == KeyEvent.VK_K){
-				KPolygon poly = KPolygon.createRectOblique(new KPoint(0,0), new KPoint(0,60), 20);
+				KPolygon poly = KPolygon.createRectOblique(new Vector2f(0,0), new Vector2f(0,60), 20);
 				poly.translateTo(lastMouseMove);
 				getWorld().movingOccluders.add(new OccluderImpl(poly));
 			}
@@ -342,7 +361,7 @@ public class Player implements Monster{
 	}
 
 
-	KPoint currentTargetPoint = null;
+	Vector2f currentTargetPoint = null;
 	public void update(double seconds, double startTime){
 		if (speed == 0){
 			return;
@@ -351,17 +370,17 @@ public class Player implements Monster{
 		double secondsLeft = seconds;
 		for (int i = 0; i < getPathPoints().size(); i++){
 			currentTargetPoint = getPathPoints().get(i);
-			KPoint oldPos = new KPoint();
+			Vector2f oldPos = new Vector2f();
 			oldPos.x = pos.x;
 			oldPos.y = pos.y;
 			//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
+			double distUntilTargetReached = Vector2fUtils.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 			double timeUntilTargetReached = distUntilTargetReached/speed;
 			assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 			double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
 			double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 			if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-				double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+				double dirAngle = Vector2fUtils.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 				moveAngle = (float)dirAngle;
 				speedX = (float)Math.cos(moveAngle) * speed;
 				speedY = (float)Math.sin(moveAngle) * speed;
@@ -467,7 +486,7 @@ public class Player implements Monster{
 		pathFinder = new PathFinder();
 	}
 
-	public KPoint getPos() {
+	public Vector2f getPos() {
 		return pos;
 	}
 
@@ -483,7 +502,7 @@ public class Player implements Monster{
 		return speedY;
 	}
 
-	public KPoint getTarget() {
+	public Vector2f getTarget() {
 		return target;
 	}
 
@@ -495,7 +514,7 @@ public class Player implements Monster{
 		return lookAngle;
 	}
 
-	public void setPos(KPoint pos) {
+	public void setPos(Vector2f pos) {
 		this.pos = pos;
 	}
 
@@ -503,11 +522,11 @@ public class Player implements Monster{
 		this.speed = speed;
 	}
 
-	public void setTarget(KPoint target) {
+	public void setTarget(Vector2f target) {
 		this.target = target;
 	}
 
-	public ArrayList<KPoint> getPathPoints() {
+	public ArrayList<Vector2f> getPathPoints() {
 		return pathData.points;
 	}
 

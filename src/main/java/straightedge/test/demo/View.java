@@ -29,12 +29,26 @@
  *
  */
 package straightedge.test.demo;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.AABB;
 import straightedge.geom.KMultiPolygon;
-import straightedge.geom.KPoint;
 import straightedge.geom.PolygonConverter;
 import straightedge.geom.path.KNode;
 import straightedge.geom.path.PathBlockingObstacleImpl;
@@ -50,13 +64,13 @@ import straightedge.geom.vision.OccluderImpl;
  */
 public class View {
 	Main main;
-	KPoint viewCenterInScreenCoords = new KPoint();
+	Vector2f viewCenterInScreenCoords = new Vector2f();
 	boolean hasRendered = false;
 
-	KPoint viewCenterInWorldCoords = new KPoint();
+	Vector2f viewCenterInWorldCoords = new Vector2f();
 	AABB viewRectInWorldCoords = new AABB();
 
-	double scaleFactor = 1;
+	float scaleFactor = 1;
 
 	protected AffineTransform originalAT;
 	protected AffineTransform worldViewAT;
@@ -117,10 +131,10 @@ public class View {
 
 		Graphics2D g = (Graphics2D)image.getGraphics();
 
-		viewCenterInScreenCoords.x = (getWidth() / 2.0);
-		viewCenterInScreenCoords.y = (getHeight() / 2.0);
-		double scaledW = getWidth() / scaleFactor;
-		double scaledH = getHeight() / scaleFactor;
+		viewCenterInScreenCoords.x = (getWidth() / 2.0f);
+		viewCenterInScreenCoords.y = (getHeight() / 2.0f);
+		float scaledW = getWidth() / scaleFactor;
+		float scaledH = getHeight() / scaleFactor;
 
 		// for the stationary world view
 		if (hasRendered == false){
@@ -128,24 +142,24 @@ public class View {
 			viewCenterInWorldCoords.x = viewCenterInScreenCoords.x;
 			viewCenterInWorldCoords.y = viewCenterInScreenCoords.y;
 		}
-		double viewRectInWorldCoordsX = viewCenterInWorldCoords.x - scaledW / 2.0;
-		double viewRectInWorldCoordsY = viewCenterInWorldCoords.y - scaledH / 2.0;
-		double viewRectInWorldCoordsW = scaledW;
-		double viewRectInWorldCoordsH = scaledH;
+		float viewRectInWorldCoordsX = viewCenterInWorldCoords.x - scaledW / 2.0f;
+		float viewRectInWorldCoordsY = viewCenterInWorldCoords.y - scaledH / 2.0f;
+		float viewRectInWorldCoordsW = scaledW;
+		float viewRectInWorldCoordsH = scaledH;
 		viewRectInWorldCoords.setFromXYWH(viewRectInWorldCoordsX, viewRectInWorldCoordsY, viewRectInWorldCoordsW, viewRectInWorldCoordsH);
 
 //		// for the player-centered view.
 //		//Note that if you use this, the mouse movement requires changes to work properly...
-//		double playerViewX = player.getPos().getX();
-//		double playerViewY = player.getPos().getY();
-//		double xOffset = 0;
-//		double yOffset = 0;
+//		float playerViewX = player.getPos().getX();
+//		float playerViewY = player.getPos().getY();
+//		float xOffset = 0;
+//		float yOffset = 0;
 //		viewCenterInWorldCoords.x = playerViewX - (xOffset / scaleFactor);
 //		viewCenterInWorldCoords.y = playerViewY - (yOffset / scaleFactor);
-//		double viewRectInWorldCoordsX = playerViewX - (scaledW/2f) - (xOffset/scaleFactor);
-//		double viewRectInWorldCoordsY = playerViewY + (scaledH/2f) - (yOffset/scaleFactor);
-//		double viewRectInWorldCoordsW = scaledW;
-//		double viewRectInWorldCoordsH = scaledH;
+//		float viewRectInWorldCoordsX = playerViewX - (scaledW/2f) - (xOffset/scaleFactor);
+//		float viewRectInWorldCoordsY = playerViewY + (scaledH/2f) - (yOffset/scaleFactor);
+//		float viewRectInWorldCoordsW = scaledW;
+//		float viewRectInWorldCoordsH = scaledH;
 //		viewRectInWorldCoords.setFromXYWH(viewRectInWorldCoordsX, viewRectInWorldCoordsY, viewRectInWorldCoordsW, viewRectInWorldCoordsH);
 
 
@@ -198,8 +212,8 @@ public class View {
 				g.fill(occluder.getPolygon());
 //				KPolygon poly = occluder.getPolygon();
 //				for (int j = 0; j < poly.getPoints().size(); j++){
-//					KPoint p = poly.getPoints().get(j);
-//					double r = 1;
+//					Vector2f p = poly.getPoints().get(j);
+//					float r = 1;
 //					g.setColor(Color.GRAY.darker());
 //					g.fill(new Ellipse2D.Double(p.x - r, p.y - r, 2*r, 2*r));
 ////					g.drawString(""+j, (float)p.x, (float)p.y);
@@ -255,11 +269,11 @@ public class View {
 				}
 				// render connections between tempReachableNodes
 				g.setColor(Color.BLUE);
-				KPoint startPoint = pathFinder.startPointDebug;
+				Vector2f startPoint = pathFinder.startPointDebug;
 				for (KNode n : pathFinder.startNodeTempReachableNodesDebug) {
 					g.draw(new Line2D.Double(startPoint.x, startPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 				}
-				KPoint endPoint = pathFinder.endPointDebug;
+				Vector2f endPoint = pathFinder.endPointDebug;
 				for (KNode n : pathFinder.endNodeTempReachableNodesDebug) {
 					g.draw(new Line2D.Double(endPoint.x, endPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 				}
@@ -274,36 +288,36 @@ public class View {
 			{
 				Player p = player;
 				g.setColor(Color.MAGENTA.darker());
-				ArrayList<KPoint> points = p.targetFinder.pathData.points;
+				ArrayList<Vector2f> points = p.targetFinder.pathData.points;
 				if (points.size() > 0) {
-					KPoint currentPoint = p.getPos();
+					Vector2f currentPoint = p.getPos();
 					for (int j = 0; j < points.size(); j++) {
-						KPoint nextPoint = points.get(j);
+						Vector2f nextPoint = points.get(j);
 						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 						float d = 5f;
 						g.draw(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 						currentPoint = nextPoint;
 					}
 				}
-				KPoint targetPoint = p.targetFinder.getAbsoluteTarget();
+				Vector2f targetPoint = p.targetFinder.getAbsoluteTarget();
 				float d = 7f;
 				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getY() - d / 2f, d, d));
 			}
 			g.setColor(Color.PINK.darker());
 			for (int i = 0; i < enemies.size(); i++){
 				Player p = enemies.get(i);
-				ArrayList<KPoint> points = p.targetFinder.pathData.points;
+				ArrayList<Vector2f> points = p.targetFinder.pathData.points;
 				if (points.size() > 0) {
-					KPoint currentPoint = p.getPos();
+					Vector2f currentPoint = p.getPos();
 					for (int j = 0; j < points.size(); j++) {
-						KPoint nextPoint = points.get(j);
+						Vector2f nextPoint = points.get(j);
 						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 						float d = 5f;
 						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 						currentPoint = nextPoint;
 					}
 				}
-				KPoint targetPoint = p.targetFinder.getAbsoluteTarget();
+				Vector2f targetPoint = p.targetFinder.getAbsoluteTarget();
 				float d = 7f;
 				g.draw(new Ellipse2D.Double(targetPoint.getX() - d / 2f, targetPoint.getY() - d / 2f, d, d));
 			}
@@ -694,32 +708,32 @@ public class View {
 	}
 
 
-	public double getWorldCoordFromViewPaneCoordX(double x){
+	public float getWorldCoordFromViewPaneCoordX(float x){
 		Player player = main.world.player;
-		double mx = ((x - viewCenterInScreenCoords.x) / scaleFactor + player.getPos().getX());
+		float mx = ((x - viewCenterInScreenCoords.x) / scaleFactor + player.getPos().getX());
 		return mx;
 	}
-	public double getWorldCoordFromViewPaneCoordY(double y){
+	public float getWorldCoordFromViewPaneCoordY(float y){
 		Player player = main.world.player;
-		double my = ((y - viewCenterInScreenCoords.y) / scaleFactor + player.getPos().getY());
+		float my = ((y - viewCenterInScreenCoords.y) / scaleFactor + player.getPos().getY());
 		return my;
 	}
-	public KPoint getWorldPointFromViewPanePoint(KPoint viewPanePoint){
-		return new KPoint(getWorldCoordFromViewPaneCoordX(viewPanePoint.x), getWorldCoordFromViewPaneCoordY(viewPanePoint.y));
+	public Vector2f getWorldPointFromViewPanePoint(Vector2f viewPanePoint){
+		return new Vector2f(getWorldCoordFromViewPaneCoordX(viewPanePoint.x), getWorldCoordFromViewPaneCoordY(viewPanePoint.y));
 	}
 
-	public double getViewPaneCoordFromWorldCoordX(double x){
+	public float getViewPaneCoordFromWorldCoordX(float x){
 		Player player = main.world.player;
-		double mx = (x - player.getPos().getX())*scaleFactor + viewCenterInScreenCoords.x;
+		float mx = (x - player.getPos().getX())*scaleFactor + viewCenterInScreenCoords.x;
 		return mx;
 	}
-	public double getViewPaneCoordFromWorldCoordY(double y){
+	public float getViewPaneCoordFromWorldCoordY(float y){
 		Player player = main.world.player;
-		double my = (y - player.getPos().getY())*scaleFactor + viewCenterInScreenCoords.y;
+		float my = (y - player.getPos().getY())*scaleFactor + viewCenterInScreenCoords.y;
 		return my;
 	}
-	public KPoint getViewPanePointFromWorldPoint(KPoint viewPanePoint){
-		return new KPoint(getViewPaneCoordFromWorldCoordX(viewPanePoint.x), getViewPaneCoordFromWorldCoordY(viewPanePoint.y));
+	public Vector2f getViewPanePointFromWorldPoint(Vector2f viewPanePoint){
+		return new Vector2f(getViewPaneCoordFromWorldCoordX(viewPanePoint.x), getViewPaneCoordFromWorldCoordY(viewPanePoint.y));
 	}
 
 

@@ -30,25 +30,25 @@
  */
 package straightedge.test.demo;
 
-
+import com.jme3.math.FastMath;
 
 public class Gun{
 	public World world;
-	public double angle;
-	public double rotationSpeed;
+	public float angle;
+	public float rotationSpeed;
 	public boolean firing;
-	public double lastTimeFiredSeconds;
-	public double triggerPressSeconds;
+	public float lastTimeFiredSeconds;
+	public float triggerPressSeconds;
 	public float length;
 	int unloadedAmmo;
 	int maxClipAmmo;
 	int clipAmmo;
-	public double reloadSeconds;
-	public double reloadClipSeconds;
-	public double timeUntilReloaded;
+	public float reloadSeconds;
+	public float reloadClipSeconds;
+	public float timeUntilReloaded;
 	boolean reloadNeeded;
 	public Player player;
-	double coneAngle;
+	float coneAngle;
 	int playerGunNum;
 	//AcceleratedImage image = new AcceleratedImage("guns/machineGun.png");
 
@@ -57,7 +57,7 @@ public class Gun{
 		respawn();
 	}
 
-	public Bullet createBullet(Player player, double xPosWhenFired, double yPosWhenFired, double playerAngle, double lastTimeFiredSeconds, double xLaunchSpeed, double yLaunchSpeed){
+	public Bullet createBullet(Player player, float xPosWhenFired, float yPosWhenFired, float playerAngle, float lastTimeFiredSeconds, float xLaunchSpeed, float yLaunchSpeed){
 		float randomAngleIncrement = (float)((world.random.nextFloat()-0.5)*coneAngle);
 		return new Bullet(this, player, xPosWhenFired, yPosWhenFired, angle + randomAngleIncrement, lastTimeFiredSeconds, 0, 0);
 	}
@@ -79,16 +79,16 @@ public class Gun{
 		unloadedAmmo = 1000000000;
 		maxClipAmmo = 100;
 		clipAmmo = maxClipAmmo;
-		rotationSpeed = Math.PI*3;
+		rotationSpeed = FastMath.PI*3;
 		coneAngle = 0;//Math.PI/36f;
 		playerGunNum = 0;
 
 	}
 
-	public void doMoveAndBulletFire(double seconds, double startTime) {
+	public void doMoveAndBulletFire(float seconds, float startTime) {
 		assert seconds >= 0 && timeUntilReloaded >= 0 : seconds+", "+timeUntilReloaded;
 		assert player != null;
-		double endTime = startTime + seconds;
+		float endTime = startTime + seconds;
 
 		if (timeUntilReloaded > 0){
 			if (timeUntilReloaded > seconds){
@@ -117,8 +117,8 @@ public class Gun{
 			assert seconds >= 0 : seconds;
 			assert startTime <= endTime : startTime + ", " + endTime;
 
-			double xPosWhenFired = player.pos.x;
-			double yPosWhenFired = player.pos.y;
+			float xPosWhenFired = player.pos.x;
+			float yPosWhenFired = player.pos.y;
 			xPosWhenFired += (float) (length * Math.cos(angle));
 			yPosWhenFired += (float) (length * Math.sin(angle));
 			fire(seconds, startTime, player, xPosWhenFired, yPosWhenFired, angle, player.speedX, player.speedY);
@@ -151,23 +151,23 @@ public class Gun{
 		}
 		doMoveBetweenFires(seconds, startTime);
 	}
-	public void doMoveBetweenFires(double seconds, double startTime){
+	public void doMoveBetweenFires(float seconds, float startTime){
 		this.doRotation(seconds, startTime);
 		player.doMoveBetweenGunFires(seconds, startTime);
 	}
-	public void fire(double secondsLeft, double timeAtStartOfMoveSeconds, Player player, double xPosWhenFired, double yPosWhenFired, double angle, double playerSpeedX, double playerSpeedY) {
+	public void fire(float secondsLeft, float timeAtStartOfMoveSeconds, Player player, float xPosWhenFired, float yPosWhenFired, float angle, float playerSpeedX, float playerSpeedY) {
 		Bullet bullet = createBullet(player, xPosWhenFired, yPosWhenFired, angle, timeAtStartOfMoveSeconds, playerSpeedX, playerSpeedY);
 		// Move the bullet to where it should be at the end of this move. Note that each bullet in world.bullets has already had doMove called on it so there won't be any doubling up.
 		bullet.doMove(secondsLeft, timeAtStartOfMoveSeconds);
 		world.bullets.add(bullet);
 	}
 
-	public void doRotation(double seconds, double timeAtStartOfMoveSeconds) {
+	public void doRotation(float seconds, float timeAtStartOfMoveSeconds) {
 		// The below is commented out since without vehicles and just using soldiers, there's no use having the gun turn independantly of the soldier.
-		double oldGunAngleRelativeToPlayer = angle;
-		double targetGunAngle = player.mouseAngle;//(float)KPoint.findAngle(0, 0, targetPoint.x, targetPoint.y);
+		float oldGunAngleRelativeToPlayer = angle;
+		float targetGunAngle = player.mouseAngle;//(float)KPoint.findAngle(0, 0, targetPoint.x, targetPoint.y);
 		//float angleToTurn = (float) (targetGunAngle - oldGunAngleRelativeToPlayer - player.getAngle());
-		double angleToTurn = (float) (targetGunAngle - oldGunAngleRelativeToPlayer);
+		float angleToTurn = (float) (targetGunAngle - oldGunAngleRelativeToPlayer);
 		// Here we make sure angleToTurn is between -Math.PI and +Math.PI so
 		// that it's easy to know which way the gun should turn.
 		// The maximum that angleToTurn could be now is + or - 2 * 2*Math.PI.
@@ -207,7 +207,7 @@ public class Gun{
 	}
 
 	public void startFiring(double triggerPressSeconds) {
-		this.triggerPressSeconds = triggerPressSeconds;
+		this.triggerPressSeconds = (float) triggerPressSeconds;
 		firing = true;
 	}
 
@@ -215,13 +215,13 @@ public class Gun{
 		firing = false;
 	}
 
-	public double getCurrentReloadSeconds() {
+	public float getCurrentReloadSeconds() {
 		if (reloadNeeded) {
 			int ammoToPutIn = maxClipAmmo - clipAmmo;
 			if (ammoToPutIn > unloadedAmmo){
 				ammoToPutIn = unloadedAmmo;
 			}
-			double proportionOfClipToReload = (ammoToPutIn/maxClipAmmo);
+			float proportionOfClipToReload = (ammoToPutIn/maxClipAmmo);
 			assert proportionOfClipToReload > 0 && proportionOfClipToReload <= 1: proportionOfClipToReload+", note that proportionOfClipToReload should not be zero.";
 			return getReloadClipSeconds()*proportionOfClipToReload;
 		} else {
@@ -277,14 +277,14 @@ public class Gun{
 		}
 	}
 
-	public double getReloadSeconds() {
+	public float getReloadSeconds() {
 		if (player != null){
 			return reloadSeconds;
 		}
 		return reloadSeconds;
 	}
 
-	public double getReloadClipSeconds() {
+	public float getReloadClipSeconds() {
 		if (player != null){
 			return reloadClipSeconds;
 		}
@@ -293,9 +293,9 @@ public class Gun{
 
 
 
-	public double getProportionOfReloadTimeElapsed(){
+	public float getProportionOfReloadTimeElapsed(){
 		//assert getLastTimeFiredSeconds() <= world.getSecondsElapsed() : world.getSecondsElapsed() + ", " + getLastTimeFiredSeconds();
-		//double timeSinceLastTimeFired = world.getTotalElapsedSeconds() - getLastTimeFiredSeconds();
+		//float timeSinceLastTimeFired = world.getTotalElapsedSeconds() - getLastTimeFiredSeconds();
 		float proportionOfReloadTimeElapsed;
 		if (reloadNeeded == true || getTotalAmmo() == 0){// || player.isDead() == true) {
 			proportionOfReloadTimeElapsed = 0;
@@ -307,7 +307,7 @@ public class Gun{
 		return proportionOfReloadTimeElapsed;
 	}
 
-	public double getProportionOfAmmoInClip(){
+	public float getProportionOfAmmoInClip(){
 		float proportionOfAmmoInClip;
 		if (reloadNeeded == false){
 			proportionOfAmmoInClip = (float)clipAmmo/maxClipAmmo;

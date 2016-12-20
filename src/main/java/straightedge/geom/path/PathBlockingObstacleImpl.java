@@ -34,6 +34,8 @@ import straightedge.geom.PolygonBufferer;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 
 /**
  *
@@ -71,7 +73,7 @@ public class PathBlockingObstacleImpl implements PathBlockingObstacle{
 		}else{
 			for (int j = 0; j < nodes.size(); j++){
 				KNodeOfObstacle node = nodes.get(j);
-				KPoint outerPolygonPoint = getOuterPolygon().getPoint(j);
+				Vector2f outerPolygonPoint = getOuterPolygon().getPoint(j);
 				node.getPoint().x = outerPolygonPoint.x;
 				node.getPoint().y = outerPolygonPoint.y;
 			}

@@ -6,7 +6,8 @@
 package straightedge.geom.path;
 
 import java.util.ArrayList;
-import straightedge.geom.KPoint;
+
+import com.jme3.math.Vector2f;
 
 /**
  *
@@ -49,7 +50,7 @@ public class PathData {
 	}
 
 	Result result;
-	public ArrayList<KPoint> points;
+	public ArrayList<Vector2f> points;
 	public ArrayList<KNode> nodes;
 
 	public PathData(){
@@ -64,7 +65,7 @@ public class PathData {
 		this.result = result;
 	}
 
-	public PathData(ArrayList<KPoint> points, ArrayList<KNode> nodes){
+	public PathData(ArrayList<Vector2f> points, ArrayList<KNode> nodes){
 		setSuccess(points, nodes);
 	}
 
@@ -73,7 +74,7 @@ public class PathData {
 		initLists();
 	}
 	public void initLists(){
-		points = new ArrayList<KPoint>();
+		points = new ArrayList<Vector2f>();
 		nodes = new ArrayList<KNode>();
 	}
 
@@ -85,7 +86,7 @@ public class PathData {
 		initLists();
 	}
 	
-	public void setSuccess(ArrayList<KPoint> points, ArrayList<KNode> nodes){
+	public void setSuccess(ArrayList<Vector2f> points, ArrayList<KNode> nodes){
 		result = Result.SUCCESS;
 		initLists();
 		this.points.addAll(points);
@@ -102,7 +103,7 @@ public class PathData {
 		return nodes;
 	}
 
-	public ArrayList<KPoint> getPoints() {
+	public ArrayList<Vector2f> getPoints() {
 		return points;
 	}
 

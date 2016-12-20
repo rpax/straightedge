@@ -32,6 +32,8 @@ package straightedge.geom.vision;
 
 import straightedge.geom.*;
 import java.util.*;
+
+import com.jme3.math.Vector2f;
 /**
  *
  * @author Keith
@@ -63,17 +65,17 @@ public class CollinearOverlapChecker {
 	 */
 	public ArrayList<CollinearOverlap> getCollinearOverlaps(KPolygon polygon, ArrayList<KPolygon> polygons){
 		ArrayList<CollinearOverlap> collinearOverlaps = new ArrayList<CollinearOverlap>();
-		ArrayList<KPoint> points = polygon.getPoints();
+		ArrayList<Vector2f> points = polygon.getPoints();
 		for (int i = 0; i < points.size(); i++){
-			KPoint p = points.get(i);
+			Vector2f p = points.get(i);
 			int iPlus = (i+1 >= points.size()-1 ? 0 : i+1);
-			KPoint pPlus = points.get(iPlus);
+			Vector2f pPlus = points.get(iPlus);
 			double pToPPlusDist = p.distance(pPlus);
 			for (int j = 0; j < polygons.size(); j++){
 				KPolygon polygon2 = polygons.get(j);
-				ArrayList<KPoint> points2 = polygon2.getPoints();
+				ArrayList<Vector2f> points2 = polygon2.getPoints();
 				for (int k = 0; k < points2.size(); k++){
-					KPoint p2 = points2.get(k);
+					Vector2f p2 = points2.get(k);
 					double pToP2Dist = p.distance(p2);
 					if (pToP2Dist < pToPPlusDist){
 						// It's possible that the points overlap.

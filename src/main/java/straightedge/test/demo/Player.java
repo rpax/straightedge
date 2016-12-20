@@ -30,15 +30,19 @@
  */
 package straightedge.test.demo;
 
-import straightedge.geom.AABB;
-import straightedge.geom.KPoint;
-import straightedge.geom.KPolygon;
-import straightedge.geom.vision.VisionDataRotation;
-import straightedge.geom.vision.VisionFinder;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.AABB;
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
+import straightedge.geom.vision.VisionDataRotation;
+import straightedge.geom.vision.VisionFinder;
 
 
 
@@ -48,32 +52,32 @@ import java.util.ArrayList;
  */
 public class Player implements TargetUser{
 	public World world;
-	KPoint pos;
+	Vector2f pos;
 	TargetFinder targetFinder;
 	KPolygon originalPolygon;
 	KPolygon polygon;
-	double maxConnectionDistance;
-	double speed;
-	double speedX;
-	double speedY;
-	double moveAngle;
-	KPoint currentTargetPoint = null;
-	double mouseAngle;
-	double angle;
-	double rotationSpeed = Math.PI;
+	float maxConnectionDistance;
+	float speed;
+	float speedX;
+	float speedY;
+	float moveAngle;
+	Vector2f currentTargetPoint = null;
+	float mouseAngle;
+	float angle;
+	float rotationSpeed = FastMath.PI;
 	Gun gun;
-	double health;
-	double maxHealth;
+	float health;
+	float maxHealth;
 
 	boolean dead = false;
-	double deathTime = -1;
-	double respawnTime = 1;
+	float deathTime = -1;
+	float respawnTime = 1;
 
 	VisionFinder visionFinder;
 	VisionDataRotation cache;
-	double smallAmount = 0.0001f;
+	float smallAmount = 0.0001f;
 
-	public Player(World world, KPoint pos){
+	public Player(World world, Vector2f pos){
 		this.world = world;
 		this.pos = pos;
 		targetFinder = new TargetFinder(this, world);
@@ -95,7 +99,7 @@ public class Player implements TargetUser{
 			originalBoundaryPolygon.scale(1, 0.6);
 			originalBoundaryPolygon.translate(50, 0);
 			// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-			KPoint originalEye = new KPoint(smallAmount, smallAmount);
+			Vector2f originalEye = new Vector2f(smallAmount, smallAmount);
 			visionFinder = new VisionFinder();
 			cache = new VisionDataRotation(originalEye, originalBoundaryPolygon);
 		}
@@ -103,8 +107,8 @@ public class Player implements TargetUser{
 		respawn(pos);
 	}
 
-	public void respawn(KPoint spawnPos){
-		this.pos.setCoords(spawnPos);
+	public void respawn(Vector2f spawnPos){
+		this.pos.set(spawnPos);
 		targetFinder.setFixedTarget(pos, true);
 		copyAndTransformPolygon();
 
@@ -127,14 +131,14 @@ public class Player implements TargetUser{
 		polygon.rotate(angle, pos);
 	}
 
-	public void nowAtTimeStop(double timeNow){
+	public void nowAtTimeStop(float timeNow){
 		if (dead){
 			if (deathTime + respawnTime < timeNow){
 				if (isBot()){
-					KPoint newPos = world.getNearestPointOutsideOfObstacles(world.makeRandomPointWithin(world.enemySpawnAABB));
+					Vector2f newPos = world.getNearestPointOutsideOfObstacles(world.makeRandomPointWithin(world.enemySpawnAABB));
 					respawn(newPos);
 				}else{
-					KPoint newPos = world.getNearestPointOutsideOfObstacles(world.makeRandomPointWithin(world.playerSpawnAABB));
+					Vector2f newPos = world.getNearestPointOutsideOfObstacles(world.makeRandomPointWithin(world.playerSpawnAABB));
 					respawn(newPos);
 				}
 			}
@@ -145,20 +149,20 @@ public class Player implements TargetUser{
 					playerVisible = true;
 					if (world.player.dead == false && world.player.pos.distance(pos) < minFollowDist){
 						// too close, so move away from player to be able to shoot him
-						KPoint target = world.player.pos.createPointToward(pos, minFollowDist-0.01);
-						KPoint targetAdjusted = world.getNearestPointOutsideOfObstacles(target);
+						Vector2f target = Vector2fUtils.createPointToward(world.player.pos,pos, minFollowDist-0.01);
+						Vector2f targetAdjusted = world.getNearestPointOutsideOfObstacles(target);
 						targetFinder.setFixedTarget(targetAdjusted, true);
 					}else{
-						KPoint target = world.player.pos.copy();
-						KPoint targetAdjusted = world.getNearestPointOutsideOfObstacles(target);
+						Vector2f target = world.player.pos.clone();
+						Vector2f targetAdjusted = world.getNearestPointOutsideOfObstacles(target);
 						targetFinder.setFixedTarget(targetAdjusted, true);
 					}
 				}else{
-					KPoint targetAdjusted = targetFinder.getAbsoluteTarget();
+					Vector2f targetAdjusted = targetFinder.getAbsoluteTarget();
 					//System.out.println(this.getClass().getSimpleName()+": bot.pos == "+this.pos+", targetAdjusted == "+targetAdjusted+", targetFinder.getPathPoints().size() == "+targetFinder.getPathPoints().size());
-					if (targetAdjusted == null || pos.distanceSq(targetAdjusted) < 10 || targetFinder.pathData.isError()){
-						//System.out.println(this.getClass().getSimpleName()+": targetAdjusted == null || pos.distanceSq(targetAdjusted) < 10");
-						KPoint target = world.makeRandomPointWithin(world.innerAABB);
+					if (targetAdjusted == null || pos.distanceSquared(targetAdjusted) < 10 || targetFinder.pathData.isError()){
+						//System.out.println(this.getClass().getSimpleName()+": targetAdjusted == null || pos.distanceSquared(targetAdjusted) < 10");
+						Vector2f target = world.makeRandomPointWithin(world.innerAABB);
 						targetAdjusted = world.getNearestPointOutsideOfObstacles(target);
 						targetFinder.setFixedTarget(targetAdjusted, true);
 					}
@@ -171,33 +175,33 @@ public class Player implements TargetUser{
 		}
 	}
 
-	public void doMove(double seconds, double startTime){
+	public void doMove(float seconds, float startTime){
 		if (dead == false){
 			gun.doMoveAndBulletFire(seconds, startTime);
 		}
 	}
 
-	double minFollowDist = 10;
+	float minFollowDist = 10;
 	boolean playerVisible = false;
-	public void doMoveBetweenGunFires(double seconds, double startTime){
+	public void doMoveBetweenGunFires(float seconds, float startTime){
 		// update the player's position as it travels from point to point along the path.
-		double secondsLeft = seconds;
-		ArrayList<KPoint> pathPoints = targetFinder.getPathData().getPoints();
+		float secondsLeft = seconds;
+		ArrayList<Vector2f> pathPoints = targetFinder.getPathData().getPoints();
 		for (int i = 0; i < pathPoints.size(); i++){
 			currentTargetPoint = pathPoints.get(i);
-			KPoint oldPos = new KPoint();
+			Vector2f oldPos = new Vector2f();
 			oldPos.x = pos.x;
 			oldPos.y = pos.y;
 			//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
-			double timeUntilTargetReached = distUntilTargetReached/speed;
+			float distUntilTargetReached = Vector2fUtils.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
+			float timeUntilTargetReached = distUntilTargetReached/speed;
 			assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
-			double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
-			double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
+			float xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
+			float yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 			if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-				moveAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
-				speedX = Math.cos(moveAngle) * speed;
-				speedY = Math.sin(moveAngle) * speed;
+				moveAngle = Vector2fUtils.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)FastMath.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+				speedX = FastMath.cos(moveAngle) * speed;
+				speedY = FastMath.sin(moveAngle) * speed;
 			}else{
 				speedX = 0f;
 				speedY = 0f;
@@ -226,7 +230,7 @@ public class Player implements TargetUser{
 
 		if (isBot()){
 			if (playerVisible){
-				mouseAngle = pos.findAngle(world.player.pos);
+				mouseAngle =Vector2fUtils.findAngle(pos,world.player.pos);
 				gun.startFiring(startTime);
 			}else{
 				mouseAngle = moveAngle;
@@ -234,7 +238,7 @@ public class Player implements TargetUser{
 			}
 		}else{
 			if (pos.equals(world.main.eventHandler.lastMousePointInWorldCoords) == false){
-				mouseAngle = KPoint.findAngle(pos, world.main.eventHandler.lastMousePointInWorldCoords);
+				mouseAngle = Vector2fUtils.findAngle(pos, world.main.eventHandler.lastMousePointInWorldCoords);
 			}
 		}
 
@@ -251,9 +255,9 @@ public class Player implements TargetUser{
 		}
 	}
 
-	public void doRotation(double seconds, double startTime){
-		double oldAngle = angle;
-		double targetAngle;
+	public void doRotation(float seconds, float startTime){
+		float oldAngle = angle;
+		float targetAngle;
 		if (speedX == 0 && speedY == 0){
 			// stationary, so turn in direction of mouse.
 			targetAngle = mouseAngle;
@@ -261,26 +265,26 @@ public class Player implements TargetUser{
 			// moving, so turn in direction of destination.
 			targetAngle = moveAngle;
 		}
-		double angleToTurn = targetAngle - oldAngle;
-		// Here we make sure angleToTurn is between -Math.PI and +Math.PI so
+		float angleToTurn = targetAngle - oldAngle;
+		// Here we make sure angleToTurn is between -FastMath.PI and +FastMath.PI so
 		// that it's easy to know which way we should turn.
-		// The maximum/minimum that angleToTurn could be now is +/-2*Math.PI.
-		while (angleToTurn < -Math.PI) {
-			angleToTurn += 2 * Math.PI;
+		// The maximum/minimum that angleToTurn could be now is +/-2*FastMath.PI.
+		while (angleToTurn < -FastMath.PI) {
+			angleToTurn += 2 * FastMath.PI;
 		}
-		while (angleToTurn > Math.PI) {
-			angleToTurn -= 2 * Math.PI;
+		while (angleToTurn > FastMath.PI) {
+			angleToTurn -= 2 * FastMath.PI;
 		}
-		assert angleToTurn >= -Math.PI && angleToTurn <= Math.PI : angleToTurn + ", " + Math.PI;
-		double maxAngleChange = rotationSpeed * seconds;
-		double timeUsed = 0;
+		assert angleToTurn >= -FastMath.PI && angleToTurn <= FastMath.PI : angleToTurn + ", " + FastMath.PI;
+		float maxAngleChange = rotationSpeed * seconds;
+		float timeUsed = 0;
 		if (angleToTurn > 0) {
 			if (angleToTurn > maxAngleChange) {
 				angle = oldAngle + maxAngleChange;
 				timeUsed = seconds;
 			} else {
 				angle = targetAngle;
-				timeUsed = Math.abs(angleToTurn/rotationSpeed);
+				timeUsed = FastMath.abs(angleToTurn/rotationSpeed);
 			}
 		} else {
 			if (angleToTurn < -maxAngleChange) {
@@ -288,19 +292,19 @@ public class Player implements TargetUser{
 				timeUsed = seconds;
 			} else {
 				angle = targetAngle;
-				timeUsed = Math.abs(angleToTurn/rotationSpeed);
+				timeUsed = FastMath.abs(angleToTurn/rotationSpeed);
 			}
 		}
 		if (angle < 0) {
-			angle += 2 * Math.PI;
+			angle += 2 * FastMath.PI;
 		}
-		if (angle >= 2 * Math.PI) {
-			angle -= 2 * Math.PI;
+		if (angle >= 2 * FastMath.PI) {
+			angle -= 2 * FastMath.PI;
 		}
 		assert mouseAngle >= 0 : mouseAngle;
 		assert angle >= 0 : angle;
 	}
-	public void die(double timeNow){
+	public void die(float timeNow){
 		dead = true;
 		this.deathTime = timeNow;
 		if (isBot()){
@@ -309,7 +313,7 @@ public class Player implements TargetUser{
 		}
 	}
 
-	public KPoint getPos() {
+	public Vector2f getPos() {
 		return pos;
 	}
 
@@ -317,36 +321,36 @@ public class Player implements TargetUser{
 	public AcceleratedImage ai;
 	public void makeImage(){
 		originalBoundaryPolygonAABB = cache.getOriginalBoundaryPolygon().getAABB();
-		int picW = (int)Math.ceil(originalBoundaryPolygonAABB.getWidth());
-		int picH = (int)Math.ceil(originalBoundaryPolygonAABB.getHeight());
+		int picW = (int)FastMath.ceil(originalBoundaryPolygonAABB.getWidth());
+		int picH = (int)FastMath.ceil(originalBoundaryPolygonAABB.getHeight());
 
 		BufferedImage image = new BufferedImage(picW, picH, BufferedImage.TYPE_INT_ARGB);
 		int[] imagePixelData = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-		double alphaEye = 0.3;
-		double redEye = 1;
-		double greenEye = 1;
-		double blueEye = 1;
+		float alphaEye = 0.3f;
+		float redEye = 1;
+		float greenEye = 1;
+		float blueEye = 1;
 
-		double alphaEdge = 0;
-		double redEdge = 1;
-		double greenEdge = 1;
-		double blueEdge = 1;
+		float alphaEdge = 0;
+		float redEdge = 1;
+		float greenEdge = 1;
+		float blueEdge = 1;
 		for (int i = 0; i < picW; i++){
 			for (int j = 0; j < picH; j++){
-				KPoint p = new KPoint();
+				Vector2f p = new Vector2f();
 				p.x = originalBoundaryPolygonAABB.getX() + i;
 				p.y = originalBoundaryPolygonAABB.getY() + j;
-				KPoint boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(), cache.getOriginalEye().createPointToward(p, cache.getOriginalBoundaryPolygon().getRadius()*2));
-				double eyeToPixelDist = cache.getOriginalEye().distanceSq(p);
-				double eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSq(boundaryP);
-				double lightness = (1 - eyeToPixelDist/eyeThruPixelToBoundaryDist);
+				Vector2f boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(), Vector2fUtils.createPointToward(cache.getOriginalEye(),p, cache.getOriginalBoundaryPolygon().getRadius()*2));
+				float eyeToPixelDist = cache.getOriginalEye().distanceSquared(p);
+				float eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSquared(boundaryP);
+				float lightness = (1 - eyeToPixelDist/eyeThruPixelToBoundaryDist);
 				if (lightness < 0){
 					lightness = 0;
 				}
-				double alpha = alphaEye*lightness + alphaEdge*(1-lightness);
-				double red = redEye*lightness + redEdge*(1-lightness);
-				double green = greenEye*lightness + greenEdge*(1-lightness);
-				double blue = blueEye*lightness + blueEdge*(1-lightness);
+				float alpha = alphaEye*lightness + alphaEdge*(1-lightness);
+				float red = redEye*lightness + redEdge*(1-lightness);
+				float green = greenEye*lightness + greenEdge*(1-lightness);
+				float blue = blueEye*lightness + blueEdge*(1-lightness);
 				imagePixelData[j*picW+i]= (int)(alpha*255) << 24 | (int)(red*255) << 16 | (int)(green*255) << 8 | (int)(blue*255);
 			}
 		}
@@ -357,38 +361,38 @@ public class Player implements TargetUser{
 	public void makeImage2(){
 		Color fogColor = world.main.view.fogColor;
 		originalBoundaryPolygonAABB = cache.getOriginalBoundaryPolygon().getAABB();
-		int picW = (int)Math.ceil(originalBoundaryPolygonAABB.getWidth());
-		int picH = (int)Math.ceil(originalBoundaryPolygonAABB.getHeight());
+		int picW = (int)FastMath.ceil(originalBoundaryPolygonAABB.getWidth());
+		int picH = (int)FastMath.ceil(originalBoundaryPolygonAABB.getHeight());
 
 		BufferedImage image = new BufferedImage(picW, picH, BufferedImage.TYPE_INT_ARGB);
 		int[] imagePixelData = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-		double alphaEye = 0;
-		double redEye = fogColor.getRed()/255f;
-		double greenEye = fogColor.getGreen()/255f;
-		double blueEye = fogColor.getBlue()/255f;
+		float alphaEye = 0;
+		float redEye = fogColor.getRed()/255f;
+		float greenEye = fogColor.getGreen()/255f;
+		float blueEye = fogColor.getBlue()/255f;
 
-		double alphaEdge = fogColor.getAlpha()/255f;
-		double redEdge = fogColor.getRed()/255f;
-		double greenEdge = fogColor.getGreen()/255f;
-		double blueEdge = fogColor.getBlue()/255f;
+		float alphaEdge = fogColor.getAlpha()/255f;
+		float redEdge = fogColor.getRed()/255f;
+		float greenEdge = fogColor.getGreen()/255f;
+		float blueEdge = fogColor.getBlue()/255f;
 		for (int i = 0; i < picW; i++){
 			for (int j = 0; j < picH; j++){
-				KPoint p = new KPoint();
+				Vector2f p = new Vector2f();
 				p.x = originalBoundaryPolygonAABB.getX() + i;
 				p.y = originalBoundaryPolygonAABB.getY() + j;
-				KPoint boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(), cache.getOriginalEye().createPointToward(p, cache.getOriginalBoundaryPolygon().getRadius()*2));
-				double eyeToPixelDist = cache.getOriginalEye().distanceSq(p);
-				double eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSq(boundaryP);
-				double lightness = (1 - eyeToPixelDist/eyeThruPixelToBoundaryDist);
+				Vector2f boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(),Vector2fUtils.createPointToward( cache.getOriginalEye(),p, cache.getOriginalBoundaryPolygon().getRadius()*2));
+				float eyeToPixelDist = cache.getOriginalEye().distanceSquared(p);
+				float eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSquared(boundaryP);
+				float lightness = (1 - eyeToPixelDist/eyeThruPixelToBoundaryDist);
 				if (lightness < 0){
 					lightness = 0;
 				}
-				//lightness = Math.pow(lightness, 0.75);
-				//lightness = Math.pow(lightness, 2);
-				double alpha = alphaEye*lightness + alphaEdge*(1-lightness);
-				double red = redEye*lightness + redEdge*(1-lightness);
-				double green = greenEye*lightness + greenEdge*(1-lightness);
-				double blue = blueEye*lightness + blueEdge*(1-lightness);
+				//lightness = FastMath.pow(lightness, 0.75);
+				//lightness = FastMath.pow(lightness, 2);
+				float alpha = alphaEye*lightness + alphaEdge*(1-lightness);
+				float red = redEye*lightness + redEdge*(1-lightness);
+				float green = greenEye*lightness + greenEdge*(1-lightness);
+				float blue = blueEye*lightness + blueEdge*(1-lightness);
 				imagePixelData[j*picW+i]= (int)(alpha*255) << 24 | (int)(red*255) << 16 | (int)(green*255) << 8 | (int)(blue*255);
 			}
 		}

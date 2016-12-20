@@ -33,6 +33,8 @@ package straightedge.test.benchmark;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  *
  * @author Phillip
@@ -44,12 +46,12 @@ public class CornerCaseWorld extends GameWorld{
 	protected ArrayList<KPolygon> makePolygons(){
 		ArrayList<KPolygon> allPolys = new ArrayList<KPolygon>();
 		int width = 20;
-		KPolygon poly = KPolygon.createRectOblique(new KPoint(50, 200), new KPoint(200, 200), width);
-		KPolygon poly2 = KPolygon.createRectOblique(new KPoint(200 - width/2, 200 + width/2), new KPoint(200 - width/2, 50 + width/2), width);
+		KPolygon poly = KPolygon.createRectOblique(new Vector2f(50, 200), new Vector2f(200, 200), width);
+		KPolygon poly2 = KPolygon.createRectOblique(new Vector2f(200 - width/2, 200 + width/2), new Vector2f(200 - width/2, 50 + width/2), width);
 
-		KPolygon poly3 = KPolygon.createRectOblique(new KPoint(300, 200), new KPoint(400, 200), width);
-		KPolygon poly4 = KPolygon.createRectOblique(new KPoint(350, 200), new KPoint(450, 200), width);
-		KPolygon poly5 = KPolygon.createRectOblique(new KPoint(375, 100), new KPoint(375, 300), width);
+		KPolygon poly3 = KPolygon.createRectOblique(new Vector2f(300, 200), new Vector2f(400, 200), width);
+		KPolygon poly4 = KPolygon.createRectOblique(new Vector2f(350, 200), new Vector2f(450, 200), width);
+		KPolygon poly5 = KPolygon.createRectOblique(new Vector2f(375, 100), new Vector2f(375, 300), width);
 		
 		allPolys.add(poly);
 		allPolys.add(poly2);

@@ -30,47 +30,49 @@
  */
 package straightedge.geom.vision;
 
-import straightedge.geom.KPoint;
-import straightedge.geom.KPolygon;
 import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
 
 /**
  *
  * @author Keith
  */
 public class VisionDataRotation extends VisionData{
-	public KPoint originalEye;
+	public Vector2f originalEye;
 	public KPolygon originalBoundaryPolygon;
 	public double boundaryPolygonRotationAroundEye = 0;
 	
-	public VisionDataRotation(KPoint originalEye, KPolygon originalBoundaryPolygon){
+	public VisionDataRotation(Vector2f originalEye, KPolygon originalBoundaryPolygon){
 		super();
 		reset(originalEye, originalBoundaryPolygon);
 	}
 	
-	public void reset(KPoint originalEye, KPolygon originalBoundaryPolygon){
+	public void reset(Vector2f originalEye, KPolygon originalBoundaryPolygon){
 		this.originalEye = originalEye;
 		this.originalBoundaryPolygon = originalBoundaryPolygon;
 		this.boundaryPolygonRotationAroundEye = 0;
 
-		super.reset(originalEye.copy(), originalBoundaryPolygon.copy());
+		super.reset(originalEye.clone(), originalBoundaryPolygon.copy());
 	}
 
 	public void reset(){
 		reset(originalEye, originalBoundaryPolygon);
 	}
 
-	public void copyAndTransformEyeAndBoundaryPolygon(KPoint newEyeCoords, double boundaryPolygonRotationAroundEye){
+	public void copyAndTransformEyeAndBoundaryPolygon(Vector2f newEyeCoords, double boundaryPolygonRotationAroundEye){
 		copyAndTransformEyeAndBoundaryPolygon(newEyeCoords.x, newEyeCoords.y, boundaryPolygonRotationAroundEye);
 	}
 	
 	public void copyAndTransformEyeAndBoundaryPolygon(double newEyeX, double newEyeY, double boundaryPolygonRotationAroundEye){
 		this.boundaryPolygonRotationAroundEye = boundaryPolygonRotationAroundEye;
-		eye = originalEye.copy();
+		eye = originalEye.clone();
 		boundaryPolygon = originalBoundaryPolygon.copy();
 		double translateX = newEyeX - originalEye.x;
 		double translateY = newEyeY - originalEye.y;
-		eye.setCoords(newEyeX, newEyeY);
+		eye.set((float)newEyeX,(float) newEyeY);
 		boundaryPolygon.translate(translateX, translateY);
 		boundaryPolygon.rotate(boundaryPolygonRotationAroundEye, eye);
 	}
@@ -83,7 +85,7 @@ public class VisionDataRotation extends VisionData{
 		return originalBoundaryPolygon;
 	}
 
-	public KPoint getOriginalEye() {
+	public Vector2f getOriginalEye() {
 		return originalEye;
 	}
 	
@@ -91,7 +93,7 @@ public class VisionDataRotation extends VisionData{
 		return boundaryPolygon;
 	}
 
-	public KPoint getEye() {
+	public Vector2f getEye() {
 		return eye;
 	}
 

@@ -39,6 +39,9 @@ import java.util.*;
 import java.awt.geom.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import com.jme3.math.Vector2f;
+
 import java.awt.*;
 import java.awt.image.*;
 
@@ -54,7 +57,7 @@ public class ViewPane extends JComponent {
 	VolatileImage backImage;
 	Graphics2D backImageGraphics2D;
 	AWTEventHandler eventHandler;
-	KPoint center = new KPoint();
+	Vector2f center = new Vector2f();
 	Rectangle.Float viewRectInWorldCoords = new Rectangle.Float();
 	float scaleFactor = 1;
 
@@ -116,7 +119,7 @@ public class ViewPane extends JComponent {
 		}
 	}
 
-	//TileArrayAABB<AABBInterface> tempTileArray = new TileArrayAABB<AABBInterface>(new KPoint(0,0), new KPoint(1000,1000), 100);
+	//TileArrayAABB<AABBInterface> tempTileArray = new TileArrayAABB<AABBInterface>(new Vector2f(0,0), new Vector2f(1000,1000), 100);
 	VolatileImage worldBackImage;
 	protected void renderWorld() {
 		Graphics2D g = backImageGraphics2D;
@@ -189,7 +192,7 @@ public class ViewPane extends JComponent {
 
 //		g.setColor(Color.RED);
 //		float r = 100;
-//		KPoint pos = this.getPlayer().getPos();
+//		Vector2f pos = this.getPlayer().getPos();
 //		ArrayList<UpdatableObstacle> nearbyObst = getWorld().getObstacleTileArray().getAllWithin(pos, r);
 //		for (int i = 0; i < nearbyObst.size(); i++) {
 //			g.fill(nearbyObst.get(i).getInnerPolygon());
@@ -228,7 +231,7 @@ public class ViewPane extends JComponent {
 //		}
 //		g.setColor(Color.RED);
 //		float r = 100;
-//		KPoint pos = this.getPlayer().getPos();
+//		Vector2f pos = this.getPlayer().getPos();
 //		ArrayList<AABBInterface> nearbyObst = tempTileArray.getAllWithin(pos.x - r, pos.y - r, pos.x + r, pos.y + r);
 //		for (int i = 0; i < nearbyObst.size(); i++) {
 //			AABBInterface aabb = nearbyObst.get(i);
@@ -295,9 +298,9 @@ public class ViewPane extends JComponent {
 
 		g.setColor(Color.MAGENTA.darker());
 		if (p.getPathFinder() != null && p.getPathPoints().size() > 0) {
-			KPoint currentPoint = p.getPos();
+			Vector2f currentPoint = p.getPos();
 			for (int j = 0; j < p.getPathPoints().size(); j++) {
-				KPoint nextPoint = p.getPathPoints().get(j);
+				Vector2f nextPoint = p.getPathPoints().get(j);
 				g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 				float d = 5f;
 				g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
@@ -311,7 +314,7 @@ public class ViewPane extends JComponent {
 //		for (int i = 0; i < sightField.polygonAndDists.size(); i++){
 //			//int nextI = (i+1 >= sightField.polygonAndDists.size() ? 0 : i+1);
 //			PolygonAndDist polygonAndDist = sightField.polygonAndDists.get(i);
-//			KPoint p1 = polygonAndDist.getPolygon().getCenter();
+//			Vector2f p1 = polygonAndDist.getPolygon().getCenter();
 //			g.drawString("pZeroAbsAngle: "+polygonAndDist.getPointZeroAbsoluteAngle()+", minRelAngle: "+polygonAndDist.getMinRelativeAngle()+", maxRelAngle: "+polygonAndDist.getMaxRelativeAngle(), p1.x, p1.y+10);
 //			//g.drawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
 //		}
@@ -320,7 +323,7 @@ public class ViewPane extends JComponent {
 //		g.setColor(Color.RED);
 //		for (int i = 0; i < sightField.sightPoints.size(); i++){
 //			//int nextI = (i+1 >= sightField.pointList.size() ? 0 : i+1);
-//			KPoint p1 = sightField.sightPoints.get(i).getPoint();
+//			Vector2f p1 = sightField.sightPoints.get(i).getPoint();
 //			g.drawString(""+i, p1.x, p1.y+10);
 //			//g.drawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
 //		}
@@ -334,7 +337,7 @@ public class ViewPane extends JComponent {
 //		g.setColor(Color.BLUE);
 //		for (int i = 0; i < sightField.sightPoints.size(); i++){
 //
-//			KPoint p = sightField.sightPoints.get(i).getPoint();
+//			Vector2f p = sightField.sightPoints.get(i).getPoint();
 //			g.drawString(""+i+", "+sightField.sightPoints.get(i).getClass().getSimpleName(), p.x, p.y+10);
 //		}
 
@@ -375,11 +378,11 @@ public class ViewPane extends JComponent {
 
 			// render connections between tempReachableNodes
 			g.setColor(Color.BLUE);
-			KPoint startPoint = p.getPathFinder().startPointDebug;
+			Vector2f startPoint = p.getPathFinder().startPointDebug;
 			for (KNode n : p.getPathFinder().startNodeTempReachableNodesDebug) {
 				g.draw(new Line2D.Double(startPoint.x, startPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 			}
-			KPoint endPoint = p.getPathFinder().endPointDebug;
+			Vector2f endPoint = p.getPathFinder().endPointDebug;
 			for (KNode n : p.getPathFinder().endNodeTempReachableNodesDebug) {
 				g.draw(new Line2D.Double(endPoint.x, endPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 			}
@@ -388,7 +391,7 @@ public class ViewPane extends JComponent {
 //			for (int i = 0; i < obstacles.size(); i++) {
 //				for (int j = 0; j < obstacles.get(i).getNodes().size(); j++) {
 //					KNode currentNode = obstacles.get(i).getNodes().get(j);
-//					KPoint point = currentNode.getPoint();
+//					Vector2f point = currentNode.getPoint();
 //					g.drawString(""+j, (float)point.x, (float)point.y+10);
 //				}
 //			}

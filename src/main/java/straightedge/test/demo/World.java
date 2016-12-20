@@ -30,20 +30,25 @@
  */
 package straightedge.test.demo;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
+import com.vividsolutions.jts.geom.Geometry;
+
 import straightedge.geom.AABB;
 import straightedge.geom.KMultiPolygon;
-import straightedge.geom.KPoint;
 import straightedge.geom.KPolygon;
 import straightedge.geom.PolygonConverter;
+import straightedge.geom.path.KNode;
 import straightedge.geom.path.NodeConnector;
 import straightedge.geom.path.PathBlockingObstacleImpl;
 import straightedge.geom.util.TileBag;
-import straightedge.geom.vision.OccluderImpl;
-import java.util.*;
-import straightedge.geom.path.KNode;
 import straightedge.geom.util.TileBagIntersections;
+import straightedge.geom.vision.OccluderImpl;
 
 /**
  *
@@ -53,7 +58,7 @@ public class World {
 
 	long systemNanosAtStart;
 	long nanosElapsed;
-	static double NANOS_IN_A_SECOND = 1000000000;
+	static float NANOS_IN_A_SECOND = 1000000000;
 	boolean pause = false;
 
 	public void setSystemNanosAtStart(long systemNanosAtStart){
@@ -64,8 +69,8 @@ public class World {
 	}
 
 	public void update(long nanos){
-		double seconds = nanos/NANOS_IN_A_SECOND;
-		double startTime = nanosElapsed/NANOS_IN_A_SECOND;
+		float seconds = nanos/NANOS_IN_A_SECOND;
+		float startTime = nanosElapsed/NANOS_IN_A_SECOND;
 		assert seconds >= 0 : seconds;
 		main.getEventHandler().eventCache.clearAndFillCache();
 		ArrayList<AWTEventWrapper> events = main.getEventHandler().eventCache.getEventsList();
@@ -105,7 +110,7 @@ public class World {
 	public ArrayList<Bullet> bullets;
 
 	public boolean makeFromOuterPolygon = false;
-	public double obstacleBufferAmount = 5;
+	public float obstacleBufferAmount = 5;
 	public int numPointsPerQuadrant = 1;
 
 	public Main main;
@@ -117,32 +122,32 @@ public class World {
 	// this method should be over-ridden by sub-classes
 	public void fillMultiPolygonsList(){
 		Container cont = main.getParentFrameOrApplet();
-		double contW = cont.getWidth() - (cont.getInsets().right + cont.getInsets().left);
-		double contH = cont.getHeight() - (cont.getInsets().top + cont.getInsets().bottom);
+		float contW = cont.getWidth() - (cont.getInsets().right + cont.getInsets().left);
+		float contH = cont.getHeight() - (cont.getInsets().top + cont.getInsets().bottom);
 		ArrayList<KPolygon> polygons = new ArrayList<KPolygon>();
 		
 		// make stars
 		for (int i = 0; i < 5; i++){
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 			int numPoints = 4 + random.nextInt(4)*2;
-			double angleIncrement = Math.PI*2f/(numPoints*2);
+			float angleIncrement = FastMath.PI*2f/(numPoints*2);
 			float rBig = 40 + random.nextFloat()*90;
 			float rSmall = 20 + random.nextFloat()*70;
-			double currentAngle = 0;
+			float currentAngle = 0;
 			for (int k = 0; k < numPoints; k++){
-				double x = rBig*Math.cos(currentAngle);
-				double y = rBig*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				float x = rBig*FastMath.cos(currentAngle);
+				float y = rBig*FastMath.sin(currentAngle);
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
-				x = rSmall*Math.cos(currentAngle);
-				y = rSmall*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				x = rSmall*FastMath.cos(currentAngle);
+				y = rSmall*FastMath.sin(currentAngle);
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 			}
 			KPolygon poly = new KPolygon(pointList);
 			assert poly.isCounterClockWise();
 			//poly.translate(20 + (float)random.nextFloat()*aabb.getWidth(), 20 + (float)random.nextFloat()*aabb.getHeight());
-			KPoint p = new KPoint(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
+			Vector2f p = new Vector2f(innerAABB.p.x + random.nextFloat()*innerAABB.getWidth(), innerAABB.p.y + random.nextFloat()*innerAABB.getHeight());
 			poly.translateTo(p);
 			polygons.add(poly);
 		}
@@ -159,11 +164,11 @@ public class World {
 		allMultiPolygons = new ArrayList<KMultiPolygon>();
 		
 		int insets = 20;
-		double contW = cont.getWidth() - (cont.getInsets().right + cont.getInsets().left);
-		double contH = cont.getHeight() - (cont.getInsets().top + cont.getInsets().bottom);
+		float contW = cont.getWidth() - (cont.getInsets().right + cont.getInsets().left);
+		float contH = cont.getHeight() - (cont.getInsets().top + cont.getInsets().bottom);
 		originalScreenAABB = AABB.createFromDiagonal(0,0,contW,contH);
 		innerAABB = AABB.createFromDiagonal(insets, insets, contW - 2*insets, contH - 2*insets);
-		double spawnWH = 150;
+		float spawnWH = 150;
 		enemySpawnAABB = new AABB(insets, insets, spawnWH+insets, spawnWH+insets);
 		playerSpawnAABB = new AABB(contW - (spawnWH+insets), contH - (spawnWH+insets), contW - insets, contH - insets);
 
@@ -232,7 +237,7 @@ public class World {
 			nodeConnector.addObstacle(obst, allObstacles, maxConnectionDistance);
 		}
 		
-		KPoint spawnPoint = getNearestPointOutsideOfObstacles(makeRandomPointWithin(playerSpawnAABB));
+		Vector2f spawnPoint = getNearestPointOutsideOfObstacles(makeRandomPointWithin(playerSpawnAABB));
 		player = new Player(this, spawnPoint);
 		player.cache.originalBoundaryPolygon.scale(3, player.cache.originalEye);
 		player.cache.reset();
@@ -254,7 +259,7 @@ public class World {
 			enemies.remove(enemies.size()-1);
 		}
 		while (enemies.size() < numEnemies){
-			KPoint spawnPoint = getNearestPointOutsideOfObstacles(makeRandomPointWithin(enemySpawnAABB));
+			Vector2f spawnPoint = getNearestPointOutsideOfObstacles(makeRandomPointWithin(enemySpawnAABB));
 			Player enemy = new Player(this, spawnPoint);
 			enemy.cache.originalBoundaryPolygon.scale(0.75 + random.nextFloat()*0.5, 0.75 + random.nextFloat()*0.5, enemy.cache.originalEye);
 			enemy.cache.reset();
@@ -264,10 +269,10 @@ public class World {
 		}
 	}
 
-	public void doMove(double seconds, double startTime){
-		KPoint botLeft = this.obstaclesAABB.getBotLeft();
-		KPoint topRight = this.obstaclesAABB.getTopRight();
-		double worldEdgeDistance = 1000;
+	public void doMove(float seconds, float startTime){
+		Vector2f botLeft = this.obstaclesAABB.getBotLeft();
+		Vector2f topRight = this.obstaclesAABB.getTopRight();
+		float worldEdgeDistance = 1000;
 		AABB worldBounds = AABB.createFromDiagonal(botLeft.x - worldEdgeDistance,
 											botLeft.y - worldEdgeDistance,
 											topRight.x + worldEdgeDistance,
@@ -320,16 +325,16 @@ public class World {
 				numTemporaryNodeConnections += node.getTempConnectedNodes().size();
 			}
 		}
-		// divide numPermanentNodeConnections by 2 since connections are double-counted.
+		// divide numPermanentNodeConnections by 2 since connections are float-counted.
 		numPermanentNodeConnections /= 2;
-		// numTemporaryNodeConnections are not double-counted since the pathFinder's start and end nodes were not included in the count.
+		// numTemporaryNodeConnections are not float-counted since the pathFinder's start and end nodes were not included in the count.
 		System.out.println(this.getClass().getSimpleName()+": numObstacles == "+numObstacles);
 		System.out.println(this.getClass().getSimpleName()+": numNodes == "+numNodes);
 		System.out.println(this.getClass().getSimpleName()+": numTemporaryNodeConnections == "+numTemporaryNodeConnections);
 		System.out.println(this.getClass().getSimpleName()+": numPermanentNodeConnections == "+numPermanentNodeConnections);
 	}
 
-	protected void nowAtTimeStop(double timeNow) {
+	protected void nowAtTimeStop(float timeNow) {
 		player.nowAtTimeStop(timeNow);
 		for (int i = 0; i < enemies.size(); i++){
 			Player enemy = enemies.get(i);
@@ -337,13 +342,13 @@ public class World {
 		}
 	}
 
-	public KPoint makeRandomPointWithin(AABB aabb){
-		return new KPoint(aabb.getX() + random.nextDouble()*aabb.w(), aabb.getY() + random.nextDouble()*aabb.h());
+	public Vector2f makeRandomPointWithin(AABB aabb){
+		return new Vector2f(aabb.getX() + random.nextFloat()*aabb.w(), aabb.getY() + random.nextFloat()*aabb.h());
 	}
-	public KPoint getNearestPointOutsideOfObstacles(KPoint point){
+	public Vector2f getNearestPointOutsideOfObstacles(Vector2f point){
 		// check that the target point isn't inside any allObstacles.
 		// if so, move it.
-		KPoint movedPoint = point.copy();
+		Vector2f movedPoint = point.clone();
 		boolean targetIsInsideObstacle = false;
 		int count = 0;
 		while (true){
@@ -351,7 +356,7 @@ public class World {
 				if (obst.getOuterPolygon().contains(movedPoint)){
 					targetIsInsideObstacle = true;
 					KPolygon poly = obst.getOuterPolygon();
-					KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
+					Vector2f p = poly.getBoundaryPointClosestTo(movedPoint);
 					if (p != null){
 						movedPoint.x = p.x;
 						movedPoint.y = p.y;

@@ -30,6 +30,8 @@
  */
 package straightedge.geom.vision;
 
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.*;
 
 /**
@@ -40,7 +42,7 @@ public class VPShadowOnOccluder extends VisiblePoint{
 	public Occluder occluder;
 	public int edgeIndex;
 	public VPOccluder castingOccluderPoint;
-	public VPShadowOnOccluder(KPoint point, Occluder occluder, int edgeIndex, VPOccluder castingOccluderPoint){
+	public VPShadowOnOccluder(Vector2f point, Occluder occluder, int edgeIndex, VPOccluder castingOccluderPoint){
 		this.point = point;
 		this.occluder = occluder;
 		this.edgeIndex = edgeIndex;

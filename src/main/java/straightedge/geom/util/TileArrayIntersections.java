@@ -35,6 +35,8 @@ import straightedge.geom.vision.Occluder;
 import straightedge.geom.vision.VPOccluderOccluderIntersection;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  * Used to store and retrieve 2D Occluders and their 
  * intersections with other Occluders.
@@ -65,24 +67,24 @@ public class TileArrayIntersections<T extends Occluder> {
 	public Tile[][] tiles; // rows, columns
 	public double tileWidthAndHeight;
 	// Euclidean coordinates are assumed with positive X axis to the right and positive y axis up.
-	public KPoint botLeft;
-	public KPoint topRight;
+	public Vector2f botLeft;
+	public Vector2f topRight;
 	// if bloated == true then an object has been added that lies outside of the rectangle bounded by botRight and topLeft.
 	boolean bloated;
 
 	Tracker tracker = new Tracker();
 
-	public TileArrayIntersections(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	public TileArrayIntersections(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
 	}
 
-	protected void init(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	protected void init(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		this.numRows = numRows;
 		this.numCols = numCols;
 		tiles = new Tile[numRows][numCols];
 		this.tileWidthAndHeight = tileWidthAndHeight;
-		this.botLeft = botLeft.copy();
-		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
+		this.botLeft = botLeft.clone();
+		topRight = new Vector2f(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
 		bloated = false;
 		for (int i = 0; i < numRows; i++){
 			for (int j = 0; j < numCols; j++){
@@ -91,7 +93,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		}
 	}
 
-	public TileArrayIntersections(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
+	public TileArrayIntersections(Vector2f botLeft, Vector2f approxTopRight, float tileWidthAndHeight){
 		double minX = botLeft.x;
 		double minY = botLeft.y;
 		double maxX = approxTopRight.x;
@@ -124,9 +126,9 @@ public class TileArrayIntersections<T extends Occluder> {
 		ArrayList<VPOccluderOccluderIntersection> occluderIntersectionPoints = new ArrayList<VPOccluderOccluderIntersection>();
 		KPolygon polygon = occluder.getPolygon();
 		for (int j = 0; j < polygon.getPoints().size(); j++){
-			KPoint p = polygon.getPoints().get(j);
+			Vector2f p = polygon.getPoints().get(j);
 			int jPlus = (j+1 >= polygon.getPoints().size() ? 0 : j+1);
-			KPoint p2 = polygon.getPoints().get(jPlus);
+			Vector2f p2 = polygon.getPoints().get(jPlus);
 
 			for (int k = 0; k < occluders.size(); k++){
 				Occluder occluder2 = occluders.get(k);
@@ -135,11 +137,11 @@ public class TileArrayIntersections<T extends Occluder> {
 					// intersection is not possible, so skip to next obstacle.
 					continue;
 				}
-				ArrayList<KPoint> points = polygon2.getPoints();
+				ArrayList<Vector2f> points = polygon2.getPoints();
 				for (int m = 0; m < points.size(); m++){
 					int nextM = (m+1 >= points.size() ? 0 : m+1);
-					if (KPoint.linesIntersect(p, p2, points.get(m), points.get(nextM))){
-						KPoint intersection = KPoint.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
+					if (Vector2fUtils.linesIntersect(p, p2, points.get(m), points.get(nextM))){
+						Vector2f intersection = Vector2fUtils.getLineLineIntersection(p, p2, points.get(m), points.get(nextM));
 						if (intersection != null){
 							occluderIntersectionPoints.add(new VPOccluderOccluderIntersection(intersection, occluder, j, occluder2, m));
 						}
@@ -151,7 +153,7 @@ public class TileArrayIntersections<T extends Occluder> {
 
 		// add polygon
 		{
-			KPoint c = occluder.getPolygon().getCenter();
+			Vector2f c = occluder.getPolygon().getCenter();
 			double r = occluder.getPolygon().getRadius();
 			boolean outsideBounds = false;
 			double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
@@ -219,7 +221,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		{
 			for (int i = 0; i < occluderIntersectionPoints.size(); i++){
 				VPOccluderOccluderIntersection obstacleIntersectionSightPoint = occluderIntersectionPoints.get(i);
-				KPoint p = obstacleIntersectionSightPoint.getPoint();
+				Vector2f p = obstacleIntersectionSightPoint.getPoint();
 				int colIndex = (int)Math.floor((p.x - botLeft.x)/tileWidthAndHeight);
 				int rowIndex = (int)Math.floor((p.y - botLeft.y)/tileWidthAndHeight);
 				if (rowIndex < 0){
@@ -239,7 +241,7 @@ public class TileArrayIntersections<T extends Occluder> {
 	}
 
 	public boolean remove(T t){
-		KPoint c = t.getPolygon().getCenter();
+		Vector2f c = t.getPolygon().getCenter();
 		double r = t.getPolygon().getRadius();
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
@@ -321,7 +323,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		assert getAllWithin(c, r).contains(t) == false : "c == "+c+", r == "+r;
 		return removed;
 	}
-	public ArrayList<T> getAllWithin(KPoint point, double radius){
+	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 		return getAllWithin(point.x, point.y, radius);
 	}
 
@@ -374,13 +376,13 @@ public class TileArrayIntersections<T extends Occluder> {
 			for (int i = 0; i < tile.getSharedObstacles().size(); i++){
 				T t = (T)tile.getSharedObstacles().get(i);
 				KPolygon polygon = t.getPolygon();
-				KPoint polygonCenter = polygon.getCenter();
+				Vector2f polygonCenter = polygon.getCenter();
 				if (polygon.isTileArraySearchStatusAdded(tracker) == true){
 					continue;
 				}
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 					polygon.setTileArraySearchStatus(true, tracker);
 				}
@@ -388,10 +390,10 @@ public class TileArrayIntersections<T extends Occluder> {
 			for (int i = 0; i < tile.getContainedObstacles().size(); i++){
 				T t = (T)tile.getContainedObstacles().get(i);
 				KPolygon polygon = t.getPolygon();
-				KPoint polygonCenter = polygon.getCenter();
+				Vector2f polygonCenter = polygon.getCenter();
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+				if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 				}
 			}
@@ -409,8 +411,8 @@ public class TileArrayIntersections<T extends Occluder> {
 						}
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
-						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						Vector2f polygonCenter = polygon.getCenter();
+						if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 							polygon.setTileArraySearchStatus(true, tracker);
 						}
@@ -421,8 +423,8 @@ public class TileArrayIntersections<T extends Occluder> {
 						KPolygon polygon = t.getPolygon();
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
-						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
+						Vector2f polygonCenter = polygon.getCenter();
+						if (Vector2fUtils.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 						}
 					}
@@ -441,9 +443,9 @@ public class TileArrayIntersections<T extends Occluder> {
 	 * @param radius
 	 * @return
 	 */
-	public ArrayList<VPOccluderOccluderIntersection> getIntersectionsWithinAtLeast(KPoint point, double radius){
+	public ArrayList<VPOccluderOccluderIntersection> getIntersectionsWithinAtLeast(Vector2f point, double radius){
 		ArrayList<VPOccluderOccluderIntersection> nearbyIntersections = new ArrayList<VPOccluderOccluderIntersection>();
-		KPoint c = point;
+		Vector2f c = point;
 		double r = radius;
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
@@ -512,7 +514,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		return numCols;
 	}
 
-	public KPoint getBotLeft() {
+	public Vector2f getBotLeft() {
 		return botLeft;
 	}
 
@@ -528,7 +530,7 @@ public class TileArrayIntersections<T extends Occluder> {
 		return tiles;
 	}
 
-	public KPoint getTopRight() {
+	public Vector2f getTopRight() {
 		return topRight;
 	}
 

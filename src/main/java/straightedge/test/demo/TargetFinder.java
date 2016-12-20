@@ -30,12 +30,13 @@
  */
 package straightedge.test.demo;
 
-import straightedge.geom.KPoint;
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
 import straightedge.geom.path.PathBlockingObstacleImpl;
-import straightedge.geom.path.PathFinder;
-import java.util.*;
 import straightedge.geom.path.PathData;
+import straightedge.geom.path.PathFinder;
 
 /**
  *
@@ -52,10 +53,10 @@ public class TargetFinder{
 	public static int TARGET_PLAYER = 2;
 	public int targetType;
 
-	public double minRange = 50f;//getPlayer().getMaxAttackDist()*3/4f;
-	public double maxRange = 60f;
+	public float minRange = 50f;//getPlayer().getMaxAttackDist()*3/4f;
+	public float maxRange = 60f;
 
-	public KPoint target = new KPoint();
+	public Vector2f target = new Vector2f();
 	public TargetUser targetPlayerToFollow = null;
 
 	public TargetFinder(TargetUser targetUser, World world){
@@ -71,28 +72,28 @@ public class TargetFinder{
 		pathData.reset();
 	}
 
-	public KPoint getAbsoluteTarget(){
-		KPoint absoluteTarget = new KPoint();
+	public Vector2f getAbsoluteTarget(){
+		Vector2f absoluteTarget = new Vector2f();
 		if (targetType == TARGET_FIXED){
 			absoluteTarget.x = target.x;
 			absoluteTarget.y = target.y;
 		} else if (targetType == TARGET_RELATIVE){
 			absoluteTarget.x = target.x + targetUser.getPos().x;
 			absoluteTarget.y = target.y + targetUser.getPos().y;
-			KPoint movedAbsoluteTarget = getNearestPointOutsideOfObstacles(absoluteTarget);
-			absoluteTarget.setCoords(movedAbsoluteTarget);
+			Vector2f movedAbsoluteTarget = getNearestPointOutsideOfObstacles(absoluteTarget);
+			absoluteTarget.set(movedAbsoluteTarget);
 		} else if (targetType == TARGET_PLAYER){
-			double distToTarget = targetUser.getPos().distance(targetPlayerToFollow.getPos());
+			float distToTarget = targetUser.getPos().distance(targetPlayerToFollow.getPos());
 //			float minRange = 50;//getPlayer().getMaxAttackDist()*3/4f;
 //			float maxRange = minRange/8f;//(getPlayer().getMaxAttackDist() - minRange)/2f;
 			if (isWithinRangeOfTargetPlayer(distToTarget)){
-				return new KPoint(targetUser.getPos());
+				return new Vector2f(targetUser.getPos());
 			}
-			KPoint p = targetPlayerToFollow.getPos().createPointToward(targetUser.getPos(), minRange);
+			Vector2f p = Vector2fUtils.createPointToward(targetPlayerToFollow.getPos(),targetUser.getPos(), minRange);
 			// Check that the point is not inside any allObstacles, or else the pathFinder won't work.
 			for (PathBlockingObstacleImpl obst : getWorld().allObstacles){
 				if (obst.getOuterPolygon().contains(p)){
-					p = targetPlayerToFollow.getPos().copy();
+					p = targetPlayerToFollow.getPos().clone();
 					//System.out.println(this.getClass().getSimpleName() + ": getPlayer().getName() == "+getPlayer().getName()+", ");
 					break;
 				}
@@ -101,7 +102,7 @@ public class TargetFinder{
 		}
 		return absoluteTarget;
 	}
-	protected boolean isWithinRangeOfTargetPlayer(double distToTarget){
+	protected boolean isWithinRangeOfTargetPlayer(float distToTarget){
 		if (distToTarget < maxRange){
 			return true;
 		}
@@ -138,21 +139,23 @@ public class TargetFinder{
 		return false;
 	}
 
-	public void setFixedTarget(double targetX, double targetY, boolean calcPathNow) {
+	public void setFixedTarget(float targetX, float targetY, boolean calcPathNow) {
 		targetType = TARGET_FIXED;
 		target.x = targetX;
 		target.y = targetY;
-		KPoint movedTarget = getNearestPointOutsideOfObstacles(target);
-		target.setCoords(movedTarget);
+		Vector2f movedTarget = getNearestPointOutsideOfObstacles(target);
+		target.set(movedTarget);
 		if (calcPathNow){
 			calcPath();
 		}
 	}
-	public void setFixedTarget(KPoint p, boolean calcPathNow) {
+	public void setFixedTarget(Vector2f p, boolean calcPathNow) {
 		setFixedTarget(p.x, p.y, calcPathNow);
 	}
-
 	public void setRelativeTarget(double targetX, double targetY, boolean calcPathNow) {
+		setRelativeTarget((float) targetX, (float) targetY, calcPathNow);
+	}
+	public void setRelativeTarget(float targetX, float targetY, boolean calcPathNow) {
 		targetType = TARGET_RELATIVE;
 		target.x = targetX;
 		target.y = targetY;
@@ -160,7 +163,7 @@ public class TargetFinder{
 			calcPath();
 		}
 	}
-	public void setRelativeTarget(KPoint p, boolean calcPathNow) {
+	public void setRelativeTarget(Vector2f p, boolean calcPathNow) {
 		setRelativeTarget(p.x, p.y, calcPathNow);
 	}
 
@@ -172,10 +175,10 @@ public class TargetFinder{
 			calcPath();
 		}
 	}
-	public KPoint getNearestPointOutsideOfObstacles(KPoint point){
+	public Vector2f getNearestPointOutsideOfObstacles(Vector2f point){
 		// check that the target point isn't inside any allObstacles.
 		// if so, move it.
-		KPoint movedPoint = point.copy();
+		Vector2f movedPoint = point.clone();
 		boolean targetIsInsideObstacle = false;
 		int count = 0;
 		while (true){
@@ -183,7 +186,7 @@ public class TargetFinder{
 				if (obst.getOuterPolygon().contains(movedPoint)){
 					targetIsInsideObstacle = true;
 					KPolygon poly = obst.getOuterPolygon();
-					KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
+					Vector2f p = poly.getBoundaryPointClosestTo(movedPoint);
 					if (p != null){
 						movedPoint.x = p.x;
 						movedPoint.y = p.y;
@@ -209,7 +212,7 @@ public class TargetFinder{
 		count++;
 		long timeNow = System.nanoTime();
 		if (timeNow - time >= oneSecond){
-			double calcsPerSecond = count/((timeNow - time)/oneSecond);
+			float calcsPerSecond = count/((timeNow - time)/oneSecond);
 			//System.out.println(this.getClass().getSimpleName()+": calcsPerSecond == "+calcsPerSecond);
 			count = 0;
 			time = timeNow;
@@ -232,7 +235,7 @@ public class TargetFinder{
 			}
 			return false;
 		}else if (targetType == TARGET_PLAYER){
-			double dist = this.getTargetUser().getPos().distance(targetPlayerToFollow.getPos());
+			float dist = this.getTargetUser().getPos().distance(targetPlayerToFollow.getPos());
 			if (isWithinRangeOfTargetPlayer(dist)){
 				return true;
 			}
@@ -258,19 +261,19 @@ public class TargetFinder{
 		return pathData;
 	}
 
-	public double getMinRange() {
+	public float getMinRange() {
 		return minRange;
 	}
 
-	public double getMaxRange() {
+	public float getMaxRange() {
 		return maxRange;
 	}
 
-	public void setMinRange(double minRange) {
+	public void setMinRange(float minRange) {
 		this.minRange = minRange;
 	}
 
-	public void setMaxRange(double maxRange) {
+	public void setMaxRange(float maxRange) {
 		this.maxRange = maxRange;
 	}
 }

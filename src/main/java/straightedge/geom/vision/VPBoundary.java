@@ -30,7 +30,7 @@
  */
 package straightedge.geom.vision;
 
-import straightedge.geom.*;
+import com.jme3.math.Vector2f;
 
 /**
  *
@@ -38,7 +38,7 @@ import straightedge.geom.*;
  */
 public class VPBoundary extends VisiblePoint{
 
-	public VPBoundary(KPoint point){
+	public VPBoundary(Vector2f point){
 		this.point = point;
 	}
 

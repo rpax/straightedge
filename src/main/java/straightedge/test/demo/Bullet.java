@@ -30,10 +30,14 @@
  */
 package straightedge.test.demo;
 
-import straightedge.geom.KPoint;
-import straightedge.geom.KPolygon;
-import straightedge.geom.vision.OccluderImpl;
 import java.util.ArrayList;
+
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
+import straightedge.geom.vision.OccluderImpl;
 
 /**
  *
@@ -43,28 +47,28 @@ import java.util.ArrayList;
 public class Bullet{
 	public World world;
 	public Player ownerGunUser;
-	public double x;
-	public double y;
-	public double speed;
-	public double speedX;
-	public double speedY;
-	double accelX;
-	double accelY;
-	public double spawnTimeSeconds;
+	public float x;
+	public float y;
+	public float speed;
+	public float speedX;
+	public float speedY;
+	float accelX;
+	float accelY;
+	public float spawnTimeSeconds;
 	public boolean dead;
 	public Player playerThatWasHit = null;
-	public double oldX;
-	public double oldY;
+	public float oldX;
+	public float oldY;
 
-	public double radius;
-	public double maxSpeed;
-	public double damage;
-	public double angle;
-	public double lifeTimeSeconds;
+	public float radius;
+	public float maxSpeed;
+	public float damage;
+	public float angle;
+	public float lifeTimeSeconds;
 
 	static float canNotHitOwnPlayerTimeSeconds = 1.0f;
 
-	public Bullet(Gun gun, Player gunUser, double newX, double newY, double angle, double spawnTimeSeconds, double xLaunchSpeed, double yLaunchSpeed) {
+	public Bullet(Gun gun, Player gunUser, float newX, float newY, float angle, float spawnTimeSeconds, float xLaunchSpeed, float yLaunchSpeed) {
 		world = gun.world;
 		this.ownerGunUser = gunUser;
 		this.spawnTimeSeconds = spawnTimeSeconds;
@@ -73,11 +77,11 @@ public class Bullet{
 		damage = 4f;
 		this.angle = angle;
 		speed = 400;//1000;
-		double randomRangeIncrement = 0;
-		double range = 300;
-		speedX = xLaunchSpeed + Math.cos(angle) * speed;
-		speedY = yLaunchSpeed + Math.sin(angle) * speed;
-		double launchSpeed = speed;//(float)Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
+		float randomRangeIncrement = 0;
+		float range = 300;
+		speedX = xLaunchSpeed + FastMath.cos(angle) * speed;
+		speedY = yLaunchSpeed + FastMath.sin(angle) * speed;
+		float launchSpeed = speed;//(float)Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
 		lifeTimeSeconds = range / launchSpeed;
 
 		this.x = newX;
@@ -94,7 +98,7 @@ public class Bullet{
 //		sightField.intersectSightPolygon(polygons, obstacleIntersectionPoints, getWorld().movingPolygons);
 	}
 
-	public void doMove(double seconds, double startTime) {
+	public void doMove(float seconds, float startTime) {
 		assert dead == false : "dead == " + dead;
 		assert seconds >= 0 : seconds;
 		if (spawnTimeSeconds + lifeTimeSeconds < startTime + seconds) {
@@ -111,43 +115,43 @@ public class Bullet{
 
 	ArrayList<OccluderIntersection> previousIntersections = new ArrayList<OccluderIntersection>();
 	ArrayList<OccluderIntersection> currentIntersections = new ArrayList<OccluderIntersection>();
-	protected void doBulletMove(double seconds, double timeAtStartOfMoveSeconds) {
+	protected void doBulletMove(float seconds, float timeAtStartOfMoveSeconds) {
 		assert Double.isNaN(x) == false;
 		assert seconds >= 0 : seconds;
 
-		double secondsLeft = seconds;
-		double timeAtStartOfMoveSecondsAdjusted = timeAtStartOfMoveSeconds;
-		double[] recentSecondsFromStartToImpact = new double[5];
+		float secondsLeft = seconds;
+		float timeAtStartOfMoveSecondsAdjusted = timeAtStartOfMoveSeconds;
+		float[] recentSecondsFromStartToImpact = new float[5];
 		int recentSecondsFromStartToImpactIndex = 0;
 		int impacts = 0;
 		while (true){
-			double distLeft = speed * secondsLeft;
-			double xIncrement = speedX * secondsLeft;
-			double yIncrement = speedY * secondsLeft;
+			float distLeft = speed * secondsLeft;
+			float xIncrement = speedX * secondsLeft;
+			float yIncrement = speedY * secondsLeft;
 			oldX = x;
 			oldY = y;
 			x += xIncrement;
 			y += yIncrement;
 
 
-			double approxDistCoveredHalved = (Math.abs(xIncrement) + Math.abs(yIncrement))/2;
-			double midPointX = (x + oldX)/2f;
-			double midPointY = (y + oldY)/2f;
+			float approxDistCoveredHalved = (Math.abs(xIncrement) + Math.abs(yIncrement))/2;
+			float midPointX = (x + oldX)/2f;
+			float midPointY = (y + oldY)/2f;
 			ArrayList<OccluderImpl> obstacles = world.allOccluders.getAllWithin(midPointX, midPointY, approxDistCoveredHalved);
 			//codeTimer.click("");
 
 			boolean touch = false;
 			OccluderIntersection closestOccluderIntersection = null;
-			double distToClosestHitObstacle = Double.MAX_VALUE;
+			float distToClosestHitObstacle = Float.MAX_VALUE;
 			ObstacleLoop:
 			for (int i = 0; i < obstacles.size(); i++) {
 				OccluderImpl obstacle = obstacles.get(i);
 				KPolygon shape = obstacle.getPolygon();
-//				double error = 0.1f;
-//				if (KPoint.distance(oldX, oldY, shape.getCenter().x, shape.getCenter().y) > shape.getRadius() + approxDistCovered + error) {
+//				float error = 0.1f;
+//				if (Vector2f.distance(oldX, oldY, shape.getCenter().x, shape.getCenter().y) > shape.getRadius() + approxDistCovered + error) {
 //					continue;
 //				}
-				ArrayList<KPoint> points = shape.getPoints();
+				ArrayList<Vector2f> points = shape.getPoints();
 				for (int j = 0; j < points.size(); j++) {
 					for (int k = 0; k < previousIntersections.size(); k++){
 						OccluderIntersection occluderIntersection = previousIntersections.get(k);
@@ -157,12 +161,12 @@ public class Bullet{
 					}
 
 					int jPlus = (j+1 == points.size() ? 0 : j+1);
-					if (KPoint.linesIntersect(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y)){
-						KPoint intersection = KPoint.getLineLineIntersection(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y);
+					if (Vector2fUtils.linesIntersect(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y)){
+						Vector2f intersection = Vector2fUtils.getLineLineIntersection(oldX, oldY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y);
 						if (intersection == null){
 							continue;
 						}
-						double distToIntersection = intersection.distance(oldX, oldY);
+						float distToIntersection = intersection.distance(new Vector2f(oldX, oldY));
 						OccluderIntersection occluderIntersection = new OccluderIntersection(distToIntersection, intersection, obstacle, j, jPlus);
 						currentIntersections.add(occluderIntersection);
 						if (distToIntersection < distToClosestHitObstacle) {
@@ -179,7 +183,7 @@ public class Bullet{
 			players.add(world.player);
 			players.addAll(world.enemies);
 			Player hitPlayer = null;
-			double distToClosestHitPlayer = Double.MAX_VALUE;
+			float distToClosestHitPlayer = Float.MAX_VALUE;
 			for (int i = 0; i < players.size(); i++) {
 				Player p = (Player)players.get(i);
 				if (p.dead == true){
@@ -188,7 +192,7 @@ public class Bullet{
 				if (p.polygon.intersectsLine(oldX, oldY, x, y)) {
 					// The below is not really the right distance to where the
 					// player was hit, but it is an OK approximation.
-					double dist = KPoint.distance(oldX, oldY, x, y);
+					float dist = Vector2fUtils.distance(oldX, oldY, x, y);
 					if (dist < distToClosestHitPlayer) {
 						distToClosestHitPlayer = dist;
 						touch = true;
@@ -205,38 +209,38 @@ public class Bullet{
 					break;
 				}else{
 					hitObstacle(closestOccluderIntersection.occluderImpl, timeAtStartOfMoveSeconds);
-					double secondsFromStartToImpact = secondsLeft*distToClosestHitObstacle/distLeft;
+					float secondsFromStartToImpact = secondsLeft*distToClosestHitObstacle/distLeft;
 					secondsLeft -= secondsFromStartToImpact;
 					timeAtStartOfMoveSecondsAdjusted += secondsFromStartToImpact;
 
-					KPoint incident = new KPoint(oldX, oldY);
-					KPoint surface = closestOccluderIntersection.occluderImpl.getPolygon().points.get(closestOccluderIntersection.occluderSideJ).copy();
+					Vector2f incident = new Vector2f(oldX, oldY);
+					Vector2f surface = closestOccluderIntersection.occluderImpl.getPolygon().points.get(closestOccluderIntersection.occluderSideJ).clone();
 
 					incident.x -= closestOccluderIntersection.intersection.x;
 					incident.y -= closestOccluderIntersection.intersection.y;
 					surface.x -= closestOccluderIntersection.intersection.x;
 					surface.y -= closestOccluderIntersection.intersection.y;
 
-					double surfaceLength = Math.sqrt(surface.x*surface.x + surface.y*surface.y);
+					float surfaceLength = FastMath.sqrt(surface.x*surface.x + surface.y*surface.y);
 					// normalise the surface:
 					surface.x /= surfaceLength;
 					surface.y /= surfaceLength;
-					double dotproduct = incident.x * surface.x + incident.y * surface.y;
-					KPoint incidentProjectedOntoSurface = new KPoint(surface.x * dotproduct, surface.y * dotproduct);
-					KPoint reflect = new KPoint(incident.x - 2*incidentProjectedOntoSurface.x, incident.y - 2*incidentProjectedOntoSurface.y);
+					float dotproduct = incident.x * surface.x + incident.y * surface.y;
+					Vector2f incidentProjectedOntoSurface = new Vector2f(surface.x * dotproduct, surface.y * dotproduct);
+					Vector2f reflect = new Vector2f(incident.x - 2*incidentProjectedOntoSurface.x, incident.y - 2*incidentProjectedOntoSurface.y);
 //					System.out.println(this.getClass().getSimpleName()+": incident == "+incident);
 //					System.out.println(this.getClass().getSimpleName()+": surface == "+surface);
 //					//System.out.println(this.getClass().getSimpleName()+": normal == "+normal);
 //					System.out.println(this.getClass().getSimpleName()+": incidentProjectedOntoSurface == "+incidentProjectedOntoSurface);
 //					System.out.println(this.getClass().getSimpleName()+": reflect == "+reflect);
-					angle = reflect.findSignedAngleFromOrigin();
+					angle = Vector2fUtils.findSignedAngleFromOrigin(reflect);
 //					System.out.println(this.getClass().getSimpleName()+": angle == "+angle);
 
 
 					x = closestOccluderIntersection.intersection.x;
 					y = closestOccluderIntersection.intersection.y;
-					speedX = Math.cos(angle) * speed;
-					speedY = Math.sin(angle) * speed;
+					speedX = FastMath.cos(angle) * speed;
+					speedY = FastMath.sin(angle) * speed;
 					oldX = x;
 					oldY = y;
 					previousIntersections.clear();
@@ -246,7 +250,7 @@ public class Bullet{
 					// check that the bullet isn't intersecting in an infinite loop.
 					impacts++;
 					recentSecondsFromStartToImpact[recentSecondsFromStartToImpactIndex] = secondsFromStartToImpact;
-					double sum = 0;
+					float sum = 0;
 					for (int i = 0; i < recentSecondsFromStartToImpact.length; i++){
 						sum += recentSecondsFromStartToImpact[i];
 					}
@@ -266,12 +270,12 @@ public class Bullet{
 	}
 
 	public static class OccluderIntersection{
-		public double distToIntersection;
-		public KPoint intersection;
+		public float distToIntersection;
+		public Vector2f intersection;
 		public OccluderImpl occluderImpl;
 		public int occluderSideJ;
 		public int occluderSideJPlus;
-		public OccluderIntersection(double distToIntersection, KPoint intersection, OccluderImpl occluderImpl, int occluderSideJ, int occluderSideJPlus){
+		public OccluderIntersection(float distToIntersection, Vector2f intersection, OccluderImpl occluderImpl, int occluderSideJ, int occluderSideJPlus){
 			this.distToIntersection = distToIntersection;
 			this.intersection = intersection;
 			this.occluderImpl = occluderImpl;
@@ -280,10 +284,10 @@ public class Bullet{
 		}
 	}
 
-	public void hitObstacle(OccluderImpl hitObstacle, double timeOfHit){
+	public void hitObstacle(OccluderImpl hitObstacle, float timeOfHit){
 		//dead = true;
 	}
-	public void hit(Player hitPlayer, double timeOfHit){
+	public void hit(Player hitPlayer, float timeOfHit){
 		//hitPlayer.takeDamage(this, timeOfHit);
 		this.playerThatWasHit = hitPlayer;
 		dead = true;
@@ -295,10 +299,10 @@ public class Bullet{
 	public boolean isDead(){
 		return dead;
 	}
-	public double getX(){
+	public float getX(){
 		return x;
 	}
-	public double getY(){
+	public float getY(){
 		return y;
 	}
 }
@@ -349,7 +353,7 @@ public class Bullet{
 // */
 //package straightedge.test.demo;
 //
-//import straightedge.geom.KPoint;
+//import straightedge.geom.Vector2f;
 //import straightedge.geom.KPolygon;
 //import straightedge.geom.vision.OccluderImpl;
 //import java.awt.geom.Point2D;
@@ -363,32 +367,32 @@ public class Bullet{
 //public class Bullet{
 //	public World world;
 //	public Player ownerGunUser;
-//	public double x;
-//	public double y;
-//	public double speedX;
-//	public double speedY;
-//	double accelX;
-//	double accelY;
-//	public double spawnTimeSeconds;
+//	public float x;
+//	public float y;
+//	public float speedX;
+//	public float speedY;
+//	float accelX;
+//	float accelY;
+//	public float spawnTimeSeconds;
 //	public boolean dead;
 //	public Player playerThatWasHit = null;
-//	public double backX;
-//	public double backY;
-//	public double oldBackX;
-//	public double oldBackY;
+//	public float backX;
+//	public float backY;
+//	public float oldBackX;
+//	public float oldBackY;
 //
-//	public double radius;
-//	public double length;
-//	public double maxSpeed;
-//	public double damage;
-//	public double angle;
-//	public double lifeTimeSeconds;
+//	public float radius;
+//	public float length;
+//	public float maxSpeed;
+//	public float damage;
+//	public float angle;
+//	public float lifeTimeSeconds;
 //
 //	static float canNotHitOwnPlayerTimeSeconds = 1.0f;
 //
 ////	SightField sightField;
 //
-//	public Bullet(Gun gun, Player gunUser, double newX, double newY, double angle, double spawnTimeSeconds, double xLaunchSpeed, double yLaunchSpeed) {
+//	public Bullet(Gun gun, Player gunUser, float newX, float newY, float angle, float spawnTimeSeconds, float xLaunchSpeed, float yLaunchSpeed) {
 //		world = gun.world;
 //		this.ownerGunUser = gunUser;
 //		this.spawnTimeSeconds = spawnTimeSeconds;
@@ -396,21 +400,21 @@ public class Bullet{
 ////		assert Point2D.distance(ownerGunUser.getX(), ownerGunUser.getY(), newX, newY) < ownerGunUser.getR() : Point2D.distance(ownerGunUser.getX(), ownerGunUser.getY(), newX, newY);
 //		radius = 2f;
 //		length = 2*radius;
-//		double damagePerSecond = 200f;
+//		float damagePerSecond = 200f;
 //		damage = gun.getReloadSeconds()*damagePerSecond;//4f;
 //		this.angle = angle;
 //		/*gun.getWorld().getRandom().setSeed(gun.getSeed());
 //		gun.setSeed(gun.getSeed()+3041);
 //		float randomSpeedIncrement = world.getRandom().nextFloat()*200;*/
-//		double startSpeed = 1000;//1500;//600;// + randomSpeedIncrement;
-//		double randomRangeIncrement = 0;//(float)Math.random()*200;
-//		double range = 1000;//1500;//180 + randomRangeIncrement;
+//		float startSpeed = 1000;//1500;//600;// + randomSpeedIncrement;
+//		float randomRangeIncrement = 0;//(float)Math.random()*200;
+//		float range = 1000;//1500;//180 + randomRangeIncrement;
 //		speedX = xLaunchSpeed + (float) Math.cos(angle) * startSpeed;
 //		speedY = yLaunchSpeed + (float) Math.sin(angle) * startSpeed;
 //		//float accel = -50;
 //		//accelX = (float) Math.cos(angle) * accel;
 //		//accelY = (float) Math.sin(angle) * accel;
-//		double launchSpeed = startSpeed;//(float)Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
+//		float launchSpeed = startSpeed;//(float)Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
 //		lifeTimeSeconds = range / launchSpeed;
 //
 //		this.x = newX + (float) Math.cos(angle) * length;
@@ -429,7 +433,7 @@ public class Bullet{
 ////		sightField.intersectSightPolygon(polygons, obstacleIntersectionPoints, getWorld().movingPolygons);
 //	}
 //
-//	public void doMove(double seconds, double startTime) {
+//	public void doMove(float seconds, float startTime) {
 //		assert dead == false : "dead == " + dead;
 //		assert seconds >= 0 : seconds;
 ////		assert spawnTimeSeconds <= timeAtStartOfMoveSeconds + seconds : "this bullet was spawned in the future! getSSCode() == " + getSSCode() + ", spawnTimeSeconds == " + (spawnTimeSeconds) + ", timeAtStartOfMoveSeconds + seconds == " + (timeAtStartOfMoveSeconds + seconds) + ", " + spawnTimeSeconds + ", " + timeAtStartOfMoveSeconds + ", " + seconds;
@@ -448,15 +452,15 @@ public class Bullet{
 //		oldBackY = backY;
 //	}
 //
-//	protected void doBulletMove(double seconds, double timeAtStartOfMoveSeconds) {
+//	protected void doBulletMove(float seconds, float timeAtStartOfMoveSeconds) {
 ////		codeTimer.setEnabled(false);
 ////		codeTimer.click("");
 //		assert Double.isNaN(x) == false;
 //		assert seconds >= 0 : seconds;
-//		double newSpeedX = (float) (speedX + accelX * seconds);
-//		double newSpeedY = (float) (speedY + accelY * seconds);
-//		double xIncrement = (float) (((newSpeedX + speedX) / 2f) * seconds);
-//		double yIncrement = (float) (((newSpeedY + speedY) / 2f) * seconds);
+//		float newSpeedX = (float) (speedX + accelX * seconds);
+//		float newSpeedY = (float) (speedY + accelY * seconds);
+//		float xIncrement = (float) (((newSpeedX + speedX) / 2f) * seconds);
+//		float yIncrement = (float) (((newSpeedY + speedY) / 2f) * seconds);
 //		x += xIncrement;
 //		y += yIncrement;
 //		backX += xIncrement;
@@ -466,34 +470,34 @@ public class Bullet{
 //		speedY = newSpeedY;
 //		//codeTimer.click("");
 //		boolean touch = false;
-//		KPoint pos = new KPoint(x, y);
+//		Vector2f pos = new Vector2f(x, y);
 ////		ArrayList<OccluderImpl> obstacles = world.allOccluders.getAllWithin(pos, length);
-//		double approxDistCoveredHalved = (Math.abs(xIncrement) + Math.abs(yIncrement) + length)/2;
-//		double midPointX = (x + backX)/2f;
-//		double midPointY = (y + backY)/2f;
+//		float approxDistCoveredHalved = (Math.abs(xIncrement) + Math.abs(yIncrement) + length)/2;
+//		float midPointX = (x + backX)/2f;
+//		float midPointY = (y + backY)/2f;
 //		ArrayList<OccluderImpl> obstacles = world.allOccluders.getAllWithin(midPointX, midPointY, approxDistCoveredHalved);
 //		//codeTimer.click("");
 //		OccluderImpl hitObstacle = null;
-//		KPoint closestIntersection = null;
-//		double distToClosestHitObstacle = Double.MAX_VALUE;
+//		Vector2f closestIntersection = null;
+//		float distToClosestHitObstacle = Double.MAX_VALUE;
 //		//float distCovered = (float) Math.pow(Math.pow(xIncrement, 2) + Math.pow(yIncrement, 2), 0.5f);
-//		double distCovered = Math.abs(xIncrement) + Math.abs(yIncrement);
+//		float distCovered = Math.abs(xIncrement) + Math.abs(yIncrement);
 //		for (int i = 0; i < obstacles.size(); i++) {
 //			OccluderImpl obstacle = obstacles.get(i);
 //			KPolygon shape = obstacle.getPolygon();
-//			double error = 0.1f;
-//			if (KPoint.distance(x, y, shape.getCenter().x, shape.getCenter().y) > shape.getRadius() + length + distCovered + error) {
+//			float error = 0.1f;
+//			if (Vector2f.distance(x, y, shape.getCenter().x, shape.getCenter().y) > shape.getRadius() + length + distCovered + error) {
 //				continue;
 //			}
-//			ArrayList<KPoint> points = shape.getPoints();
+//			ArrayList<Vector2f> points = shape.getPoints();
 //			for (int j = 0; j < points.size(); j++) {
 //				int jPlus = (j+1 == points.size() ? 0 : j+1);
-//				if (KPoint.linesIntersect(oldBackX, oldBackY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y)){
-//					KPoint intersection = KPoint.getLineLineIntersection(oldBackX, oldBackY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y);
+//				if (Vector2f.linesIntersect(oldBackX, oldBackY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y)){
+//					Vector2f intersection = Vector2f.getLineLineIntersection(oldBackX, oldBackY, x, y, points.get(j).x, points.get(j).y, points.get(jPlus).x, points.get(jPlus).y);
 //					if (intersection == null){
 //						continue;
 //					}
-//					double dist = intersection.distance(oldBackX, oldBackY);
+//					float dist = intersection.distance(oldBackX, oldBackY);
 //					if (dist < distToClosestHitObstacle) {
 //						distToClosestHitObstacle = dist;
 //						closestIntersection = intersection;
@@ -504,8 +508,8 @@ public class Bullet{
 //			}
 //		}
 //		//codeTimer.click("");
-//		KPoint midPoint = KPoint.midPoint(oldBackX, oldBackY, x, y);
-//		double halfDist = KPoint.distance(oldBackX, oldBackY, x, y)/2f;
+//		Vector2f midPoint = Vector2f.midPoint(oldBackX, oldBackY, x, y);
+//		float halfDist = Vector2f.distance(oldBackX, oldBackY, x, y)/2f;
 //		//ArrayList<Player> monsters = getWorld().getMonsters().getAllWithin(midPoint, halfDist);
 //		ArrayList<Player> monsters = new ArrayList<Player>();
 //		monsters.add(world.player);
@@ -516,7 +520,7 @@ public class Bullet{
 //		// assert players.get(players.indexOf(ownerGunUser)) == ownerGunUser : ownerGunUser+", "+players;
 //		Player hitPlayer = null;
 //		//Point2D.Double playerIntersection = null;
-//		double distToClosestHitPlayer = Double.MAX_VALUE;
+//		float distToClosestHitPlayer = Double.MAX_VALUE;
 //		for (int i = 0; i < monsters.size(); i++) {
 //			Player p = monsters.get(i);
 //			if (p.dead == true){
@@ -531,7 +535,7 @@ public class Bullet{
 //			if (p.polygon.intersectsLine(oldBackX, oldBackY, x, y)) {
 //				// The below is not really the right distance to where the
 //				// ownerGunUser was hit, but it is an OK approximation.
-//				double dist = KPoint.distance(oldBackX, oldBackY, x, y);
+//				float dist = Vector2f.distance(oldBackX, oldBackY, x, y);
 //				if (dist < distToClosestHitPlayer) {
 //					distToClosestHitPlayer = dist;
 //					touch = true;
@@ -554,10 +558,10 @@ public class Bullet{
 //	}
 //
 //
-//	public void hitObstacle(OccluderImpl hitObstacle, double timeOfHit){
+//	public void hitObstacle(OccluderImpl hitObstacle, float timeOfHit){
 //		dead = true;
 //	}
-//	public void hit(Player hitPlayer, double timeOfHit){
+//	public void hit(Player hitPlayer, float timeOfHit){
 //		//hitPlayer.takeDamage(this, timeOfHit);
 //		this.playerThatWasHit = hitPlayer;
 //		dead = true;

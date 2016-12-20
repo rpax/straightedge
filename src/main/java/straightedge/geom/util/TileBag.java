@@ -30,8 +30,18 @@
  */
 package straightedge.geom.util;
 
-import straightedge.geom.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Random;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.AABB;
+import straightedge.geom.KPolygon;
+import straightedge.geom.PolygonHolder;
 
 /**
  * All the benefits of a Bag and a TileArray!
@@ -46,16 +56,16 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 		this.bag = bag;
 	}
 
-	public TileBag(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	public TileBag(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
 	}
 
-	protected void init(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	protected void init(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		tileArray = new TileArray<T>(botLeft, tileWidthAndHeight, numRows, numCols);
 		bag = new Bag<T>();
 	}
 
-	public TileBag(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
+	public TileBag(Vector2f botLeft, Vector2f approxTopRight, float tileWidthAndHeight){
 		tileArray = new TileArray<T>(botLeft, approxTopRight, tileWidthAndHeight);
 		bag = new Bag<T>();
 	}
@@ -91,7 +101,7 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 		}
 	}
 
-	public ArrayList<T> getAllWithin(KPoint point, double radius){
+	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 		return tileArray.getAllWithin(point, radius);
 	}
 	public ArrayList<T> getAllWithin(double x, double y, double radius){
@@ -296,8 +306,8 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 	public static void main(String[] args){
 		float w = 2000;
 		float h = 2000;
-		KPoint botLeft = new KPoint(0, 0);
-		KPoint topRight = new KPoint(w, h);
+		Vector2f botLeft = new Vector2f(0, 0);
+		Vector2f topRight = new Vector2f(w, h);
 		TileBag<KPolygon> tileBag = new TileBag(new TileArray<KPolygon>(botLeft, topRight, 100), new Bag());
 //		System.out.println(TileArray.class.getSimpleName()+": tileArray == "+tileArray);
 
@@ -306,24 +316,24 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 		Random rand = new Random(0);
 		for (int i = 0; i < numPolygons; i++){
 			{
-				ArrayList<KPoint> points = new ArrayList<KPoint>();
+				ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 				float width = 25;
 				float height = 25;
-				KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
-				points.add(new KPoint(point.x, point.y));
-				points.add(new KPoint(point.x, point.y + height));
-				points.add(new KPoint(point.x + width, point.y + height));
-				points.add(new KPoint(point.x + width, point.y));
+				Vector2f point = new Vector2f(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
+				points.add(new Vector2f(point.x, point.y));
+				points.add(new Vector2f(point.x, point.y + height));
+				points.add(new Vector2f(point.x + width, point.y + height));
+				points.add(new Vector2f(point.x + width, point.y));
 				KPolygon poly = new KPolygon(points);
 				poly.rotate(rand.nextFloat());
 				allPolygons.add(poly);
 			}
 			{
-				ArrayList<KPoint> points = new ArrayList<KPoint>();
+				ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 				int numPoints = 3 + rand.nextInt(10);
 				float radius = rand.nextFloat()*200;
 				KPolygon poly = KPolygon.createRegularPolygon(numPoints, radius);
-				KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
+				Vector2f point = new Vector2f(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
 				poly.translateTo(point);
 				poly.rotate(rand.nextFloat());
 				allPolygons.add(poly);
@@ -345,7 +355,7 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 			if (i == 1024){
 				ct.setEnabled(true);
 			}
-			KPoint c = new KPoint(w/rand.nextFloat(), h/rand.nextFloat());
+			Vector2f c = new Vector2f(w/rand.nextFloat(), h/rand.nextFloat());
 			float r = rand.nextFloat()*400;
 			ct.click("getAllWithin");
 			ArrayList<KPolygon> polygons = tileBag.getAllWithin(c, r);
@@ -364,7 +374,7 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 //			ct.click("getAllWithin");
 //			for (int j = 0; j < allPolygons.size(); j++){
 //				KPolygon poly = allPolygons.get(j);
-//				KPoint c = new KPoint(w/rand.nextFloat(), h/rand.nextFloat());
+//				Vector2f c = new Vector2f(w/rand.nextFloat(), h/rand.nextFloat());
 //				float r = rand.nextFloat()*50;
 //				ArrayList<KPolygon> polygons = tileBag.getAllWithin(c, r);
 //			}

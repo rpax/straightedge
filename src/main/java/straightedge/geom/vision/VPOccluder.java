@@ -30,6 +30,8 @@
  */
 package straightedge.geom.vision;
 
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.*;
 
 /**
@@ -40,7 +42,7 @@ public class VPOccluder extends VisiblePoint{
 	public Occluder occluder;
 	public int polygonPointNum;
 
-	public VPOccluder(KPoint point, Occluder occluder, int polygonPointNum){
+	public VPOccluder(Vector2f point, Occluder occluder, int polygonPointNum){
 		this.point = point;
 		this.occluder = occluder;
 		this.polygonPointNum = polygonPointNum;

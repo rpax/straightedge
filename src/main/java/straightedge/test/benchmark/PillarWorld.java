@@ -32,6 +32,9 @@ package straightedge.test.benchmark;
 
 import straightedge.geom.*;
 import java.util.*;
+
+import com.jme3.math.Vector2f;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.geom.*;
@@ -48,7 +51,7 @@ public class PillarWorld extends GameWorld{
 		{
 			float pillarH = 10;
 			float pillarW = 2;
-			KPoint centerOfSpiral = new KPoint(200, 250);
+			Vector2f centerOfSpiral = new Vector2f(200, 250);
 			int numPoints = 40;//250;
 			double angleIncrement = Math.PI*2f/(numPoints);
 			float rBig = 100;
@@ -56,7 +59,7 @@ public class PillarWorld extends GameWorld{
 			for (int k = 0; k < numPoints; k++){
 				double x = rBig*Math.cos(currentAngle);
 				double y = rBig*Math.sin(currentAngle);
-				KPoint center = new KPoint((float)x, (float)y);
+				Vector2f center = new Vector2f((float)x, (float)y);
 				KPolygon poly = KPolygon.createRectOblique(0,0, pillarH,0, pillarW);
 				poly.rotate((float)currentAngle);
 				poly.translateTo(center);
@@ -70,7 +73,7 @@ public class PillarWorld extends GameWorld{
 		{
 			float pillarH = 5;
 			float pillarW = 1;
-			KPoint centerOfSpiral = new KPoint(400, 250);
+			Vector2f centerOfSpiral = new Vector2f(400, 250);
 			int numPoints = 60;//200;
 			double angleIncrement = Math.PI*2f/(numPoints);
 			float rBig = 50;
@@ -78,7 +81,7 @@ public class PillarWorld extends GameWorld{
 			for (int k = 0; k < numPoints; k++){
 				double x = rBig*Math.cos(currentAngle);
 				double y = rBig*Math.sin(currentAngle);
-				KPoint center = new KPoint((float)x, (float)y);
+				Vector2f center = new Vector2f((float)x, (float)y);
 				KPolygon poly = KPolygon.createRectOblique(0,0, pillarH,0, pillarW);
 				poly.rotate((float)currentAngle);
 				poly.translateTo(center);
@@ -92,14 +95,14 @@ public class PillarWorld extends GameWorld{
 		{
 			float pillarH = 10;
 			float pillarW = 2;
-			KPoint wallStart = new KPoint(50, 50);
-			KPoint wallEnd = new KPoint(550, 50);
+			Vector2f wallStart = new Vector2f(50, 50);
+			Vector2f wallEnd = new Vector2f(550, 50);
 			float wallGap = 15;
 			float currentDist = 0;
 			while(currentDist < wallStart.distance(wallEnd)){
-				KPoint center = wallStart.createPointToward(wallEnd, currentDist);
+				Vector2f center = Vector2fUtils.createPointToward(wallStart,wallEnd, currentDist);
 				KPolygon poly = KPolygon.createRectOblique(0,0, pillarH,0, pillarW);
-				poly.rotate((float)(wallStart.findAngle(wallEnd)+Math.PI/2f));
+				poly.rotate((float)(Vector2fUtils.findAngle(wallStart,wallEnd)+Math.PI/2f));
 				poly.translateTo(center);
 				allPolys.add(poly);
 				currentDist += wallGap;
@@ -110,14 +113,14 @@ public class PillarWorld extends GameWorld{
 		{
 			float pillarH = 10;
 			float pillarW = 2;
-			KPoint wallStart = new KPoint(50, 80);
-			KPoint wallEnd = new KPoint(550, 80);
+			Vector2f wallStart = new Vector2f(50, 80);
+			Vector2f wallEnd = new Vector2f(550, 80);
 			float wallGap = 15;
 			float currentDist = 0;
 			while(currentDist < wallStart.distance(wallEnd)){
-				KPoint center = wallStart.createPointToward(wallEnd, currentDist);
+				Vector2f center = Vector2fUtils.createPointToward(wallStart,wallEnd, currentDist);
 				KPolygon poly = KPolygon.createRectOblique(0,0, pillarH,0, pillarW);
-				poly.rotate((float)(wallStart.findAngle(wallEnd)+Math.PI/2f));
+				poly.rotate((float)(Vector2fUtils.findAngle(wallStart,wallEnd)+Math.PI/2f));
 				poly.translateTo(center);
 				allPolys.add(poly);
 				currentDist += wallGap;
@@ -129,7 +132,7 @@ public class PillarWorld extends GameWorld{
 //		{
 //			float pillarH = 5;
 //			float pillarW = 1;
-//			KPoint centerOfSpiral = new KPoint(400, 350);
+//			Vector2f centerOfSpiral = new Vector2f(400, 350);
 //			int numPoints = 40;
 //			int numSpirals = 3;
 //			int totalPillars = numPoints*numSpirals;
@@ -142,7 +145,7 @@ public class PillarWorld extends GameWorld{
 //				currentRadius = rSmall + (rBig - rSmall)*k/totalPillars;
 //				double x = currentRadius*Math.cos(currentAngle);
 //				double y = currentRadius*Math.sin(currentAngle);
-//				KPoint center = new KPoint((float)x, (float)y);
+//				Vector2f center = new Vector2f((float)x, (float)y);
 //				KPolygon poly = KPolygon.createRectangle(0,0, pillarH,0, pillarW);
 //				poly.rotate((float)currentAngle);
 //				poly.translateTo(center);

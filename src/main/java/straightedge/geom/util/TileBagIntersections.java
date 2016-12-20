@@ -32,6 +32,9 @@ package straightedge.geom.util;
 
 import straightedge.geom.*;
 import java.util.*;
+
+import com.jme3.math.Vector2f;
+
 import straightedge.geom.vision.Occluder;
 
 /**
@@ -47,16 +50,16 @@ public class TileBagIntersections<T extends Occluder> implements Collection<T>{
 		this.bag = bag;
 	}
 
-	public TileBagIntersections(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	public TileBagIntersections(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
 	}
 
-	protected void init(KPoint botLeft, float tileWidthAndHeight, int numRows, int numCols){
+	protected void init(Vector2f botLeft, float tileWidthAndHeight, int numRows, int numCols){
 		tileArray = new TileArrayIntersections<T>(botLeft, tileWidthAndHeight, numRows, numCols);
 		bag = new Bag<T>();
 	}
 
-	public TileBagIntersections(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
+	public TileBagIntersections(Vector2f botLeft, Vector2f approxTopRight, float tileWidthAndHeight){
 		tileArray = new TileArrayIntersections<T>(botLeft, approxTopRight, tileWidthAndHeight);
 		bag = new Bag<T>();
 	}
@@ -92,7 +95,7 @@ public class TileBagIntersections<T extends Occluder> implements Collection<T>{
 		}
 	}
 
-	public ArrayList<T> getAllWithin(KPoint point, double radius){
+	public ArrayList<T> getAllWithin(Vector2f point, double radius){
 		return tileArray.getAllWithin(point, radius);
 	}
 

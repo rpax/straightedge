@@ -30,23 +30,50 @@
  */
 package straightedge.test;
 
-import straightedge.geom.*;
-import straightedge.geom.vision.*;
+import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Transparency;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.image.VolatileImage;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.PolygonBufferer;
+import straightedge.geom.Vector2fUtils;
 import straightedge.geom.path.KNodeOfObstacle;
 import straightedge.geom.path.NodeConnector;
 import straightedge.geom.path.PathBlockingObstacleImpl;
+import straightedge.geom.path.PathData;
 import straightedge.geom.path.PathFinder;
-import straightedge.geom.PolygonBufferer;
 import straightedge.geom.util.Bag;
 import straightedge.geom.util.TileArray;
 import straightedge.geom.util.TileBag;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.*;
-import straightedge.geom.path.PathData;
+import straightedge.geom.vision.OccluderImpl;
+import straightedge.geom.vision.VisionData;
+import straightedge.geom.vision.VisionFinder;
 
 /**
  *
@@ -62,7 +89,7 @@ public class MovingObstacleTest {
 	Object mutex = new Object();
 	ArrayList<AWTEvent> events = new ArrayList<AWTEvent>();
 	ArrayList<AWTEvent> eventsCopy = new ArrayList<AWTEvent>();
-	KPoint lastMouseMovePoint = new KPoint();
+	Vector2f lastMouseMovePoint = new Vector2f();
 
 	ArrayList<KPolygon> originalPulsatingOccluderPolygons;
 	ArrayList<OccluderImpl> pulsatingOccluders;
@@ -160,8 +187,8 @@ public class MovingObstacleTest {
 		allOccluders = new ArrayList<OccluderImpl>();
 		// make some rectangles
 		for (int i = 0; i < 4; i++){
-			KPoint p = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
-			KPoint p2 = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+			Vector2f p = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+			Vector2f p2 = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
 			float width = 10 + 30*rand.nextFloat();
 			KPolygon rect = KPolygon.createRectOblique(p, p2, width);
 			allOccluders.add(new OccluderImpl(rect));
@@ -171,7 +198,7 @@ public class MovingObstacleTest {
 		allOccluders.add(new OccluderImpl(KPolygon.createRectOblique(70, 40, 70, 100, 20)));
 		// make a star
 		for (int i = 0; i < 4; i++){
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 			int numPoints = 4 + rand.nextInt(4)*2;
 			double angleIncrement = Math.PI*2f/(numPoints*2);
 			float rBig = 40 + rand.nextFloat()*90;
@@ -180,11 +207,11 @@ public class MovingObstacleTest {
 			for (int k = 0; k < numPoints; k++){
 				double x = rBig*Math.cos(currentAngle);
 				double y = rBig*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 				x = rSmall*Math.cos(currentAngle);
 				y = rSmall*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 			}
 			KPolygon poly = new KPolygon(pointList);
@@ -277,8 +304,8 @@ public class MovingObstacleTest {
 		}
 
 		player = new Player();
-		player.pos = new KPoint(10, 100);
-		player.target = player.pos.copy();
+		player.pos = new Vector2f(10, 100);
+		player.target = player.pos.clone();
 	}
 
 	ArrayList<ObstacleReachableNodesCache> obstacleReachableNodesCaches;
@@ -460,20 +487,20 @@ public class MovingObstacleTest {
 	}
 
 	public class Player{
-		KPoint pos;
-		KPoint target;
-		KPoint targetAdjusted;
+		Vector2f pos;
+		Vector2f target;
+		Vector2f targetAdjusted;
 		float maxConnectionDistance;
 		PathData pathData;
 		float speed;
 		float speedX;
 		float speedY;
 		float moveAngle;
-		KPoint currentTargetPoint = null;
+		Vector2f currentTargetPoint = null;
 
 		VisionFinder visionFinder;
 		VisionData cache;
-		double smallAmount = 0.0001f;
+		float smallAmount = 0.0001f;
 
 		public Player(){
 			maxConnectionDistance = 1000f;
@@ -484,7 +511,7 @@ public class MovingObstacleTest {
 				float radius = 200;
 				KPolygon boundaryPolygon = KPolygon.createRegularPolygon(numPoints, radius);
 				// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-				KPoint eye = new KPoint(smallAmount, smallAmount);
+				Vector2f eye = new Vector2f(smallAmount, smallAmount);
 				visionFinder = new VisionFinder();
 				cache = new VisionData(eye, boundaryPolygon);
 			}
@@ -506,17 +533,17 @@ public class MovingObstacleTest {
 			double secondsLeft = seconds;
 			for (int i = 0; i < pathData.points.size(); i++){
 				currentTargetPoint = pathData.points.get(i);
-				KPoint oldPos = new KPoint();
+				Vector2f oldPos = new Vector2f();
 				oldPos.x = pos.x;
 				oldPos.y = pos.y;
 				//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
+				double distUntilTargetReached = Vector2fUtils.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 				double timeUntilTargetReached = distUntilTargetReached/speed;
 				assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 				double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
 				double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 				if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
-					double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
+					double dirAngle = Vector2fUtils.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 					moveAngle = (float)dirAngle;
 					speedX = (float)Math.cos(moveAngle) * speed;
 					speedY = (float)Math.sin(moveAngle) * speed;
@@ -546,7 +573,7 @@ public class MovingObstacleTest {
 			// Move the eye and boundaryPolygon to wherever they need to be.
 			// By making the eye slightly offset from its integer coordinate by smallAmount,
 			// it will prevent problems caused by collinearity.
-			cache.eye.setCoords(pos.x + smallAmount, pos.y + smallAmount);
+			cache.eye.set(pos.x + smallAmount, pos.y + smallAmount);
 			cache.boundaryPolygon.translateTo(cache.eye);
 			visionFinder.calc(cache, allOccluders);
 			/* Note that the above is a slow way to process shadows - every occluder is
@@ -560,10 +587,10 @@ public class MovingObstacleTest {
 			}
 		}
 
-		public KPoint getNearestPointOutsideOfObstacles(KPoint point){
+		public Vector2f getNearestPointOutsideOfObstacles(Vector2f point){
 			// check that the target point isn't inside any obstacles.
 			// if so, move it.
-			KPoint movedPoint = point.copy();
+			Vector2f movedPoint = point.clone();
 			boolean targetIsInsideObstacle = false;
 			int count = 0;
 			while (true){
@@ -571,7 +598,7 @@ public class MovingObstacleTest {
 					if (obst.getOuterPolygon().contains(movedPoint)){
 						targetIsInsideObstacle = true;
 						KPolygon poly = obst.getOuterPolygon();
-						KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
+						Vector2f p = poly.getBoundaryPointClosestTo(movedPoint);
 						if (p != null){
 							movedPoint.x = p.x;
 							movedPoint.y = p.y;
@@ -595,11 +622,11 @@ public class MovingObstacleTest {
 			return pathData;
 		}
 
-		public KPoint getPos() {
+		public Vector2f getPos() {
 			return pos;
 		}
 
-		public KPoint getTarget() {
+		public Vector2f getTarget() {
 			return target;
 		}
 
@@ -678,7 +705,7 @@ public class MovingObstacleTest {
 				for (int i = 0; i < tileBag.getBag().size(); i++) {
 					PathBlockingObstacleImpl obst = tileBag.getBag().get(i);
 					for (int j = 0; j < obst.getNodes().size(); j++) {
-						KPoint nextPoint = obst.getNodes().get(j).getPoint();
+						Vector2f nextPoint = obst.getNodes().get(j).getPoint();
 						float d = 2f;
 						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 					}
@@ -694,9 +721,9 @@ public class MovingObstacleTest {
 				Player p = player;
 				g.setColor(Color.MAGENTA.darker());
 				if (p.pathData.points.size() > 0) {
-					KPoint currentPoint = p.getPos();
+					Vector2f currentPoint = p.getPos();
 					for (int j = 0; j < p.pathData.points.size(); j++) {
-						KPoint nextPoint = p.pathData.points.get(j);
+						Vector2f nextPoint = p.pathData.points.get(j);
 						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 						float d = 5f;
 						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));

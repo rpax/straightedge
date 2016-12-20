@@ -33,6 +33,8 @@ package straightedge.geom.vision;
 import straightedge.geom.*;
 import java.util.*;
 
+import com.jme3.math.Vector2f;
+
 /**
  * @author Keith
  */
@@ -50,18 +52,18 @@ public class PointShuffler {
 		this.maxNumTries = maxNumTries;
 	}
 	public void shufflePoint(KPolygon poly, int pointIndex){
-		KPoint p = poly.getPoints().get(pointIndex);
-		KPoint pNext = p.createPointToward(poly.getNextPoint(pointIndex), 10);
-		KPoint pPrev = p.createPointToward(poly.getPrevPoint(pointIndex), 10);
-		KPoint mid = pNext.midPoint(pPrev);
-		double oldPX = p.x;
-		double oldPY = p.y;
+		Vector2f p = poly.getPoints().get(pointIndex);
+		Vector2f pNext = Vector2fUtils.createPointToward(p,poly.getNextPoint(pointIndex), 10);
+		Vector2f pPrev =  Vector2fUtils.createPointToward(p,poly.getPrevPoint(pointIndex), 10);
+		Vector2f mid = Vector2fUtils.midPoint(pNext,pPrev);
+		float oldPX = p.x;
+		float oldPY = p.y;
 		boolean done = false;
 		// Here we attempt to move the point at a random angle but in
 		// the general direction away from the polygon
 		for (int j = 0; j < maxNumTries; j++){
-			double angle = mid.findAngle(p) + ((rand.nextFloat()-0.5f)*Math.PI/5f);
-			KPoint newPoint = p.createPointFromAngle(angle, maxPointMoveDist);
+			double angle = Vector2fUtils.findAngle(mid,p) + ((rand.nextFloat()-0.5f)*Math.PI/5f);
+			Vector2f newPoint = Vector2fUtils.createPointFromAngle(p.x,p.y,angle, maxPointMoveDist);
 			p.x = newPoint.x;
 			p.y = newPoint.y;
 			poly.calcAll();
@@ -77,8 +79,8 @@ public class PointShuffler {
 		// the general direction into the center of the polygon
 		if (done == false){
 			for (int j = 0; j < maxNumTries; j++){
-				double angle = mid.findAngle(p) + ((rand.nextFloat()-0.5f)*Math.PI/5f) + Math.PI;
-				KPoint newPoint = p.createPointFromAngle(angle, maxPointMoveDist);
+				double angle = Vector2fUtils.findAngle(mid,p) + ((rand.nextFloat()-0.5f)*Math.PI/5f) + Math.PI;
+				Vector2f newPoint = Vector2fUtils.createPointFromAngle(p.x,p.y,angle, maxPointMoveDist);
 				p.x = newPoint.x;
 				p.y = newPoint.y;
 				poly.calcAll();

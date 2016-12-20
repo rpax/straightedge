@@ -33,11 +33,14 @@ package straightedge.geom.util;
 //import java.awt.*;
 //import java.awt.geom.*;
 //import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
 
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.geom.*;
-import straightedge.geom.KPoint;
+import com.jme3.math.Vector2f;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+
 import straightedge.geom.KPolygon;
 import straightedge.geom.PolygonConverter;
 
@@ -48,10 +51,10 @@ import straightedge.geom.PolygonConverter;
 
 public class ConvexHull {
 
-	public static KPolygon calcConvexHullPolygon(ArrayList<KPoint> array) {
+	public static KPolygon calcConvexHullPolygon(ArrayList<Vector2f> array) {
 		Coordinate[] coordinateArray = new Coordinate[array.size()];
 		for (int i = 0; i < array.size(); i++){
-			KPoint p = array.get(i);
+			Vector2f p = array.get(i);
 			coordinateArray[i] = new Coordinate(p.x, p.y);
 		}
 		com.vividsolutions.jts.algorithm.ConvexHull convexHull = new com.vividsolutions.jts.algorithm.ConvexHull(coordinateArray, new GeometryFactory());
@@ -74,9 +77,9 @@ public class ConvexHull {
 //	 * by Neumann
 //	 */
 //    //Returns the points of convex hull in the correct order
-//    public static ArrayList<KPoint> calcConvexHull(ArrayList<KPoint> array) {
-//		Collections.sort(array, new Comparator<KPoint>() {
-//			public int compare (KPoint pt1, KPoint pt2) {
+//    public static ArrayList<Vector2f> calcConvexHull(ArrayList<Vector2f> array) {
+//		Collections.sort(array, new Comparator<Vector2f>() {
+//			public int compare (Vector2f pt1, Vector2f pt2) {
 //				float r = pt1.x - pt2.x;
 //				if (r != 0)
 //					return (r > 0 ? 1 : -1);
@@ -87,9 +90,9 @@ public class ConvexHull {
 //		int size = array.size();
 //		if (size < 2)
 //			return null;
-//		KPoint l = array.get(0);
-//		KPoint r = array.get(size - 1);
-//		ArrayList<KPoint> path = new ArrayList<KPoint>();
+//		Vector2f l = array.get(0);
+//		Vector2f r = array.get(size - 1);
+//		ArrayList<Vector2f> path = new ArrayList<Vector2f>();
 //		path.add(l);
 //		cHull(array, l, r, path);
 //		path.add(r);
@@ -97,13 +100,13 @@ public class ConvexHull {
 //		return path;
 //    }
 //
-//    protected static void cHull(ArrayList<KPoint> points, KPoint l, KPoint r, ArrayList<KPoint> path) {
+//    protected static void cHull(ArrayList<Vector2f> points, Vector2f l, Vector2f r, ArrayList<Vector2f> path) {
 //		if (points.size() < 3)
 //			return;
 //		float maxDist = -1;
 //		float tmp;
-//		KPoint p = null;
-//		for (KPoint pt : points) {
+//		Vector2f p = null;
+//		for (Vector2f pt : points) {
 //			if (pt != l && pt != r) {
 //				tmp = distance(l, r, pt);
 //				if (tmp > maxDist) {
@@ -116,11 +119,11 @@ public class ConvexHull {
 //		if (p == null){
 //			return;
 //		}
-//		ArrayList<KPoint> left = new ArrayList<KPoint>();
-//		ArrayList<KPoint> right = new ArrayList<KPoint>();
+//		ArrayList<Vector2f> left = new ArrayList<Vector2f>();
+//		ArrayList<Vector2f> right = new ArrayList<Vector2f>();
 //		left.add(l);
 //		right.add(p);
-//		for (KPoint pt : points) {
+//		for (Vector2f pt : points) {
 //			if (distance(l, p, pt) > 0)
 //				left.add(pt);
 //			else if (distance(p, r, pt) > 0)
@@ -135,7 +138,7 @@ public class ConvexHull {
 //
 //	//Returns the determinant of the point matrix
 //    //This determinant tells how far p3 is from vector p1p2 and on which side it is
-//    protected static float distance(KPoint p1, KPoint p2, KPoint p3) {
+//    protected static float distance(Vector2f p1, Vector2f p2, Vector2f p3) {
 //		float x1 = p1.x;
 //		float x2 = p2.x;
 //		float x3 = p3.x;

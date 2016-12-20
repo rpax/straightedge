@@ -30,15 +30,37 @@
  */
 package straightedge.test;
 
-import straightedge.geom.*;
-import straightedge.geom.vision.*;
-import straightedge.geom.util.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.util.Bag;
+import straightedge.geom.util.TileArrayIntersections;
+import straightedge.geom.util.TileBagIntersections;
+import straightedge.geom.vision.OccluderImpl;
+import straightedge.geom.vision.VisionData;
+import straightedge.geom.vision.VisionFinder;
 
 /**
  *
@@ -52,11 +74,11 @@ public class VisionTestActiveRendering {
 	final Object mutex = new Object();
 	ArrayList<AWTEvent> events = new ArrayList<AWTEvent>();
 	ArrayList<AWTEvent> eventsCopy = new ArrayList<AWTEvent>();
-	KPoint lastMouseMovePoint = new KPoint();
+	Vector2f lastMouseMovePoint = new Vector2f();
 
 	VisionFinder visionFinder;
 	VisionData visionData = null;
-	double smallAmount = 0.0001;
+	float smallAmount = 0.0001f;
 
 	ArrayList<OccluderImpl> movingOccluders;
 	TileBagIntersections<OccluderImpl> stationaryOccluders;
@@ -93,7 +115,7 @@ public class VisionTestActiveRendering {
 		float radius = 200;
 		KPolygon boundaryPolygon = KPolygon.createRegularPolygon(numPoints, radius);
 		// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-		KPoint eye = new KPoint(smallAmount, smallAmount);
+		Vector2f eye = new Vector2f(smallAmount, smallAmount);
 		visionData = new VisionData(eye, boundaryPolygon);
 		visionFinder = new VisionFinder();
 
@@ -146,8 +168,8 @@ public class VisionTestActiveRendering {
 
 		// make some rectangles
 		for (int i = 0; i < 4; i++){
-			KPoint p = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
-			KPoint p2 = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+			Vector2f p = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+			Vector2f p2 = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
 			float width = 10 + 30*rand.nextFloat();
 			KPolygon rect = KPolygon.createRectOblique(p, p2, width);
 			polygons.add(rect);
@@ -157,7 +179,7 @@ public class VisionTestActiveRendering {
 		polygons.add(KPolygon.createRectOblique(70, 40, 70, 100, 20));
 		// make some stars
 		for (int i = 0; i < 4; i++){
-			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 			int numPoints = 4 + rand.nextInt(4)*2;
 			double angleIncrement = Math.PI*2f/(numPoints*2);
 			float rBig = 40 + rand.nextFloat()*90;
@@ -166,11 +188,11 @@ public class VisionTestActiveRendering {
 			for (int k = 0; k < numPoints; k++){
 				double x = rBig*Math.cos(currentAngle);
 				double y = rBig*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 				x = rSmall*Math.cos(currentAngle);
 				y = rSmall*Math.sin(currentAngle);
-				pointList.add(new KPoint((float)x, (float)y));
+				pointList.add(new Vector2f((float)x, (float)y));
 				currentAngle += angleIncrement;
 			}
 			KPolygon poly = new KPolygon(pointList);
@@ -219,7 +241,7 @@ public class VisionTestActiveRendering {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		visionData.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
+		visionData.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
 		visionData.boundaryPolygon.translateTo(visionData.eye);
 		visionFinder.calc(visionData, stationaryOccluders, movingOccluders);
 		/* Note that the above line is the fast way to process shadows since the
@@ -282,7 +304,7 @@ public class VisionTestActiveRendering {
 
 //				g.setColor(Color.RED);
 //				for (int i = 0; i < visiblePolygon.getPoints().size(); i++){
-//					KPoint p1 = visiblePolygon.getPoints().get(i);
+//					Vector2f p1 = visiblePolygon.getPoints().get(i);
 //					g.drawString(""+i, (float)p1.x, (float)p1.y+10);
 //				}
 			}

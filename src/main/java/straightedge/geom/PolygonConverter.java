@@ -30,246 +30,333 @@
  */
 package straightedge.geom;
 
-import java.util.*;
-import com.vividsolutions.jts.geom.*;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-	
+import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
+
 /**
  *
  * @author Keith Woodward
  */
-public class PolygonConverter{
+public class PolygonConverter {
 	public GeometryFactory geometryFactory = new GeometryFactory();
 
-	public PolygonConverter(){
+	public PolygonConverter()
+	{
 	}
-	
-	public com.vividsolutions.jts.geom.Polygon makeJTSPolygonFrom(KPolygon polygon){
+
+	public com.vividsolutions.jts.geom.Polygon makeJTSPolygonFrom(
+			KPolygon polygon)
+	{
 		com.vividsolutions.jts.geom.Polygon jtsPolygon;
-		Coordinate[] coordinateArray = new Coordinate[polygon.getPoints().size() + 1];
-		for (int i = 0; i < polygon.getPoints().size(); i++){
-			KPoint p = polygon.getPoints().get(i);
+		Coordinate[] coordinateArray = new Coordinate[polygon.getPoints().size()
+				+ 1];
+		for (int i = 0; i < polygon.getPoints().size(); i++)
+		{
+			Vector2f p = polygon.getPoints().get(i);
 			coordinateArray[i] = new Coordinate(p.x, p.y);
 		}
 		// link the first and last points
-		coordinateArray[polygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
-		LinearRing linearRing = geometryFactory.createLinearRing(coordinateArray);
-		jtsPolygon = new com.vividsolutions.jts.geom.Polygon(linearRing, null, geometryFactory);
+		coordinateArray[polygon.getPoints().size()] = new Coordinate(
+				coordinateArray[0].x, coordinateArray[0].y);
+		LinearRing linearRing = geometryFactory
+				.createLinearRing(coordinateArray);
+		jtsPolygon = new com.vividsolutions.jts.geom.Polygon(linearRing, null,
+				geometryFactory);
 		return jtsPolygon;
 	}
 
-	public com.vividsolutions.jts.geom.Polygon makeJTSPolygonFrom(KMultiPolygon polygon){
+	public com.vividsolutions.jts.geom.Polygon makeJTSPolygonFrom(
+			KMultiPolygon polygon)
+	{
 		com.vividsolutions.jts.geom.Polygon jtsPolygon;
 		KPolygon exteriorPolygon = polygon.getExteriorPolygon();
-		Coordinate[] coordinateArray = new Coordinate[exteriorPolygon.points.size() + 1];
-		for (int i = 0; i < exteriorPolygon.getPoints().size(); i++){
-			KPoint p = exteriorPolygon.getPoints().get(i);
+		Coordinate[] coordinateArray = new Coordinate[exteriorPolygon.points
+				.size() + 1];
+		for (int i = 0; i < exteriorPolygon.getPoints().size(); i++)
+		{
+			Vector2f p = exteriorPolygon.getPoints().get(i);
 			coordinateArray[i] = new Coordinate(p.x, p.y);
 		}
 		// link the first and last points
-		coordinateArray[exteriorPolygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
-		LinearRing exteriorLinearRing = geometryFactory.createLinearRing(coordinateArray);
+		coordinateArray[exteriorPolygon.getPoints().size()] = new Coordinate(
+				coordinateArray[0].x, coordinateArray[0].y);
+		LinearRing exteriorLinearRing = geometryFactory
+				.createLinearRing(coordinateArray);
 
-		
-		ArrayList<KPolygon> interiorPolygons = polygon.getInteriorPolygonsCopy();
-		ArrayList<LinearRing> interiorLinearRings = new ArrayList<LinearRing>(interiorPolygons.size());
-		for (int i = 0; i < interiorPolygons.size(); i++){
+		ArrayList<KPolygon> interiorPolygons = polygon
+				.getInteriorPolygonsCopy();
+		ArrayList<LinearRing> interiorLinearRings = new ArrayList<LinearRing>(
+				interiorPolygons.size());
+		for (int i = 0; i < interiorPolygons.size(); i++)
+		{
 			KPolygon interiorPolygon = interiorPolygons.get(i);
 			coordinateArray = new Coordinate[interiorPolygon.points.size() + 1];
-			for (int j = 0; j < interiorPolygon.getPoints().size(); j++){
-				KPoint p = interiorPolygon.getPoints().get(j);
+			for (int j = 0; j < interiorPolygon.getPoints().size(); j++)
+			{
+				Vector2f p = interiorPolygon.getPoints().get(j);
 				coordinateArray[j] = new Coordinate(p.x, p.y);
 			}
 			// link the first and last points
-			coordinateArray[interiorPolygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
-			LinearRing interiorLinearRing = geometryFactory.createLinearRing(coordinateArray);
+			coordinateArray[interiorPolygon.getPoints()
+					.size()] = new Coordinate(coordinateArray[0].x,
+							coordinateArray[0].y);
+			LinearRing interiorLinearRing = geometryFactory
+					.createLinearRing(coordinateArray);
 			interiorLinearRings.add(interiorLinearRing);
 		}
 
-		LinearRing[] interiorLinearRingArray = interiorLinearRings.toArray(new LinearRing[interiorLinearRings.size()]);
-		jtsPolygon = new com.vividsolutions.jts.geom.Polygon(exteriorLinearRing, interiorLinearRingArray, geometryFactory);
+		LinearRing[] interiorLinearRingArray = interiorLinearRings
+				.toArray(new LinearRing[interiorLinearRings.size()]);
+		jtsPolygon = new com.vividsolutions.jts.geom.Polygon(exteriorLinearRing,
+				interiorLinearRingArray, geometryFactory);
 		return jtsPolygon;
 	}
 
 	/**
-	 * Returns a KPolygon of this polygon, or returns null if there was a problem.
-	 * For example, if there are less than 3 points, returns null.
-	 * If there are more than 3 points but consecutive points have the same coordinates,
-	 * and when the duplicates are deleted then there are less than 3 points.
+	 * Returns a KPolygon of this polygon, or returns null if there was a
+	 * problem. For example, if there are less than 3 points, returns null. If
+	 * there are more than 3 points but consecutive points have the same
+	 * coordinates, and when the duplicates are deleted then there are less than
+	 * 3 points.
+	 * 
 	 * @param jtsPolygon
 	 * @return
 	 */
-	public KPolygon makeKPolygonFromExterior(com.vividsolutions.jts.geom.Polygon jtsPolygon){
+	public KPolygon makeKPolygonFromExterior(
+			com.vividsolutions.jts.geom.Polygon jtsPolygon)
+	{
 		LineString exteriorRingLineString = jtsPolygon.getExteriorRing();
 		KPolygon polygon = makeKPolygonFrom(exteriorRingLineString);
 		return polygon;
 	}
-	public KMultiPolygon makeKMultiPolygonFrom(com.vividsolutions.jts.geom.Polygon jtsPolygon){
+
+	public KMultiPolygon makeKMultiPolygonFrom(
+			com.vividsolutions.jts.geom.Polygon jtsPolygon)
+	{
 		LineString exteriorRingLineString = jtsPolygon.getExteriorRing();
 		KPolygon polygon = makeKPolygonFrom(exteriorRingLineString);
-		if (polygon == null){
+		if (polygon == null)
+		{
 			return null;
 		}
 		KMultiPolygon multiPolygon = new KMultiPolygon(polygon);
-		for (int i = 0; i < jtsPolygon.getNumInteriorRing(); i++){
+		for (int i = 0; i < jtsPolygon.getNumInteriorRing(); i++)
+		{
 			LineString interiorRingLineString = jtsPolygon.getInteriorRingN(i);
 			KPolygon internalPolygon = makeKPolygonFrom(interiorRingLineString);
-			if (internalPolygon == null){
+			if (internalPolygon == null)
+			{
 				continue;
 			}
 			multiPolygon.getPolygons().add(internalPolygon);
 		}
 		return multiPolygon;
 	}
-	public KPolygon makeKPolygonFrom(com.vividsolutions.jts.geom.LineString lineString){
-		CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
-		ArrayList<KPoint> points = new ArrayList<KPoint>();
+
+	public KPolygon makeKPolygonFrom(
+			com.vividsolutions.jts.geom.LineString lineString)
+	{
+		CoordinateSequence coordinateSequence = lineString
+				.getCoordinateSequence();
+		ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 		// The loop stops at the second-last coord since the last coord will be
 		// the same as the start coord.
-		KPoint lastAddedPoint = null;
-		for (int i = 0; i < coordinateSequence.size()-1; i++){
+		Vector2f lastAddedPoint = null;
+		for (int i = 0; i < coordinateSequence.size() - 1; i++)
+		{
 			Coordinate coord = coordinateSequence.getCoordinate(i);
-			KPoint p = new KPoint(coord.x, coord.y);
-			if (lastAddedPoint != null && p.x == lastAddedPoint.x && p.y == lastAddedPoint.y){
+			Vector2f p = new Vector2f((float) coord.x, (float) coord.y);
+			if (lastAddedPoint != null && p.x == lastAddedPoint.x
+					&& p.y == lastAddedPoint.y)
+			{
 				// Don't add the point since it's the same as the last one
-//				System.out.println(this.getClass().getSimpleName()+": skipping p == "+p+", lastAddedPoint == "+lastAddedPoint+", i == "+i+", coordinateSequence.size()-1 == "+(coordinateSequence.size()-1));
+				// System.out.println(this.getClass().getSimpleName()+":
+				// skipping p == "+p+", lastAddedPoint == "+lastAddedPoint+", i
+				// == "+i+", coordinateSequence.size()-1 ==
+				// "+(coordinateSequence.size()-1));
 				continue;
-			}else{
+			} else
+			{
 				points.add(p);
 				lastAddedPoint = p;
 			}
 		}
-		if (points.size() < 3){
+		if (points.size() < 3)
+		{
 			return null;
 		}
 		KPolygon polygon = new KPolygon(points);
 		return polygon;
 	}
-	
 
-//	public ArrayList<KPolygon> makeKPolygonsFrom(com.vividsolutions.jts.geom.MultiPolygon jtsMultiPolygon){
-//		ArrayList<KPolygon> polygons = new ArrayList<KPolygon>();
-//		int numGeomtries = jtsMultiPolygon.getNumGeometries();
-//		for (int i = 0; i < numGeomtries; i++){
-//			Geometry geom = jtsMultiPolygon.getGeometryN(i);
-//			if (geom instanceof Polygon){
-//				Polygon jtsPoly = (Polygon)geom;
-//				LineString lineString = jtsPoly.getExteriorRing();
-//				CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
-//				ArrayList<KPoint> points = new ArrayList<KPoint>(coordinateSequence.size());
-//				// The loop stops at the second-last coord since the last coord will be
-//				// the same as the start coord.
-//				for (int j = 0; j < coordinateSequence.size()-1; j++){
-//					Coordinate coord = coordinateSequence.getCoordinate(j);
-//					points.add(new KPoint(coord.x, coord.y));
-//				}
-//				KPolygon poly = new KPolygon(points);
-//				polygons.add(poly);
-//
-//			}else{
-//				System.out.println(this.getClass().getSimpleName()+": geom.getClass() == "+geom.getClass());
-//				System.out.println(this.getClass().getSimpleName()+": numGeomtries == "+numGeomtries);
-//				if (geom instanceof LineString){
-//					LineString lineString = (LineString)geom;
-//					System.out.println(this.getClass().getSimpleName()+": lineString.isRing() == "+lineString.isRing());
-//				}
-//				//throw new RuntimeException("geom is not a polygon, geom == "+geom);
-//			}
-//		}
-//		return polygons;
-//	}
+	// public ArrayList<KPolygon>
+	// makeKPolygonsFrom(com.vividsolutions.jts.geom.MultiPolygon
+	// jtsMultiPolygon){
+	// ArrayList<KPolygon> polygons = new ArrayList<KPolygon>();
+	// int numGeomtries = jtsMultiPolygon.getNumGeometries();
+	// for (int i = 0; i < numGeomtries; i++){
+	// Geometry geom = jtsMultiPolygon.getGeometryN(i);
+	// if (geom instanceof Polygon){
+	// Polygon jtsPoly = (Polygon)geom;
+	// LineString lineString = jtsPoly.getExteriorRing();
+	// CoordinateSequence coordinateSequence =
+	// lineString.getCoordinateSequence();
+	// ArrayList<Vector2f> points = new
+	// ArrayList<Vector2f>(coordinateSequence.size());
+	// // The loop stops at the second-last coord since the last coord will be
+	// // the same as the start coord.
+	// for (int j = 0; j < coordinateSequence.size()-1; j++){
+	// Coordinate coord = coordinateSequence.getCoordinate(j);
+	// points.add(new Vector2f(coord.x, coord.y));
+	// }
+	// KPolygon poly = new KPolygon(points);
+	// polygons.add(poly);
+	//
+	// }else{
+	// System.out.println(this.getClass().getSimpleName()+": geom.getClass() ==
+	// "+geom.getClass());
+	// System.out.println(this.getClass().getSimpleName()+": numGeomtries ==
+	// "+numGeomtries);
+	// if (geom instanceof LineString){
+	// LineString lineString = (LineString)geom;
+	// System.out.println(this.getClass().getSimpleName()+": lineString.isRing()
+	// == "+lineString.isRing());
+	// }
+	// //throw new RuntimeException("geom is not a polygon, geom == "+geom);
+	// }
+	// }
+	// return polygons;
+	// }
 
-	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(Geometry geometry){
+	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(Geometry geometry)
+	{
 		ArrayList<KMultiPolygon> list = new ArrayList<KMultiPolygon>();
-		if (geometry instanceof com.vividsolutions.jts.geom.Polygon){
-			com.vividsolutions.jts.geom.Polygon jtsIntersectionPoly = (com.vividsolutions.jts.geom.Polygon)geometry;
+		if (geometry instanceof com.vividsolutions.jts.geom.Polygon)
+		{
+			com.vividsolutions.jts.geom.Polygon jtsIntersectionPoly = (com.vividsolutions.jts.geom.Polygon) geometry;
 			KMultiPolygon path2D = makeKMultiPolygonFrom(jtsIntersectionPoly);
-			if (path2D != null){
+			if (path2D != null)
+			{
 				list.add(path2D);
 			}
-		}else if (geometry instanceof com.vividsolutions.jts.geom.MultiPolygon){
-			com.vividsolutions.jts.geom.MultiPolygon multiPolygon = (com.vividsolutions.jts.geom.MultiPolygon)geometry;
+		} else if (geometry instanceof com.vividsolutions.jts.geom.MultiPolygon)
+		{
+			com.vividsolutions.jts.geom.MultiPolygon multiPolygon = (com.vividsolutions.jts.geom.MultiPolygon) geometry;
 			addGeometryToKMultiPolygonList(multiPolygon, list);
-		}else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection){
-			/* Even though MultiPolygon extends GeometryCollection, sometimes a
+		} else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection)
+		{
+			/*
+			 * Even though MultiPolygon extends GeometryCollection, sometimes a
 			 * buffer or intersection operation will result in random points, in
 			 * addition to Polygons and MultiPolygons. For this reason we should
-			 * still deal with GeometryCollections, and simply ignore the random points.
+			 * still deal with GeometryCollections, and simply ignore the random
+			 * points.
 			 */
-			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)geometry;
+			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection) geometry;
 			addGeometryToKMultiPolygonList(geometryCollection, list);
-		}else{
+		} else
+		{
 			// Sometimes these are found:
-			//com.vividsolutions.jts.geom.Point
-			//com.vividsolutions.jts.geom.LineString
+			// com.vividsolutions.jts.geom.Point
+			// com.vividsolutions.jts.geom.LineString
 		}
 		return list;
 	}
-	public void addGeometryToKMultiPolygonList(Geometry geometry, ArrayList<KMultiPolygon> list){
-		if (geometry instanceof com.vividsolutions.jts.geom.Polygon){
-			com.vividsolutions.jts.geom.Polygon jtsIntersectionPoly = (com.vividsolutions.jts.geom.Polygon)geometry;
+
+	public void addGeometryToKMultiPolygonList(Geometry geometry,
+			ArrayList<KMultiPolygon> list)
+	{
+		if (geometry instanceof com.vividsolutions.jts.geom.Polygon)
+		{
+			com.vividsolutions.jts.geom.Polygon jtsIntersectionPoly = (com.vividsolutions.jts.geom.Polygon) geometry;
 			KMultiPolygon path2D = makeKMultiPolygonFrom(jtsIntersectionPoly);
-			if (path2D != null){
+			if (path2D != null)
+			{
 				list.add(path2D);
 			}
-		}else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection){
+		} else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection)
+		{
 			// GeometryCollection is the super-class of MultiPolygon and
-			// MultiLineString and MultiPoint so these ones are taken care of in this code block.
-			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)geometry;
-			for (int i = 0; i < geometryCollection.getNumGeometries(); i++){
+			// MultiLineString and MultiPoint so these ones are taken care of in
+			// this code block.
+			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection) geometry;
+			for (int i = 0; i < geometryCollection.getNumGeometries(); i++)
+			{
 				Geometry internalGeometry = geometryCollection.getGeometryN(i);
 				addGeometryToKMultiPolygonList(internalGeometry, list);
 			}
-		}else{
+		} else
+		{
 			// Sometimes these are found:
-			//com.vividsolutions.jts.geom.Point
-			//com.vividsolutions.jts.geom.LineString
-			//System.out.println(this.getClass().getSimpleName()+": geometry.getClass() == "+geometry.getClass());
+			// com.vividsolutions.jts.geom.Point
+			// com.vividsolutions.jts.geom.LineString
+			// System.out.println(this.getClass().getSimpleName()+":
+			// geometry.getClass() == "+geometry.getClass());
 		}
 	}
 
-
-
-	public Path2D.Double makePath2DFrom(Geometry geometry){
+	public Path2D.Double makePath2DFrom(Geometry geometry)
+	{
 		Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
 		addGeometryToPath2D(geometry, path);
 		return path;
 	}
 
-	public void addGeometryToPath2D(Geometry geometry, Path2D.Double path){
-		if (geometry instanceof com.vividsolutions.jts.geom.Polygon){
-			com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)geometry;
+	public void addGeometryToPath2D(Geometry geometry, Path2D.Double path)
+	{
+		if (geometry instanceof com.vividsolutions.jts.geom.Polygon)
+		{
+			com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon) geometry;
 			addPolygonToPath2D(polygon, path);
-		}else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection){
+		} else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection)
+		{
 			// GeometryCollection is the super-class of MultiPolygon and
-			// MultiLineString and MultiPoint so these ones are taken care of in this code block.
-			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)geometry;
-			for (int i = 0; i < geometryCollection.getNumGeometries(); i++){
+			// MultiLineString and MultiPoint so these ones are taken care of in
+			// this code block.
+			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection) geometry;
+			for (int i = 0; i < geometryCollection.getNumGeometries(); i++)
+			{
 				Geometry internalGeometry = geometryCollection.getGeometryN(i);
 				addGeometryToPath2D(internalGeometry, path);
 			}
-		}else{
+		} else
+		{
 			// Sometimes these are found:
-			//com.vividsolutions.jts.geom.Point
-			//com.vividsolutions.jts.geom.LineString
-			//System.out.println(this.getClass().getSimpleName()+": geometry.getClass() == "+geometry.getClass());
+			// com.vividsolutions.jts.geom.Point
+			// com.vividsolutions.jts.geom.LineString
+			// System.out.println(this.getClass().getSimpleName()+":
+			// geometry.getClass() == "+geometry.getClass());
 		}
 	}
 
-	public void addPolygonToPath2D(Polygon jtsPolygon, Path2D path){
+	public void addPolygonToPath2D(Polygon jtsPolygon, Path2D path)
+	{
 		LineString lineString = jtsPolygon.getExteriorRing();
 		addLineStringToPath2D(lineString, path);
-		for (int i = 0; i < jtsPolygon.getNumInteriorRing(); i++){
+		for (int i = 0; i < jtsPolygon.getNumInteriorRing(); i++)
+		{
 			lineString = jtsPolygon.getInteriorRingN(i);
 			addLineStringToPath2D(lineString, path);
 		}
 	}
 
-	public void addLineStringToPath2D(LineString lineString, Path2D path){
-		CoordinateSequence coordinateSequence = lineString.getCoordinateSequence();
-		if (coordinateSequence.size() == 0){
+	public void addLineStringToPath2D(LineString lineString, Path2D path)
+	{
+		CoordinateSequence coordinateSequence = lineString
+				.getCoordinateSequence();
+		if (coordinateSequence.size() == 0)
+		{
 			// sometimes JTS gives an empty LineString
 			return;
 		}
@@ -278,35 +365,44 @@ public class PolygonConverter{
 		path.moveTo(coord.x, coord.y);
 		// The loop stops at the second-last coord since the last coord will be
 		// the same as the start coord.
-		for (int i = 1; i < coordinateSequence.size()-1; i++){
+		for (int i = 1; i < coordinateSequence.size() - 1; i++)
+		{
 			coord = coordinateSequence.getCoordinate(i);
 			path.lineTo(coord.x, coord.y);
 		}
 		path.closePath();
 	}
 
-	public GeometryFactory getGeometryFactory() {
+	public GeometryFactory getGeometryFactory()
+	{
 		return geometryFactory;
 	}
-	
 
-	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(ArrayList<KPolygon> polygons){
+	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(
+			ArrayList<KPolygon> polygons)
+	{
 		ArrayList<KMultiPolygon> multiPolygons = new ArrayList<KMultiPolygon>();
-		OuterLoop:
-		for (int i = 0; i < polygons.size(); i++){
+		OuterLoop: for (int i = 0; i < polygons.size(); i++)
+		{
 			KPolygon polygon = polygons.get(i).copy();
 			KMultiPolygon mpoly = new KMultiPolygon(polygon);
-			for (int j = 0; j < multiPolygons.size(); j++){
+			for (int j = 0; j < multiPolygons.size(); j++)
+			{
 				KMultiPolygon mpoly2 = multiPolygons.get(j);
-				if (mpoly2.getExteriorPolygon().contains(polygon.getPoint(0))){
+				if (mpoly2.getExteriorPolygon().contains(polygon.getPoint(0)))
+				{
 					mpoly2.getPolygons().add(polygon);
 					continue OuterLoop;
-				}else if (polygon.contains(mpoly2.getExteriorPolygon().getPoint(0))){
+				} else if (polygon
+						.contains(mpoly2.getExteriorPolygon().getPoint(0)))
+				{
 					multiPolygons.remove(j);
 					j--;
 					mpoly.getPolygons().add(mpoly2.getExteriorPolygon());
-					mpoly.getPolygons().addAll(mpoly2.getInteriorPolygonsCopy());
-					// Note that we might need to swallow up other mpolygons too, so keep going.
+					mpoly.getPolygons()
+							.addAll(mpoly2.getInteriorPolygonsCopy());
+					// Note that we might need to swallow up other mpolygons
+					// too, so keep going.
 					continue;
 				}
 			}
@@ -314,28 +410,37 @@ public class PolygonConverter{
 		}
 		return multiPolygons;
 	}
-	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(Shape shape, double flatness){
+
+	public ArrayList<KMultiPolygon> makeKMultiPolygonListFrom(Shape shape,
+			float flatness)
+	{
 		ArrayList<KPolygon> list = makeKPolygonListFrom(shape, flatness);
 		ArrayList<KMultiPolygon> multiPolygon = makeKMultiPolygonListFrom(list);
 		return multiPolygon;
 	}
 
-	public ArrayList<KPolygon> makeKPolygonListFrom(Shape shape, double flatness){
+	public ArrayList<KPolygon> makeKPolygonListFrom(Shape shape, float flatness)
+	{
 		ArrayList<KPolygon> list = new ArrayList<KPolygon>();
 		PathIterator pathIterator = shape.getPathIterator(null, flatness);
-		double[] coords = new double[6];
-		while (pathIterator.isDone() == false){
+		float[] coords = new float[6];
+		while (pathIterator.isDone() == false)
+		{
 			int type = pathIterator.currentSegment(coords);
-			if (type == PathIterator.SEG_MOVETO){
-				ArrayList<KPoint> points = new ArrayList<KPoint>();
+			if (type == PathIterator.SEG_MOVETO)
+			{
+				ArrayList<Vector2f> points = new ArrayList<Vector2f>();
 				addPathIteratorPointsToList(pathIterator, points);
 				// remove last point if it's the same as the first one.
-				while (points.size() >= 2){
-					KPoint firstPoint = points.get(0);
-					KPoint lastPoint = points.get(points.size()-1);
-					if (firstPoint.equals(lastPoint)){
-						points.remove(points.size()-1);
-					}else{
+				while (points.size() >= 2)
+				{
+					Vector2f firstPoint = points.get(0);
+					Vector2f lastPoint = points.get(points.size() - 1);
+					if (firstPoint.equals(lastPoint))
+					{
+						points.remove(points.size() - 1);
+					} else
+					{
 						break;
 					}
 				}
@@ -346,33 +451,43 @@ public class PolygonConverter{
 		return list;
 	}
 
-	public void addPathIteratorPointsToList(PathIterator pathIterator, ArrayList<KPoint> points){
-		double[] coords = new double[6];
-		while (pathIterator.isDone() == false){
+	public void addPathIteratorPointsToList(PathIterator pathIterator,
+			ArrayList<Vector2f> points)
+	{
+		float[] coords = new float[6];
+		while (pathIterator.isDone() == false)
+		{
 			int type = pathIterator.currentSegment(coords);
-			if (type == PathIterator.SEG_MOVETO){
-				points.add(new KPoint(coords[0], coords[1]));
+			if (type == PathIterator.SEG_MOVETO)
+			{
+				points.add(new Vector2f(coords[0], coords[1]));
 				pathIterator.next();
-			}else if (type == PathIterator.SEG_LINETO){
-				points.add(new KPoint(coords[0], coords[1]));
+			} else if (type == PathIterator.SEG_LINETO)
+			{
+				points.add(new Vector2f(coords[0], coords[1]));
 				pathIterator.next();
-			}else if (type == PathIterator.SEG_CLOSE){
+			} else if (type == PathIterator.SEG_CLOSE)
+			{
 				pathIterator.next();
 				return;
 			}
 		}
 	}
 
-	public Path2D.Double makePath2DFrom(ArrayList<KMultiPolygon> multiPolygons){
+	public Path2D.Double makePath2DFrom(ArrayList<KMultiPolygon> multiPolygons)
+	{
 		Path2D.Double path = new Path2D.Double(PathIterator.WIND_EVEN_ODD);
-		for (int h = 0; h < multiPolygons.size(); h++){
+		for (int h = 0; h < multiPolygons.size(); h++)
+		{
 			KMultiPolygon multiPolygon = multiPolygons.get(h);
 			ArrayList<KPolygon> polygons = multiPolygon.getPolygons();
-			for (int i = 0; i < polygons.size(); i++){
+			for (int i = 0; i < polygons.size(); i++)
+			{
 				KPolygon polygon = polygons.get(i);
-				KPoint p = polygon.getPoint(0);
+				Vector2f p = polygon.getPoint(0);
 				path.moveTo(p.x, p.y);
-				for (int j = 1; j < polygon.getPoints().size(); j++){
+				for (int j = 1; j < polygon.getPoints().size(); j++)
+				{
 					p = polygon.getPoint(j);
 					path.lineTo(p.x, p.y);
 				}
@@ -381,14 +496,18 @@ public class PolygonConverter{
 		}
 		return path;
 	}
-	public Path2D.Double makePath2DFrom(KMultiPolygon multiPolygon){
+
+	public Path2D.Double makePath2DFrom(KMultiPolygon multiPolygon)
+	{
 		Path2D.Double path = new Path2D.Double(PathIterator.WIND_EVEN_ODD);
 		ArrayList<KPolygon> polygons = multiPolygon.getPolygons();
-		for (int i = 0; i < polygons.size(); i++){
+		for (int i = 0; i < polygons.size(); i++)
+		{
 			KPolygon polygon = polygons.get(i);
-			KPoint p = polygon.getPoint(0);
+			Vector2f p = polygon.getPoint(0);
 			path.moveTo(p.x, p.y);
-			for (int j = 1; j < polygon.getPoints().size(); j++){
+			for (int j = 1; j < polygon.getPoints().size(); j++)
+			{
 				p = polygon.getPoint(j);
 				path.lineTo(p.x, p.y);
 			}
@@ -396,11 +515,14 @@ public class PolygonConverter{
 		}
 		return path;
 	}
-	public Path2D.Double makePath2DFrom(KPolygon polygon){
+
+	public Path2D.Double makePath2DFrom(KPolygon polygon)
+	{
 		Path2D.Double path = new Path2D.Double(PathIterator.WIND_EVEN_ODD);
-		KPoint p = polygon.getPoint(0);
+		Vector2f p = polygon.getPoint(0);
 		path.moveTo(p.x, p.y);
-		for (int j = 1; j < polygon.getPoints().size(); j++){
+		for (int j = 1; j < polygon.getPoints().size(); j++)
+		{
 			p = polygon.getPoint(j);
 			path.lineTo(p.x, p.y);
 		}
@@ -408,28 +530,41 @@ public class PolygonConverter{
 		return path;
 	}
 
-	public void printGeometry(Geometry geometry){
-		if (geometry instanceof com.vividsolutions.jts.geom.Polygon){
-			com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon)geometry;
-			System.out.println(this.getClass().getSimpleName()+": geometry.getClass() == "+geometry.getClass());
+	@SuppressWarnings("unused")
+	public void printGeometry(Geometry geometry)
+	{
+		if (geometry instanceof com.vividsolutions.jts.geom.Polygon)
+		{
+			com.vividsolutions.jts.geom.Polygon polygon = (com.vividsolutions.jts.geom.Polygon) geometry;
+			System.out.println(this.getClass().getSimpleName()
+					+ ": geometry.getClass() == " + geometry.getClass());
 			Coordinate[] coords = geometry.getCoordinates();
-			for (int i = 0; i < coords.length; i++){
-				System.out.println(this.getClass().getSimpleName()+": coords["+i+"] == "+coords[i].x+", "+coords[i].y);
+			for (int i = 0; i < coords.length; i++)
+			{
+				System.out.println(this.getClass().getSimpleName() + ": coords["
+						+ i + "] == " + coords[i].x + ", " + coords[i].y);
 			}
-		}else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection){
+		} else if (geometry instanceof com.vividsolutions.jts.geom.GeometryCollection)
+		{
 			// GeometryCollection is the super-class of MultiPolygon and
-			// MultiLineString and MultiPoint so these ones are taken care of in this code block.
-			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection)geometry;
-			System.out.println(this.getClass().getSimpleName()+": geometryCollection.getClass() == "+geometryCollection.getClass());
-			for (int i = 0; i < geometryCollection.getNumGeometries(); i++){
+			// MultiLineString and MultiPoint so these ones are taken care of in
+			// this code block.
+			com.vividsolutions.jts.geom.GeometryCollection geometryCollection = (com.vividsolutions.jts.geom.GeometryCollection) geometry;
+			System.out.println(this.getClass().getSimpleName()
+					+ ": geometryCollection.getClass() == "
+					+ geometryCollection.getClass());
+			for (int i = 0; i < geometryCollection.getNumGeometries(); i++)
+			{
 				Geometry internalGeometry = geometryCollection.getGeometryN(i);
 				printGeometry(internalGeometry);
 			}
-		}else{
+		} else
+		{
 			// Sometimes these are found:
-			//com.vividsolutions.jts.geom.Point
-			//com.vividsolutions.jts.geom.LineString
-			System.out.println(this.getClass().getSimpleName()+": geometry.getClass() == "+geometry.getClass());
+			// com.vividsolutions.jts.geom.Point
+			// com.vividsolutions.jts.geom.LineString
+			System.out.println(this.getClass().getSimpleName()
+					+ ": geometry.getClass() == " + geometry.getClass());
 		}
 	}
 }

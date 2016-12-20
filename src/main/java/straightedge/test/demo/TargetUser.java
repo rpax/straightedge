@@ -30,13 +30,13 @@
  */
 package straightedge.test.demo;
 
-import straightedge.geom.KPoint;
+import com.jme3.math.Vector2f;
 
 /**
  *
  * @author Keith
  */
 public interface TargetUser {
-	public KPoint getPos();
+	public Vector2f getPos();
 	public boolean isMoving();
 }
