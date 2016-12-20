@@ -70,7 +70,7 @@ public class VisionDataRotation extends VisionData{
 		boundaryPolygon = originalBoundaryPolygon.copy();
 		double translateX = newEyeX - originalEye.x;
 		double translateY = newEyeY - originalEye.z;
-		eye.setCoords(newEyeX, newEyeY);
+		eye.set(newEyeX, newEyeY);
 		boundaryPolygon.translate(translateX, translateY);
 		boundaryPolygon.rotate(boundaryPolygonRotationAroundEye, eye);
 	}

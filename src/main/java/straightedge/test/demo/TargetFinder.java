@@ -80,7 +80,7 @@ public class TargetFinder{
 			absoluteTarget.x = target.x + targetUser.getPos().x;
 			absoluteTarget.z = target.z + targetUser.getPos().z;
 			KPoint movedAbsoluteTarget = getNearestPointOutsideOfObstacles(absoluteTarget);
-			absoluteTarget.setCoords(movedAbsoluteTarget);
+			absoluteTarget.set(movedAbsoluteTarget);
 		} else if (targetType == TARGET_PLAYER){
 			double distToTarget = targetUser.getPos().distance(targetPlayerToFollow.getPos());
 //			float minRange = 50;//getPlayer().getMaxAttackDist()*3/4f;
@@ -143,7 +143,7 @@ public class TargetFinder{
 		target.x = targetX;
 		target.z = targetY;
 		KPoint movedTarget = getNearestPointOutsideOfObstacles(target);
-		target.setCoords(movedTarget);
+		target.set(movedTarget);
 		if (calcPathNow){
 			calcPath();
 		}

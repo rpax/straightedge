@@ -546,7 +546,7 @@ public class MovingObstacleTest {
 			// Move the eye and boundaryPolygon to wherever they need to be.
 			// By making the eye slightly offset from its integer coordinate by smallAmount,
 			// it will prevent problems caused by collinearity.
-			cache.eye.setCoords(pos.x + smallAmount, pos.z + smallAmount);
+			cache.eye.set(pos.x + smallAmount, pos.z + smallAmount);
 			cache.boundaryPolygon.translateTo(cache.eye);
 			visionFinder.calc(cache, allOccluders);
 			/* Note that the above is a slow way to process shadows - every occluder is

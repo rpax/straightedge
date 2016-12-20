@@ -219,7 +219,7 @@ public class VisionTestActiveRendering {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		visionData.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
+		visionData.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
 		visionData.boundaryPolygon.translateTo(visionData.eye);
 		visionFinder.calc(visionData, stationaryOccluders, movingOccluders);
 		/* Note that the above line is the fast way to process shadows since the

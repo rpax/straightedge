@@ -104,7 +104,7 @@ public class Player implements TargetUser{
 	}
 
 	public void respawn(KPoint spawnPos){
-		this.pos.setCoords(spawnPos);
+		this.pos.set(spawnPos);
 		targetFinder.setFixedTarget(pos, true);
 		copyAndTransformPolygon();
 

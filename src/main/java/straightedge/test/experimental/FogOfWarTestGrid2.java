@@ -211,7 +211,7 @@ public class FogOfWarTestGrid2 {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
+		performanceCache.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
 		performanceCache.boundaryPolygon.translateTo(performanceCache.eye);
 		visionFinder.calc(performanceCache, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), occluders);
 		visiblePolygon = performanceCache.visiblePolygon;

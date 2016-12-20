@@ -65,11 +65,11 @@ public class KPoint{
 		this.z = y;
 	}
 
-	public void setCoords(double x, double y){
+	public void set(double x, double y){
 		this.x = x;
 		this.z = y;
 	}
-	public void setCoords(KPoint p){
+	public void set(KPoint p){
 		this.x = p.x;
 		this.z = p.z;
 	}
