@@ -76,7 +76,7 @@ public class WorldHexagonalGosperCurve extends World{
 			char c = instr.charAt(i);
 			if (c == ('F') || c == ('L') || c == ('R')){
 				p.x += Math.cos(angle)*dist;
-				p.z += Math.sin(angle)*dist;
+				p.y += Math.sin(angle)*dist;
 				allPolygons.add(KPolygon.createRectOblique(p, oldP, width));
 				oldP = p.copy();
 			}else if (c == ('+')){
@@ -91,7 +91,7 @@ public class WorldHexagonalGosperCurve extends World{
 		KPoint centerBounds = bounds.getCenter();
 		for (int i = 0; i < allPolygons.size(); i++){
 			KPolygon poly = allPolygons.get(i);
-			poly.translate(center.x-centerBounds.x, center.z-centerBounds.z);
+			poly.translate(center.x-centerBounds.x, center.y-centerBounds.y);
 			if (screenPoly.contains(poly)){
 				finalPolygons.add(poly);
 			}

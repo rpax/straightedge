@@ -192,7 +192,7 @@ public class Player implements Monster{
 				}
 			}
 
-			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.z, ev.getAbsoluteX(), ev.getAbsoluteY());
+			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
 
 			if (rightMousePressed || rightMouseDragged || rightMouseReleased){
 				// insert an obstacle or take one away
@@ -273,7 +273,7 @@ public class Player implements Monster{
 			}
 		}else if (playerEvent.getType() == AWTEventWrapper.MOUSE_MOVE){
 			PlayerMouseEvent ev = (PlayerMouseEvent)playerEvent;
-			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.z, ev.getAbsoluteX(), ev.getAbsoluteY());
+			stationaryAngleTarget = (float)KPoint.findAngle(pos.x, pos.y, ev.getAbsoluteX(), ev.getAbsoluteY());
 			float worldX = ev.getAbsoluteX();
 			float worldY = ev.getAbsoluteY();
 			lastMouseMove = new KPoint(worldX, worldY);
@@ -353,13 +353,13 @@ public class Player implements Monster{
 			currentTargetPoint = getPathPoints().get(i);
 			KPoint oldPos = new KPoint();
 			oldPos.x = pos.x;
-			oldPos.z = pos.z;
+			oldPos.y = pos.y;
 			//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.z, pos.x, pos.z);
+			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 			double timeUntilTargetReached = distUntilTargetReached/speed;
 			assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 			double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
-			double yCoordToWorkOutAngle = currentTargetPoint.z - pos.z;
+			double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 			if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
 				double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 				moveAngle = (float)dirAngle;
@@ -371,7 +371,7 @@ public class Player implements Monster{
 			}
 			if (secondsLeft >= timeUntilTargetReached){
 				pos.x = currentTargetPoint.x;
-				pos.z = currentTargetPoint.z;
+				pos.y = currentTargetPoint.y;
 				speedX = 0f;
 				speedY = 0f;
 				secondsLeft -= timeUntilTargetReached;
@@ -382,7 +382,7 @@ public class Player implements Monster{
 			}else{
 				//s = t(u + v)/2
 				pos.x = (float)(oldPos.x + secondsLeft * speedX);
-				pos.z = (float)(oldPos.z + secondsLeft * speedY);
+				pos.y = (float)(oldPos.y + secondsLeft * speedY);
 				secondsLeft = 0;
 				break;
 			}

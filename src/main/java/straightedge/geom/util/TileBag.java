@@ -310,10 +310,10 @@ public class TileBag<T extends PolygonHolder> implements Collection<T>{
 				float width = 25;
 				float height = 25;
 				KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
-				points.add(new KPoint(point.x, point.z));
-				points.add(new KPoint(point.x, point.z + height));
-				points.add(new KPoint(point.x + width, point.z + height));
-				points.add(new KPoint(point.x + width, point.z));
+				points.add(new KPoint(point.x, point.y));
+				points.add(new KPoint(point.x, point.y + height));
+				points.add(new KPoint(point.x + width, point.y + height));
+				points.add(new KPoint(point.x + width, point.y));
 				KPolygon poly = new KPolygon(points);
 				poly.rotate(rand.nextFloat());
 				allPolygons.add(poly);

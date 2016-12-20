@@ -56,7 +56,7 @@ public abstract class VisiblePoint implements Comparable{
 
 	public void preSortCalcs(KPoint eye){
 		double relX = point.x - eye.x;
-		double relY = point.z - eye.z;
+		double relY = point.y - eye.y;
 //		if (relX >= 0){
 //			if (relY >= 0){
 //				quadrant = 0;

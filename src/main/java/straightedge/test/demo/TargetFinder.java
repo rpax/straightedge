@@ -75,12 +75,12 @@ public class TargetFinder{
 		KPoint absoluteTarget = new KPoint();
 		if (targetType == TARGET_FIXED){
 			absoluteTarget.x = target.x;
-			absoluteTarget.z = target.z;
+			absoluteTarget.y = target.y;
 		} else if (targetType == TARGET_RELATIVE){
 			absoluteTarget.x = target.x + targetUser.getPos().x;
-			absoluteTarget.z = target.z + targetUser.getPos().z;
+			absoluteTarget.y = target.y + targetUser.getPos().y;
 			KPoint movedAbsoluteTarget = getNearestPointOutsideOfObstacles(absoluteTarget);
-			absoluteTarget.set(movedAbsoluteTarget);
+			absoluteTarget.setCoords(movedAbsoluteTarget);
 		} else if (targetType == TARGET_PLAYER){
 			double distToTarget = targetUser.getPos().distance(targetPlayerToFollow.getPos());
 //			float minRange = 50;//getPlayer().getMaxAttackDist()*3/4f;
@@ -141,27 +141,27 @@ public class TargetFinder{
 	public void setFixedTarget(double targetX, double targetY, boolean calcPathNow) {
 		targetType = TARGET_FIXED;
 		target.x = targetX;
-		target.z = targetY;
+		target.y = targetY;
 		KPoint movedTarget = getNearestPointOutsideOfObstacles(target);
-		target.set(movedTarget);
+		target.setCoords(movedTarget);
 		if (calcPathNow){
 			calcPath();
 		}
 	}
 	public void setFixedTarget(KPoint p, boolean calcPathNow) {
-		setFixedTarget(p.x, p.z, calcPathNow);
+		setFixedTarget(p.x, p.y, calcPathNow);
 	}
 
 	public void setRelativeTarget(double targetX, double targetY, boolean calcPathNow) {
 		targetType = TARGET_RELATIVE;
 		target.x = targetX;
-		target.z = targetY;
+		target.y = targetY;
 		if (calcPathNow){
 			calcPath();
 		}
 	}
 	public void setRelativeTarget(KPoint p, boolean calcPathNow) {
-		setRelativeTarget(p.x, p.z, calcPathNow);
+		setRelativeTarget(p.x, p.y, calcPathNow);
 	}
 
 	public void setTargetPlayer(TargetUser targetPlayerToFollow, boolean calcPathNow) {
@@ -186,7 +186,7 @@ public class TargetFinder{
 					KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
 					if (p != null){
 						movedPoint.x = p.x;
-						movedPoint.z = p.z;
+						movedPoint.y = p.y;
 					}
 					assert point != null;
 				}

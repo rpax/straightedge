@@ -331,17 +331,17 @@ public class MovingObstacleTest {
 					MouseEvent e = (MouseEvent)awtEvent;
 					if (e.getID() == MouseEvent.MOUSE_MOVED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.z = e.getY();
+						lastMouseMovePoint.y = e.getY();
 					}else if (e.getID() == MouseEvent.MOUSE_PRESSED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.z = e.getY();
+						lastMouseMovePoint.y = e.getY();
 						player.target.x = lastMouseMovePoint.x;
-						player.target.z = lastMouseMovePoint.z;
+						player.target.y = lastMouseMovePoint.y;
 					}else if (e.getID() == MouseEvent.MOUSE_DRAGGED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.z = e.getY();
+						lastMouseMovePoint.y = e.getY();
 						player.target.x = lastMouseMovePoint.x;
-						player.target.z = lastMouseMovePoint.z;
+						player.target.y = lastMouseMovePoint.y;
 					}
 				}else if (awtEvent instanceof java.awt.event.KeyEvent){
 					KeyEvent e = (KeyEvent)awtEvent;
@@ -508,13 +508,13 @@ public class MovingObstacleTest {
 				currentTargetPoint = pathData.points.get(i);
 				KPoint oldPos = new KPoint();
 				oldPos.x = pos.x;
-				oldPos.z = pos.z;
+				oldPos.y = pos.y;
 				//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.z, pos.x, pos.z);
+				double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 				double timeUntilTargetReached = distUntilTargetReached/speed;
 				assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 				double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
-				double yCoordToWorkOutAngle = currentTargetPoint.z - pos.z;
+				double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 				if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
 					double dirAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 					moveAngle = (float)dirAngle;
@@ -526,7 +526,7 @@ public class MovingObstacleTest {
 				}
 				if (secondsLeft >= timeUntilTargetReached){
 					pos.x = currentTargetPoint.x;
-					pos.z = currentTargetPoint.z;
+					pos.y = currentTargetPoint.y;
 					speedX = 0f;
 					speedY = 0f;
 					secondsLeft -= timeUntilTargetReached;
@@ -537,7 +537,7 @@ public class MovingObstacleTest {
 				}else{
 					//s = t(u + v)/2
 					pos.x = (float)(oldPos.x + secondsLeft * speedX);
-					pos.z = (float)(oldPos.z + secondsLeft * speedY);
+					pos.y = (float)(oldPos.y + secondsLeft * speedY);
 					secondsLeft = 0;
 					break;
 				}
@@ -546,7 +546,7 @@ public class MovingObstacleTest {
 			// Move the eye and boundaryPolygon to wherever they need to be.
 			// By making the eye slightly offset from its integer coordinate by smallAmount,
 			// it will prevent problems caused by collinearity.
-			cache.eye.set(pos.x + smallAmount, pos.z + smallAmount);
+			cache.eye.setCoords(pos.x + smallAmount, pos.y + smallAmount);
 			cache.boundaryPolygon.translateTo(cache.eye);
 			visionFinder.calc(cache, allOccluders);
 			/* Note that the above is a slow way to process shadows - every occluder is
@@ -574,7 +574,7 @@ public class MovingObstacleTest {
 						KPoint p = poly.getBoundaryPointClosestTo(movedPoint);
 						if (p != null){
 							movedPoint.x = p.x;
-							movedPoint.z = p.z;
+							movedPoint.y = p.y;
 						}
 						assert point != null;
 					}
@@ -680,7 +680,7 @@ public class MovingObstacleTest {
 					for (int j = 0; j < obst.getNodes().size(); j++) {
 						KPoint nextPoint = obst.getNodes().get(j).getPoint();
 						float d = 2f;
-						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
+						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 					}
 					//int numNodes = getPathNodes().size();
 					//g.setColor(Color.BLACK);
@@ -689,7 +689,7 @@ public class MovingObstacleTest {
 
 				g.setColor(Color.MAGENTA);
 				float r = 1f;
-				g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.z - r, 2*r, 2*r));
+				g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.y - r, 2*r, 2*r));
 
 				Player p = player;
 				g.setColor(Color.MAGENTA.darker());
@@ -697,9 +697,9 @@ public class MovingObstacleTest {
 					KPoint currentPoint = p.getPos();
 					for (int j = 0; j < p.pathData.points.size(); j++) {
 						KPoint nextPoint = p.pathData.points.get(j);
-						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
+						g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 						float d = 5f;
-						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
+						g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 						currentPoint = nextPoint;
 					}
 					//int numNodes = getPathNodes().size();
@@ -708,7 +708,7 @@ public class MovingObstacleTest {
 				}
 				g.setColor(Color.BLUE);
 				r = 3;
-				g.fill(new Ellipse2D.Double(player.getPos().x - r, player.getPos().z - r, 2*r, 2*r));
+				g.fill(new Ellipse2D.Double(player.getPos().x - r, player.getPos().y - r, 2*r, 2*r));
 			}else{
 				float backGroundGrey = 77f/255f;
 				g.setColor(new Color(backGroundGrey, backGroundGrey, backGroundGrey));
@@ -722,7 +722,7 @@ public class MovingObstacleTest {
 
 				if (player.cache.visiblePolygon != null){
 					{
-						Point2D.Double center = new Point2D.Double(player.getPos().x, player.getPos().z);
+						Point2D.Double center = new Point2D.Double(player.getPos().x, player.getPos().y);
 						float[] dist = {0.0f, 0.9f, 1.0f};
 						float g0 = 0.6f;
 						float g1 = 0.2f * g0 + 0.8f * backGroundGrey;
@@ -758,7 +758,7 @@ public class MovingObstacleTest {
 				if (r < minR){
 					r = minR;
 				}
-				g.fill(new Ellipse2D.Double(player.getPos().x - r, player.getPos().z - r, 2*r, 2*r));
+				g.fill(new Ellipse2D.Double(player.getPos().x - r, player.getPos().y - r, 2*r, 2*r));
 			}
 
 

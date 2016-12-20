@@ -55,7 +55,7 @@ public class PointShuffler {
 		KPoint pPrev = p.createPointToward(poly.getPrevPoint(pointIndex), 10);
 		KPoint mid = pNext.midPoint(pPrev);
 		double oldPX = p.x;
-		double oldPY = p.z;
+		double oldPY = p.y;
 		boolean done = false;
 		// Here we attempt to move the point at a random angle but in
 		// the general direction away from the polygon
@@ -63,14 +63,14 @@ public class PointShuffler {
 			double angle = mid.findAngle(p) + ((rand.nextFloat()-0.5f)*Math.PI/5f);
 			KPoint newPoint = p.createPointFromAngle(angle, maxPointMoveDist);
 			p.x = newPoint.x;
-			p.z = newPoint.z;
+			p.y = newPoint.y;
 			poly.calcAll();
 			if (poly.isValidNoLineIntersections() == true){
 				done = true;
 				break;
 			}else{
 				p.x = oldPX;
-				p.z = oldPY;
+				p.y = oldPY;
 			}
 		}
 		// Here we attempt to move the point at a random angle but in
@@ -80,14 +80,14 @@ public class PointShuffler {
 				double angle = mid.findAngle(p) + ((rand.nextFloat()-0.5f)*Math.PI/5f) + Math.PI;
 				KPoint newPoint = p.createPointFromAngle(angle, maxPointMoveDist);
 				p.x = newPoint.x;
-				p.z = newPoint.z;
+				p.y = newPoint.y;
 				poly.calcAll();
 				if (poly.isValidNoLineIntersections() == true){
 					done = true;
 					break;
 				}else{
 					p.x = oldPX;
-					p.z = oldPY;
+					p.y = oldPY;
 				}
 			}
 		}

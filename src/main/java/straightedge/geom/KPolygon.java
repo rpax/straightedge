@@ -143,17 +143,17 @@ public class KPolygon implements PolygonHolder, Shape{
 	}
 	public static KPolygon createRect(AABB aabb){
 		ArrayList<KPoint> pointList = new ArrayList<KPoint>();
-		pointList.add(new KPoint(aabb.p.x,  aabb.p.z));
-		pointList.add(new KPoint(aabb.p2.x, aabb.p.z));
-		pointList.add(new KPoint(aabb.p2.x, aabb.p2.z));
-		pointList.add(new KPoint(aabb.p.x,  aabb.p2.z));
+		pointList.add(new KPoint(aabb.p.x,  aabb.p.y));
+		pointList.add(new KPoint(aabb.p2.x, aabb.p.y));
+		pointList.add(new KPoint(aabb.p2.x, aabb.p2.y));
+		pointList.add(new KPoint(aabb.p.x,  aabb.p2.y));
 		return new KPolygon(pointList, false);
 	}
 	public static KPolygon createRect(KPoint p, KPoint p2){
-		return createRect(p.x, p.z, p2.x, p2.z);
+		return createRect(p.x, p.y, p2.x, p2.y);
 	}
 	public static KPolygon createRect(KPoint botLeftPoint, double width, double height){
-		return createRect(botLeftPoint.x, botLeftPoint.z, botLeftPoint.x + width, botLeftPoint.z + height);
+		return createRect(botLeftPoint.x, botLeftPoint.y, botLeftPoint.x + width, botLeftPoint.y + height);
 	}
 
 	public static KPolygon createRectOblique(double x, double y, double x2, double y2, double width){
@@ -182,7 +182,7 @@ public class KPolygon implements PolygonHolder, Shape{
 		return new KPolygon(pointList, false);
 	}
 	public static KPolygon createRectOblique(KPoint p1, KPoint p2, double width){
-		return createRectOblique(p1.x, p1.z, p2.x, p2.z, width);
+		return createRectOblique(p1.x, p1.y, p2.x, p2.y, width);
 	}
 
 	public static KPolygon createRegularPolygon(int numPoints, double distFromCenterToPoints){
@@ -216,8 +216,8 @@ public class KPolygon implements PolygonHolder, Shape{
 		int nextI;
 		for (int i = 0; i < points.size(); i++){
 			nextI = (i+1 == points.size() ? 0 : i+1);
-			if (KPoint.linesIntersect(x1,y1,x2,y2,points.get(i).x,points.get(i).z,points.get(nextI).x,points.get(nextI).z)){
-				KPoint currentIntersectionPoint = KPoint.getLineLineIntersection(x1,y1,x2,y2,points.get(i).x,points.get(i).z,points.get(nextI).x,points.get(nextI).z);
+			if (KPoint.linesIntersect(x1,y1,x2,y2,points.get(i).x,points.get(i).y,points.get(nextI).x,points.get(nextI).y)){
+				KPoint currentIntersectionPoint = KPoint.getLineLineIntersection(x1,y1,x2,y2,points.get(i).x,points.get(i).y,points.get(nextI).x,points.get(nextI).y);
 				if (currentIntersectionPoint == null){
 					continue;
 				}
@@ -231,11 +231,11 @@ public class KPolygon implements PolygonHolder, Shape{
 		return closestIntersectionPoint;
 	}
 	public KPoint getClosestIntersectionToFirstFromSecond(KPoint first, KPoint second){
-		return getClosestIntersectionToFirstFromSecond(first.x, first.z, second.x, second.z);
+		return getClosestIntersectionToFirstFromSecond(first.x, first.y, second.x, second.y);
 	}
 
 	public KPoint getBoundaryPointClosestTo(KPoint p){
-		return getBoundaryPointClosestTo(p.x, p.z);
+		return getBoundaryPointClosestTo(p.x, p.y);
 	}
 	public KPoint getBoundaryPointClosestTo(double x, double y){
 		double closestDistanceSq = Double.MAX_VALUE;
@@ -247,7 +247,7 @@ public class KPolygon implements PolygonHolder, Shape{
 			nextI = (i+1 == points.size() ? 0 : i+1);
 			KPoint p = this.getPoints().get(i);
 			KPoint pNext = this.getPoints().get(nextI);
-			double ptSegDistSq = KPoint.ptSegDistSq(p.x, p.z, pNext.x, pNext.z, x, y);
+			double ptSegDistSq = KPoint.ptSegDistSq(p.x, p.y, pNext.x, pNext.y, x, y);
 			if (ptSegDistSq < closestDistanceSq){
 				closestDistanceSq = ptSegDistSq;
 				closestIndex = i;
@@ -256,7 +256,7 @@ public class KPolygon implements PolygonHolder, Shape{
 		}
 		KPoint p = this.getPoints().get(closestIndex);
 		KPoint pNext = this.getPoints().get(closestNextIndex);
-		return KPoint.getClosestPointOnSegment(p.x, p.z, pNext.x, pNext.z, x, y);
+		return KPoint.getClosestPointOnSegment(p.x, p.y, pNext.x, pNext.y, x, y);
 	}
 
 
@@ -271,7 +271,7 @@ public class KPolygon implements PolygonHolder, Shape{
 	}
 	
 	public boolean contains(KPoint p){
-		return contains(p.x, p.z);
+		return contains(p.x, p.y);
 	}
 
     // Source code from: http://exaflop.org/docs/cgafaq/cga2.html
@@ -289,9 +289,9 @@ public class KPolygon implements PolygonHolder, Shape{
 		int crossings = 0;
 		for (int i = 0; i < points.size(); i++) {
 			KPoint pointI = points.get(i);
-			if (((pointIBefore.z <= y && y < pointI.z)
-					|| (pointI.z <= y && y < pointIBefore.z))
-					&& x < ((pointI.x - pointIBefore.x)/(pointI.z - pointIBefore.z)*(y - pointIBefore.z) + pointIBefore.x)) {
+			if (((pointIBefore.y <= y && y < pointI.y)
+					|| (pointI.y <= y && y < pointIBefore.y))
+					&& x < ((pointI.x - pointIBefore.x)/(pointI.y - pointIBefore.y)*(y - pointIBefore.y) + pointIBefore.x)) {
 				crossings++;
 			}
 			pointIBefore = pointI;
@@ -315,10 +315,10 @@ public class KPolygon implements PolygonHolder, Shape{
 	public double getAndCalcSignedArea(){
 		double totalArea = 0;
 		for (int i = 0; i < points.size() - 1; i++) {
-			totalArea += ((points.get(i).x - points.get(i+1).x)*(points.get(i+1).z + (points.get(i).z - points.get(i+1).z)/2));
+			totalArea += ((points.get(i).x - points.get(i+1).x)*(points.get(i+1).y + (points.get(i).y - points.get(i+1).y)/2));
 		}
 		// need to do points[point.length-1] and points[0].
-		totalArea += ((points.get(points.size()-1).x - points.get(0).x)*(points.get(0).z + (points.get(points.size()-1).z - points.get(0).z)/2));
+		totalArea += ((points.get(points.size()-1).x - points.get(0).x)*(points.get(0).y + (points.get(points.size()-1).y - points.get(0).y)/2));
 		return totalArea;
 	}
 
@@ -338,11 +338,11 @@ public class KPolygon implements PolygonHolder, Shape{
 			if (points.get(i).x > rightX) {
 				rightX = points.get(i).x;
 			}
-			if (points.get(i).z < botY) {
-				botY = points.get(i).z;
+			if (points.get(i).y < botY) {
+				botY = points.get(i).y;
 			}
-			if (points.get(i).z > topY) {
-				topY = points.get(i).z;
+			if (points.get(i).y > topY) {
+				topY = points.get(i).y;
 			}
 		}
 		bounds[0] = leftX;
@@ -365,11 +365,11 @@ public class KPolygon implements PolygonHolder, Shape{
 			if (points.get(i).x > rightX) {
 				rightX = points.get(i).x;
 			}
-			if (points.get(i).z < botY) {
-				botY = points.get(i).z;
+			if (points.get(i).y < botY) {
+				botY = points.get(i).y;
 			}
-			if (points.get(i).z > topY) {
-				topY = points.get(i).z;
+			if (points.get(i).y > topY) {
+				topY = points.get(i).y;
 			}
 		}
 		AABB aabb = new AABB(leftX, botY, rightX, topY);
@@ -419,7 +419,7 @@ public class KPolygon implements PolygonHolder, Shape{
 		return true;
 	}
 	public boolean intersectionPossible(KPoint p1, KPoint p2){
-		return intersectionPossible(p1.x, p1.z, p2.x, p2.z);
+		return intersectionPossible(p1.x, p1.y, p2.x, p2.y);
 	}
 	public boolean intersectionPossible(double x1, double y1, double x2, double y2){
 		if (center.ptSegDistSq(x1, y1, x2, y2) > radiusSq){
@@ -429,7 +429,7 @@ public class KPolygon implements PolygonHolder, Shape{
 	}
 	
 	public boolean intersectsLine(KPoint p1, KPoint p2){
-		return intersectsLine(p1.x, p1.z, p2.x, p2.z);
+		return intersectsLine(p1.x, p1.y, p2.x, p2.y);
 	}
 	public boolean intersectsLine(double x1, double y1, double x2, double y2){
 //		// pretty much just does the following, but with some optimisations by
@@ -455,9 +455,9 @@ public class KPolygon implements PolygonHolder, Shape{
 		for (int i = 0; i < points.size(); i++){
 			KPoint pointI = points.get(i);
 			double x3 = pointIBefore.x;
-			double y3 = pointIBefore.z;
+			double y3 = pointIBefore.y;
 			double x4 = pointI.x;
-			double y4 = pointI.z;
+			double y4 = pointI.y;
 
 			double bx = x3-x4;
 			double by = y3-y4;
@@ -521,7 +521,7 @@ public class KPolygon implements PolygonHolder, Shape{
 		}
 		if (getArea() == 0){
 			center.x = points.get(0).x;
-			center.z = points.get(0).z;
+			center.y = points.get(0).y;
 			return;
 		}
         double cx = 0.0f;
@@ -533,9 +533,9 @@ public class KPolygon implements PolygonHolder, Shape{
 //			cx += (points.get(i).x + points.get(nextI).x) * multiplier;
 //			cy += (points.get(i).y + points.get(nextI).y) * multiplier;
 			KPoint pointI = points.get(i);
-			double multiplier = (pointIBefore.z * pointI.x - pointIBefore.x * pointI.z);
+			double multiplier = (pointIBefore.y * pointI.x - pointIBefore.x * pointI.y);
 			cx += (pointIBefore.x + pointI.x) * multiplier;
-			cy += (pointIBefore.z + pointI.z) * multiplier;
+			cy += (pointIBefore.y + pointI.y) * multiplier;
 			pointIBefore = pointI;
         }
 		cx /= (6 * getArea());
@@ -545,7 +545,7 @@ public class KPolygon implements PolygonHolder, Shape{
 			cy *= -1;
 		}
         center.x = cx;
-		center.z = cy;
+		center.y = cy;
     }
 	public void calcRadius() {
 		if (center == null){
@@ -595,10 +595,10 @@ public class KPolygon implements PolygonHolder, Shape{
 	}
 
 	public void rotate(double angle) {
-		rotate(angle, center.x, center.z);
+		rotate(angle, center.x, center.y);
 	}
 	public void rotate(double angle, KPoint axle) {
-		rotate(angle, axle.x, axle.z);
+		rotate(angle, axle.x, axle.y);
 	}
 	public void rotate(double angle, double x, double y) {
 		for (int i = 0; i < points.size(); i++) {
@@ -606,7 +606,7 @@ public class KPolygon implements PolygonHolder, Shape{
 			p.rotate(angle, x, y);
 		}
 		// rotate the center if it's not equal to the axle.
-		if (x != center.x || y != center.z){
+		if (x != center.x || y != center.y){
 			center.rotate(angle, x, y);
 		}
 	}
@@ -615,27 +615,27 @@ public class KPolygon implements PolygonHolder, Shape{
 	public void translate(double x, double y) {
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).x += x;
-			points.get(i).z += y;
+			points.get(i).y += y;
 		}
 		center.x += x;
-		center.z += y;
+		center.y += y;
 	}
 	public void translate(KPoint translation){
-		translate(translation.x, translation.z);
+		translate(translation.x, translation.y);
 	}
 
 	public void translateTo(double x, double y){
 		double xIncrement = x - center.x;
-		double yIncrement = y - center.z;
+		double yIncrement = y - center.y;
 		center.x = x;
-		center.z = y;
+		center.y = y;
 		for (int i = 0; i < points.size(); i++){
 			points.get(i).x += xIncrement;
-			points.get(i).z += yIncrement;
+			points.get(i).y += yIncrement;
 		}
 	}
 	public void translateTo(KPoint newCentre){
-		translateTo(newCentre.x, newCentre.z);
+		translateTo(newCentre.x, newCentre.y);
 	}
 	public void translateToOrigin(){
 		translateTo(0, 0);
@@ -646,40 +646,40 @@ public class KPolygon implements PolygonHolder, Shape{
 		double incY;
 		for (int i = 0; i < points.size(); i++){
 			incX = points.get(i).x - x;
-			incY = points.get(i).z - y;
+			incY = points.get(i).y - y;
 			incX *= xMultiplier;
 			incY *= yMultiplier;
 			points.get(i).x = x + incX;
-			points.get(i).z = y + incY;
+			points.get(i).y = y + incY;
 		}
 		incX = center.x - x;
-		incY = center.z - y;
+		incY = center.y - y;
 		incX *= xMultiplier;
 		incY *= yMultiplier;
 		center.x = x + incX;
-		center.z = y + incY;
+		center.y = y + incY;
 		this.calcArea();
 		this.calcRadius();
 	}
 	public void scale(double multiplierX, double multiplierY){
-		scale(multiplierX, multiplierY, getCenter().x, getCenter().z);
+		scale(multiplierX, multiplierY, getCenter().x, getCenter().y);
 	}
 	public void scale(double multiplierX, double multiplierY, KPoint p){
-		scale(multiplierX, multiplierY, p.x, p.z);
+		scale(multiplierX, multiplierY, p.x, p.y);
 	}
 	public void scale(double multiplier){
-		scale(multiplier, multiplier, getCenter().x, getCenter().z);
+		scale(multiplier, multiplier, getCenter().x, getCenter().y);
 	}
 	public void scale(double multiplier, KPoint p){
-		scale(multiplier, multiplier, p.x, p.z);
+		scale(multiplier, multiplier, p.x, p.y);
 	}
 
 	public KPoint getBoundaryPointFromCenterToward(KPoint endPoint){
 		double distToExtendOutTo = 3*getRadius();
 		double xCoord = getCenter().x;
-		double yCoord = getCenter().z;
+		double yCoord = getCenter().y;
 		double xDiff = endPoint.x - getCenter().x;
-		double yDiff = endPoint.z - getCenter().z;
+		double yDiff = endPoint.y - getCenter().y;
 		if (xDiff == 0 && yDiff == 0){
 			yCoord += distToExtendOutTo;
 		}else if (xDiff == 0){
@@ -690,7 +690,7 @@ public class KPolygon implements PolygonHolder, Shape{
 			xCoord += distToExtendOutTo * Math.abs(xDiff/(xDiff + yDiff)) * Math.signum(xDiff);
 			yCoord += distToExtendOutTo * Math.abs(yDiff/(xDiff + yDiff)) * Math.signum(yDiff);
 		}
-		KPoint boundaryPoint = getClosestIntersectionToFirstFromSecond(getCenter().x, getCenter().z, xCoord, yCoord);
+		KPoint boundaryPoint = getClosestIntersectionToFirstFromSecond(getCenter().x, getCenter().y, xCoord, yCoord);
 		return boundaryPoint;
 	}
 
@@ -734,7 +734,7 @@ public class KPolygon implements PolygonHolder, Shape{
 		KPoint pointIBefore = (points.size() != 0 ? points.get(points.size()-1) : null);
 		for (int i = 0; i < points.size(); i++){
 			KPoint pointI = points.get(i);
-			if (pointI.x == pointIBefore.x && pointI.z == pointIBefore.z){
+			if (pointI.x == pointIBefore.x && pointI.y == pointIBefore.y){
 				return false;
 			}
 		}
@@ -748,7 +748,7 @@ public class KPolygon implements PolygonHolder, Shape{
 			KPoint pointI = points.get(i);
 			for (int j = i+1; j < points.size(); j++){
 				KPoint pointJ = points.get(j);
-				if (pointI.x == pointJ.x && pointI.z == pointJ.z){
+				if (pointI.x == pointJ.x && pointI.y == pointJ.y){
 					return false;
 				}
 			}
@@ -867,21 +867,21 @@ public class KPolygon implements PolygonHolder, Shape{
 	public boolean intersects(double x, double y, double w, double h){
 		if (x + w < center.x - radius ||
 				x > center.x + radius ||
-				y + h < center.z - radius ||
-				y > center.z + radius){
+				y + h < center.y - radius ||
+				y > center.y + radius){
 			return false;
 		}
 		for (int i = 0; i < points.size(); i++){
 			int nextI = (i+1 >= points.size() ? 0 : i+1);
-			if (KPoint.linesIntersect(x, y, x + w, y, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x, y, x, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x, y+h, x+w, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x+w, y, x+w, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z)){
+			if (KPoint.linesIntersect(x, y, x + w, y, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x, y, x, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x, y+h, x+w, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x+w, y, x+w, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y)){
 				return true;
 			}
 		}
 		double px = points.get(0).x;
-		double py = points.get(0).z;
+		double py = points.get(0).y;
 		if (px > x && px < x + w && py > y && py < y + h){
 			return true;
 		}
@@ -908,21 +908,21 @@ public class KPolygon implements PolygonHolder, Shape{
 	public boolean contains(double x, double y, double w, double h){
 		if (x + w < center.x - radius ||
 				x > center.x + radius ||
-				y + h < center.z - radius ||
-				y > center.z + radius){
+				y + h < center.y - radius ||
+				y > center.y + radius){
 			return false;
 		}
 		for (int i = 0; i < points.size(); i++){
 			int nextI = (i+1 >= points.size() ? 0 : i+1);
-			if (KPoint.linesIntersect(x, y, x + w, y, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x, y, x, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x, y+h, x+w, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z) ||
-					KPoint.linesIntersect(x+w, y, x+w, y+h, points.get(i).x, points.get(i).z, points.get(nextI).x, points.get(nextI).z)){
+			if (KPoint.linesIntersect(x, y, x + w, y, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x, y, x, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x, y+h, x+w, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y) ||
+					KPoint.linesIntersect(x+w, y, x+w, y+h, points.get(i).x, points.get(i).y, points.get(nextI).x, points.get(nextI).y)){
 				return false;
 			}
 		}
 		double px = points.get(0).x;
-		double py = points.get(0).z;
+		double py = points.get(0).y;
 		if (px > x && px < x + w && py > y && py < y + h){
 			return false;
 		}
@@ -1004,11 +1004,11 @@ public class KPolygon implements PolygonHolder, Shape{
 				if (affine != null){
 					float[] singlePointSetFloat = new float[2];
 					singlePointSetFloat[0] = (float)currentPoint.x;
-					singlePointSetFloat[1] = (float)currentPoint.z;
+					singlePointSetFloat[1] = (float)currentPoint.y;
 					affine.transform(singlePointSetFloat, 0, coords, 0, 1);
 				} else{
 					coords[0] = (float)currentPoint.x;
-					coords[1] = (float)currentPoint.z;
+					coords[1] = (float)currentPoint.y;
 				}
 			}
 			return type;
@@ -1019,11 +1019,11 @@ public class KPolygon implements PolygonHolder, Shape{
 			if (type != PathIterator.SEG_CLOSE){
 				if (affine != null){
 					singlePointSetDouble[0] = currentPoint.x;
-					singlePointSetDouble[1] = currentPoint.z;
+					singlePointSetDouble[1] = currentPoint.y;
 					affine.transform(singlePointSetDouble, 0, coords, 0, 1);
 				} else{
 					coords[0] = currentPoint.x;
-					coords[1] = currentPoint.z;
+					coords[1] = currentPoint.y;
 				}
 			}
 			return type;

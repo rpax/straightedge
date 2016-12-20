@@ -123,13 +123,13 @@ public class ViewPane extends JComponent {
 		float xOffset = 0;//getPlayer().getViewOffsetFromCenterX();
 		float yOffset = 0;//getPlayer().getViewOffsetFromCenterY();
 		center.x = (float) (getWidth() / 2f) + xOffset;
-		center.z = (float) (getHeight() / 2f) + yOffset;
+		center.y = (float) (getHeight() / 2f) + yOffset;
 
 		float scaledWidth = getWidth() / scaleFactor;
 		float scaledHeight = getHeight() / scaleFactor;
 
 		double playerViewX = getPlayer().getPos().getX();
-		double playerViewY = getPlayer().getPos().getZ();
+		double playerViewY = getPlayer().getPos().getY();
 
 		viewRectInWorldCoords.x = (float) (playerViewX - scaledWidth / 2f - xOffset / scaleFactor);
 		viewRectInWorldCoords.y = (float) (playerViewY - scaledHeight / 2f - yOffset / scaleFactor);
@@ -168,7 +168,7 @@ public class ViewPane extends JComponent {
 			for (int i = 0; i < obstacleTileGrid.getNumRows(); i++) {
 				for (int j = 0; j < obstacleTileGrid.getNumCols(); j++) {
 					float x = (float)(obstacleTileGrid.getBotLeft().x + j * obstacleTileGrid.getTileWidthAndHeight());
-					float y = (float)(obstacleTileGrid.getBotLeft().z + i * obstacleTileGrid.getTileWidthAndHeight());
+					float y = (float)(obstacleTileGrid.getBotLeft().y + i * obstacleTileGrid.getTileWidthAndHeight());
 					TileArray.Tile tile = obstacleTileGrid.getTile(i, j);
 					g.drawRect((int) x, (int) y, (int)obstacleTileGrid.getTileWidthAndHeight(), (int)obstacleTileGrid.getTileWidthAndHeight());
 					g.drawString("co" + tile.getContainedObstacles().size() + ", sh" + tile.getSharedObstacles().size(), x + 2, y + 15);
@@ -298,9 +298,9 @@ public class ViewPane extends JComponent {
 			KPoint currentPoint = p.getPos();
 			for (int j = 0; j < p.getPathPoints().size(); j++) {
 				KPoint nextPoint = p.getPathPoints().get(j);
-				g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getZ(), nextPoint.getX(), nextPoint.getZ()));
+				g.draw(new Line2D.Double(currentPoint.getX(), currentPoint.getY(), nextPoint.getX(), nextPoint.getY()));
 				float d = 5f;
-				g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getZ() - d / 2f, d, d));
+				g.fill(new Ellipse2D.Double(nextPoint.getX() - d / 2f, nextPoint.getY() - d / 2f, d, d));
 				currentPoint = nextPoint;
 			}
 			//int numNodes = getPathNodes().size();
@@ -343,7 +343,7 @@ public class ViewPane extends JComponent {
 		g.setStroke(oldStroke);
 //		g.setColor(Color.WHITE.darker());
 		g.setColor(Color.MAGENTA.darker());
-		g.translate(p.pos.getX(), p.pos.getZ());
+		g.translate(p.pos.getX(), p.pos.getY());
 		g.rotate(p.getLookAngle());
 		g.fill(p.polygon);
 		g.setColor(Color.YELLOW);
@@ -367,7 +367,7 @@ public class ViewPane extends JComponent {
 					for (int j = 0; j < obstacles.get(i).getNodes().size(); j++) {
 						KNode currentNode = obstacles.get(i).getNodes().get(j);
 						for (KNode n : currentNode.getConnectedNodes()) {
-							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().z, n.getPoint().getX(), n.getPoint().getZ()));
+							g.draw(new Line2D.Double(currentNode.getPoint().x, currentNode.getPoint().y, n.getPoint().getX(), n.getPoint().getY()));
 						}
 					}
 				}
@@ -377,11 +377,11 @@ public class ViewPane extends JComponent {
 			g.setColor(Color.BLUE);
 			KPoint startPoint = p.getPathFinder().startPointDebug;
 			for (KNode n : p.getPathFinder().startNodeTempReachableNodesDebug) {
-				g.draw(new Line2D.Double(startPoint.x, startPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
+				g.draw(new Line2D.Double(startPoint.x, startPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 			}
 			KPoint endPoint = p.getPathFinder().endPointDebug;
 			for (KNode n : p.getPathFinder().endNodeTempReachableNodesDebug) {
-				g.draw(new Line2D.Double(endPoint.x, endPoint.z, n.getPoint().getX(), n.getPoint().getZ()));
+				g.draw(new Line2D.Double(endPoint.x, endPoint.y, n.getPoint().getX(), n.getPoint().getY()));
 			}
 
 //			// draw the node numbers

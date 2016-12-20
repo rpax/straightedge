@@ -61,7 +61,7 @@ public class VisionDataRotation extends VisionData{
 	}
 
 	public void copyAndTransformEyeAndBoundaryPolygon(KPoint newEyeCoords, double boundaryPolygonRotationAroundEye){
-		copyAndTransformEyeAndBoundaryPolygon(newEyeCoords.x, newEyeCoords.z, boundaryPolygonRotationAroundEye);
+		copyAndTransformEyeAndBoundaryPolygon(newEyeCoords.x, newEyeCoords.y, boundaryPolygonRotationAroundEye);
 	}
 	
 	public void copyAndTransformEyeAndBoundaryPolygon(double newEyeX, double newEyeY, double boundaryPolygonRotationAroundEye){
@@ -69,8 +69,8 @@ public class VisionDataRotation extends VisionData{
 		eye = originalEye.copy();
 		boundaryPolygon = originalBoundaryPolygon.copy();
 		double translateX = newEyeX - originalEye.x;
-		double translateY = newEyeY - originalEye.z;
-		eye.set(newEyeX, newEyeY);
+		double translateY = newEyeY - originalEye.y;
+		eye.setCoords(newEyeX, newEyeY);
 		boundaryPolygon.translate(translateX, translateY);
 		boundaryPolygon.rotate(boundaryPolygonRotationAroundEye, eye);
 	}

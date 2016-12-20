@@ -36,17 +36,17 @@ package straightedge.geom;
  */
 public class KPoint{
 	public double x;
-	public double z;
+	public double y;
 	public final static double TWO_PI = Math.PI*2;
 	public KPoint(){
 	}
 	public KPoint(double x, double y){
 		this.x = x;
-		this.z = y;
+		this.y = y;
 	}
 	public KPoint(KPoint old){
 		this.x = old.x;
-		this.z = old.z;
+		this.y = old.y;
 	}
 
 	public double getX() {
@@ -57,32 +57,32 @@ public class KPoint{
 		this.x = x;
 	}
 
-	public double getZ() {
-		return z;
+	public double getY() {
+		return y;
 	}
 
-	public void setZ(double y) {
-		this.z = y;
+	public void setY(double y) {
+		this.y = y;
 	}
 
-	public void set(double x, double y){
+	public void setCoords(double x, double y){
 		this.x = x;
-		this.z = y;
+		this.y = y;
 	}
-	public void set(KPoint p){
+	public void setCoords(KPoint p){
 		this.x = p.x;
-		this.z = p.z;
+		this.y = p.y;
 	}
 	public void translate(KPoint pointIncrement){
-		translate(pointIncrement.x, pointIncrement.z);
+		translate(pointIncrement.x, pointIncrement.y);
 	}
 	public void translate(double xIncrement, double yIncrement){
 		this.x += xIncrement;
-		this.z += yIncrement;
+		this.y += yIncrement;
 	}
 	public KPoint translateCopy(KPoint pointIncrement){
 		KPoint p = this.copy();
-		p.translate(pointIncrement.x, pointIncrement.z);
+		p.translate(pointIncrement.x, pointIncrement.y);
 		return p;
 	}
 	public KPoint translateCopy(double xIncrement, double yIncrement){
@@ -92,47 +92,47 @@ public class KPoint{
 	}
 	
 	public void rotate(double angle, KPoint center) {
-		rotate(angle, center.x, center.z);
+		rotate(angle, center.x, center.y);
 	}
 	public void rotate(double angle, double xCenter, double yCenter) {
 		double currentAngle;
 		double distance;
-		currentAngle = Math.atan2(z - yCenter, x - xCenter);
+		currentAngle = Math.atan2(y - yCenter, x - xCenter);
 		currentAngle += angle;
-		distance = KPoint.distance(x, z, xCenter, yCenter);
+		distance = KPoint.distance(x, y, xCenter, yCenter);
 		x = xCenter + (distance*Math.cos(currentAngle));
-		z = yCenter + (distance*Math.sin(currentAngle));
+		y = yCenter + (distance*Math.sin(currentAngle));
 	}
 	public KPoint rotateCopy(double angle, KPoint center) {
 		KPoint p = this.copy();
-		p.rotate(angle, center.x, center.z);
+		p.rotate(angle, center.x, center.y);
 		return p;
 	}
 	public KPoint rotateCopy(double angle, double xCenter, double yCenter) {
 		KPoint p = this.copy();
-		double currentAngle = Math.atan2(p.z - yCenter, p.x - xCenter);
+		double currentAngle = Math.atan2(p.y - yCenter, p.x - xCenter);
 		currentAngle += angle;
-		double distance = KPoint.distance(p.x, p.z, xCenter, yCenter);
+		double distance = KPoint.distance(p.x, p.y, xCenter, yCenter);
 		p.x = xCenter + (distance*Math.cos(currentAngle));
-		p.z = yCenter + (distance*Math.sin(currentAngle));
+		p.y = yCenter + (distance*Math.sin(currentAngle));
 		return p;
 	}
 
 	public boolean equals(KPoint p){
-		if (x == p.x && z == p.z){
+		if (x == p.x && y == p.y){
 			return true;
 		}
 		return false;
 	}
 	
 	public double distance(KPoint p){
-		return distance(this.x, this.z, p.x, p.z);
+		return distance(this.x, this.y, p.x, p.y);
 	}
 	public double distance(double x2, double y2){
-		return distance(this.x, this.z, x2, y2);
+		return distance(this.x, this.y, x2, y2);
 	}
 	public static double distance(KPoint p, KPoint p2){
-		return distance(p.x, p.z, p2.x, p2.z);
+		return distance(p.x, p.y, p2.x, p2.y);
     }
 	public static double distance(double x1, double y1,
 				  double x2, double y2){
@@ -141,10 +141,10 @@ public class KPoint{
 		return Math.sqrt(x1 * x1 + y1 * y1);
     }
 	public double distanceSq(KPoint p){
-		return distanceSq(this.x, this.z, p.x, p.z);
+		return distanceSq(this.x, this.y, p.x, p.y);
 	}
 	public double distanceSq(double x2, double y2){
-		return distanceSq(this.x, this.z, x2, y2);
+		return distanceSq(this.x, this.y, x2, y2);
 	}
 	public static double distanceSq(double x1, double y1,
 				  double x2, double y2){
@@ -161,17 +161,17 @@ public class KPoint{
 		return false;
 	}
 	public static boolean collinear(KPoint p1, KPoint p2, KPoint p3){
-		return collinear(p1.x, p1.z, p2.x, p2.z, p3.x, p3.z);
+		return collinear(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 	}
 	public boolean collinear(KPoint p1, KPoint p2){
-		return collinear(x, z, p1.x, p1.z, p2.x, p2.z);
+		return collinear(x, y, p1.x, p1.y, p2.x, p2.y);
 	}
 	public boolean collinear(double x1, double y1, double x2, double y2){
-		return collinear(x, z, x1, y1, x2, y2);
+		return collinear(x, y, x1, y1, x2, y2);
 	}
 
 	public static boolean linesIntersect(KPoint p1, KPoint p2, KPoint p3, KPoint p4){
-		return linesIntersect(p1.x, p1.z, p2.x, p2.z, p3.x, p3.z, p4.x, p4.z);
+		return linesIntersect(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
 	}
 	public static boolean linesIntersect(double x1, double y1, double x2, double y2,
 										double x3, double y3, double x4, double y4){
@@ -234,7 +234,7 @@ public class KPoint{
 	}
 
 	public static KPoint getLineLineIntersection(KPoint p1, KPoint p2, KPoint p3, KPoint p4){
-		return getLineLineIntersection(p1.x, p1.z, p2.x, p2.z, p3.x, p3.z, p4.x, p4.z);
+		return getLineLineIntersection(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
 	}
 	public static KPoint getLineLineIntersection(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
 		double det1And2 = det(x1, y1, x2, y2);
@@ -276,7 +276,7 @@ public class KPoint{
 
 	 *
 	 * @param x
-	 * @param z
+	 * @param y
 	 * @param x2
 	 * @param y2
 	 * @return
@@ -319,10 +319,10 @@ public class KPoint{
 
 
 	public double ccwDouble(double x2, double y2){
-		return ccwDouble(x, z, x2, y2);
+		return ccwDouble(x, y, x2, y2);
 	}
 	public double ccwDouble(KPoint p){
-		return ccwDouble(x, z, p.x, p.z);
+		return ccwDouble(x, y, p.x, p.y);
 	}
 	public static int ccw(double x, double y,
 				  double x2, double y2){
@@ -330,10 +330,10 @@ public class KPoint{
 		return (ccw < 0.0) ? -1 : ((ccw > 0.0) ? 1 : 0);
 	}
 	public double ccw(double x2, double y2){
-		return ccw(x, z, x2, y2);
+		return ccw(x, y, x2, y2);
 	}
 	public double ccw(KPoint p){
-		return ccw(x, z, p.x, p.z);
+		return ccw(x, y, p.x, p.y);
 	}
 
 	public static double relCCWDouble(double x1, double y1,
@@ -347,10 +347,10 @@ public class KPoint{
 		return ccw;
 	}
 	public double relCCWDouble(double x1, double y1, double x2, double y2){
-		return relCCWDouble(x1, y1, x2, y2, x, z);
+		return relCCWDouble(x1, y1, x2, y2, x, y);
 	}
 	public double relCCWDouble(KPoint p1, KPoint p2){
-		return relCCWDouble(p1.x, p1.z, p2.x, p2.z, x, z);
+		return relCCWDouble(p1.x, p1.y, p2.x, p2.y, x, y);
 	}
 	/**
 	 * Returns a positive double if (px, py) is counter-clockwise to (x2, y2) relative to (x1, y1).
@@ -375,10 +375,10 @@ public class KPoint{
     }
 
 	public int relCCW(double x1, double y1, double x2, double y2){
-		return relCCW(x1, y1, x2, y2, x, z);
+		return relCCW(x1, y1, x2, y2, x, y);
 	}
 	public int relCCW(KPoint p1, KPoint p2){
-		return relCCW(p1.x, p1.z, p2.x, p2.z, x, z);
+		return relCCW(p1.x, p1.y, p2.x, p2.y, x, y);
 	}
 
 	public static double relCCWDoubleExtra(double x1, double y1,
@@ -417,16 +417,16 @@ public class KPoint{
 	}
 	
 	public String toString(){
-		return ""+x+", "+z;
+		return ""+x+", "+y;
 	}
 	public double findSignedAngle(double ox, double oy){
-		return findSignedAngle(this.x, this.z, ox, oy);
+		return findSignedAngle(this.x, this.y, ox, oy);
 	}
 	public double findSignedAngle(KPoint dest){
 		return findSignedAngle(this, dest);
 	}
 	public static double findSignedAngle(KPoint start, KPoint dest){
-		return findSignedAngle(start.x, start.z, dest.x, dest.z);
+		return findSignedAngle(start.x, start.y, dest.x, dest.y);
 	}
 	public static double findSignedAngle(double x1, double y1, double x2, double y2){
 		double x = x2 - x1;
@@ -435,7 +435,7 @@ public class KPoint{
 		return angle;
 	}
 	public double findAngle(double ox, double oy){
-		return findAngle(this.x, this.z, ox, oy);
+		return findAngle(this.x, this.y, ox, oy);
 	}
 	public double findAngle(KPoint dest){
 		return findAngle(this, dest);
@@ -449,11 +449,11 @@ public class KPoint{
 		return angle;
 	}
 	public double findSignedAngleFromOrigin(){
-		return Math.atan2(z, x);
+		return Math.atan2(y, x);
 	}
 	
 	public static double findAngle(KPoint start, KPoint dest){
-		return findAngle(start.x, start.z, dest.x, dest.z);
+		return findAngle(start.x, start.y, dest.x, dest.y);
 	}
 	public static double findAngle(double x1, double y1, double x2, double y2){
 		double angle = findSignedAngle(x1, y1, x2, y2);
@@ -464,13 +464,13 @@ public class KPoint{
 	}
 
 	public double findSignedRelativeAngle(double x1, double y1, double x2, double y2){
-		return findSignedRelativeAngle(this.x, this.z, x1, y1, x2, y2);
+		return findSignedRelativeAngle(this.x, this.y, x1, y1, x2, y2);
 	}
 	public double findSignedRelativeAngle(KPoint start, KPoint end){
 		return findSignedRelativeAngle(this, start, end);
 	}
 	public static double findSignedRelativeAngle(KPoint point, KPoint start, KPoint end){
-		return findSignedRelativeAngle(point.x, point.z, start.x, start.z, end.x, end.z);
+		return findSignedRelativeAngle(point.x, point.y, start.x, start.y, end.x, end.y);
 	}
 	public static double findSignedRelativeAngle(double x, double y, double x1, double y1, double x2, double y2){
 		double lineAngle = findAngle(x1, y1, x2, y2);
@@ -487,13 +487,13 @@ public class KPoint{
 	}
 
 	public double findRelativeAngle(double x1, double y1, double x2, double y2){
-		return findRelativeAngle(this.x, this.z, x1, y1, x2, y2);
+		return findRelativeAngle(this.x, this.y, x1, y1, x2, y2);
 	}
 	public double findRelativeAngle(KPoint start, KPoint end){
 		return findRelativeAngle(this, start, end);
 	}
 	public static double findRelativeAngle(KPoint point, KPoint start, KPoint end){
-		return findRelativeAngle(point.x, point.z, start.x, start.z, end.x, end.z);
+		return findRelativeAngle(point.x, point.y, start.x, start.y, end.x, end.y);
 	}
 	public static double findRelativeAngle(double x, double y, double x1, double y1, double x2, double y2){
 		double relativePointAngle = findSignedRelativeAngle(x, y, x1, y1, x2, y2);
@@ -507,30 +507,30 @@ public class KPoint{
 	
 
 	public KPoint midPoint(KPoint p){
-		return midPoint(x, z, p.x, p.z);
+		return midPoint(x, y, p.x, p.y);
 	}
 	public static KPoint midPoint(KPoint p, KPoint p2){
-		return midPoint(p.x, p.z, p2.x, p2.z);
+		return midPoint(p.x, p.y, p2.x, p2.y);
 	}
 	public static KPoint midPoint(double x, double y, double x2, double y2){
 		return new KPoint((x + x2)/2f, (y + y2)/2f);
 	}
 	public KPoint createPointFromAngle(double angle, double distance){
-		return createPointFromAngle(x, z, angle, distance);
+		return createPointFromAngle(x, y, angle, distance);
 	}
 	public static KPoint createPointFromAngle(double x, double y, double angle, double distance){
 		KPoint p = new KPoint();
 		double xDist = Math.cos(angle)*distance;
 		double yDist = Math.sin(angle)*distance;
 		p.x = (x+xDist);
-		p.z = (y+yDist);
+		p.y = (y+yDist);
 		return p;
 	}
 	public KPoint createPointToward(KPoint p, double distance){
-		return createPointToward(x, z, p.x, p.z, distance);
+		return createPointToward(x, y, p.x, p.y, distance);
 	}
 	public KPoint createPointToward(double x2, double y2, double distance){
-		return createPointToward(x, z, x2, y2, distance);
+		return createPointToward(x, y, x2, y2, distance);
 	}
 	public static KPoint createPointToward(double x, double y, double x2, double y2, double distance){
 		KPoint p = new KPoint();
@@ -541,34 +541,34 @@ public class KPoint{
 		double xDist = xDiff*distOnPtDist;
 		double yDist = yDiff*distOnPtDist;
 		p.x = (x+xDist);
-		p.z = (y+yDist);
+		p.y = (y+yDist);
 		return p;
 	}
 	public KPoint copy(){
-		return new KPoint(x, z);
+		return new KPoint(x, y);
 	}
 
 	public double ptLineDist(double x1, double y1, double x2, double y2){
-		return ptLineDist(x1, y1, x2, y2, x, z);
+		return ptLineDist(x1, y1, x2, y2, x, y);
 	}
 	public double ptLineDist(KPoint start, KPoint end){
-		return ptLineDist(start.x, start.z, end.x, end.z, x, z);
+		return ptLineDist(start.x, start.y, end.x, end.y, x, y);
 	}
 	public static double ptLineDist(KPoint start, KPoint end, KPoint p){
-		return ptLineDist(start.x, start.z, end.x, end.z, p.x, p.z);
+		return ptLineDist(start.x, start.y, end.x, end.y, p.x, p.y);
 	}
 	public static double ptLineDist(double x1, double y1, double x2, double y2, double px, double py){
 		return Math.sqrt(ptLineDistSq(x1, y1, x2, y2, px, py));
 	}
 
 	public double ptLineDistSq(double x1, double y1, double x2, double y2){
-		return ptLineDistSq(x1, y1, x2, y2, x, z);
+		return ptLineDistSq(x1, y1, x2, y2, x, y);
 	}
 	public double ptLineDistSq(KPoint start, KPoint end){
-		return ptLineDistSq(start.x, start.z, end.x, end.z, x, z);
+		return ptLineDistSq(start.x, start.y, end.x, end.y, x, y);
 	}
 	public static double ptLineDistSq(KPoint start, KPoint end, KPoint p){
-		return ptLineDistSq(start.x, start.z, end.x, end.z, p.x, p.z);
+		return ptLineDistSq(start.x, start.y, end.x, end.y, p.x, p.y);
 	}
 	public static double ptLineDistSq(double x1, double y1, double x2, double y2, double px, double py){
 		//from: Line2D.Float.ptLineDistSq(x1, y1, x2, y2, px, py);
@@ -594,26 +594,26 @@ public class KPoint{
 	}
 
 	public double ptSegDist(double x1, double y1, double x2, double y2){
-		return ptSegDist(x1, y1, x2, y2, x, z);
+		return ptSegDist(x1, y1, x2, y2, x, y);
 	}
 	public double ptSegDist(KPoint start, KPoint end){
-		return ptSegDist(start.x, start.z, end.x, end.z, x, z);
+		return ptSegDist(start.x, start.y, end.x, end.y, x, y);
 	}
 	public static double ptSegDist(KPoint start, KPoint end, KPoint p){
-		return ptSegDist(start.x, start.z, end.x, end.z, p.x, p.z);
+		return ptSegDist(start.x, start.y, end.x, end.y, p.x, p.y);
 	}
 	public static double ptSegDist(double x1, double y1, double x2, double y2, double px, double py){
 		return Math.sqrt(ptSegDistSq(x1, y1, x2, y2, px, py));
 	}
 
 	public double ptSegDistSq(double x1, double y1, double x2, double y2){
-		return ptSegDistSq(x1, y1, x2, y2, x, z);
+		return ptSegDistSq(x1, y1, x2, y2, x, y);
 	}
 	public double ptSegDistSq(KPoint start, KPoint end){
-		return ptSegDistSq(start.x, start.z, end.x, end.z, x, z);
+		return ptSegDistSq(start.x, start.y, end.x, end.y, x, y);
 	}
 	public static double ptSegDistSq(KPoint start, KPoint end, KPoint p){
-		return ptSegDistSq(start.x, start.z, end.x, end.z, p.x, p.z);
+		return ptSegDistSq(start.x, start.y, end.x, end.y, p.x, p.y);
 	}
 	public static double ptSegDistSq(double x1, double y1, double x2, double y2, double px, double py){
 		//from: Line2D.Float.ptSegDistSq(x1, y1, x2, y2, px, py);
@@ -674,13 +674,13 @@ public class KPoint{
 //		double rNum = ((px - x1)*(x2 - x1) + (py - y1)*(y2 - y1)) / lNum;
 		if (rNum <= 0){
 			closestPoint.x = x1;
-			closestPoint.z = y1;
+			closestPoint.y = y1;
 		}else if (rNum >= 1){
 			closestPoint.x = x2;
-			closestPoint.z = y2;
+			closestPoint.y = y2;
 		}else{
 			closestPoint.x = (x1 + rNum*x2LessX1);
-			closestPoint.z = (y1 + rNum*y2LessY1);
+			closestPoint.y = (y1 + rNum*y2LessY1);
 		}
 		return closestPoint;
 //    from:  http://www.codeguru.com/forum/showthread.php?t=194400
@@ -746,10 +746,10 @@ public class KPoint{
 //    Then the distance from C to P = |s|*L.
 	}
 	public KPoint getClosestPointOnSegment(double x1, double y1, double x2, double y2){
-		return getClosestPointOnSegment(x1, y1, x2, y2, x, z);
+		return getClosestPointOnSegment(x1, y1, x2, y2, x, y);
 	}
 	public KPoint getClosestPointOnSegment(KPoint p1, KPoint p2){
-		return getClosestPointOnSegment(p1.x, p1.z, p2.x, p2.z, x, z);
+		return getClosestPointOnSegment(p1.x, p1.y, p2.x, p2.y, x, y);
 	}
 
 

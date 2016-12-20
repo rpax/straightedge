@@ -51,7 +51,7 @@ public class PolygonConverter{
 		Coordinate[] coordinateArray = new Coordinate[polygon.getPoints().size() + 1];
 		for (int i = 0; i < polygon.getPoints().size(); i++){
 			KPoint p = polygon.getPoints().get(i);
-			coordinateArray[i] = new Coordinate(p.x, p.z);
+			coordinateArray[i] = new Coordinate(p.x, p.y);
 		}
 		// link the first and last points
 		coordinateArray[polygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
@@ -66,7 +66,7 @@ public class PolygonConverter{
 		Coordinate[] coordinateArray = new Coordinate[exteriorPolygon.points.size() + 1];
 		for (int i = 0; i < exteriorPolygon.getPoints().size(); i++){
 			KPoint p = exteriorPolygon.getPoints().get(i);
-			coordinateArray[i] = new Coordinate(p.x, p.z);
+			coordinateArray[i] = new Coordinate(p.x, p.y);
 		}
 		// link the first and last points
 		coordinateArray[exteriorPolygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
@@ -80,7 +80,7 @@ public class PolygonConverter{
 			coordinateArray = new Coordinate[interiorPolygon.points.size() + 1];
 			for (int j = 0; j < interiorPolygon.getPoints().size(); j++){
 				KPoint p = interiorPolygon.getPoints().get(j);
-				coordinateArray[j] = new Coordinate(p.x, p.z);
+				coordinateArray[j] = new Coordinate(p.x, p.y);
 			}
 			// link the first and last points
 			coordinateArray[interiorPolygon.getPoints().size()] = new Coordinate(coordinateArray[0].x, coordinateArray[0].y);
@@ -132,7 +132,7 @@ public class PolygonConverter{
 		for (int i = 0; i < coordinateSequence.size()-1; i++){
 			Coordinate coord = coordinateSequence.getCoordinate(i);
 			KPoint p = new KPoint(coord.x, coord.y);
-			if (lastAddedPoint != null && p.x == lastAddedPoint.x && p.z == lastAddedPoint.z){
+			if (lastAddedPoint != null && p.x == lastAddedPoint.x && p.y == lastAddedPoint.y){
 				// Don't add the point since it's the same as the last one
 //				System.out.println(this.getClass().getSimpleName()+": skipping p == "+p+", lastAddedPoint == "+lastAddedPoint+", i == "+i+", coordinateSequence.size()-1 == "+(coordinateSequence.size()-1));
 				continue;
@@ -371,10 +371,10 @@ public class PolygonConverter{
 			for (int i = 0; i < polygons.size(); i++){
 				KPolygon polygon = polygons.get(i);
 				KPoint p = polygon.getPoint(0);
-				path.moveTo(p.x, p.z);
+				path.moveTo(p.x, p.y);
 				for (int j = 1; j < polygon.getPoints().size(); j++){
 					p = polygon.getPoint(j);
-					path.lineTo(p.x, p.z);
+					path.lineTo(p.x, p.y);
 				}
 				path.closePath();
 			}
@@ -387,10 +387,10 @@ public class PolygonConverter{
 		for (int i = 0; i < polygons.size(); i++){
 			KPolygon polygon = polygons.get(i);
 			KPoint p = polygon.getPoint(0);
-			path.moveTo(p.x, p.z);
+			path.moveTo(p.x, p.y);
 			for (int j = 1; j < polygon.getPoints().size(); j++){
 				p = polygon.getPoint(j);
-				path.lineTo(p.x, p.z);
+				path.lineTo(p.x, p.y);
 			}
 			path.closePath();
 		}
@@ -399,10 +399,10 @@ public class PolygonConverter{
 	public Path2D.Double makePath2DFrom(KPolygon polygon){
 		Path2D.Double path = new Path2D.Double(PathIterator.WIND_EVEN_ODD);
 		KPoint p = polygon.getPoint(0);
-		path.moveTo(p.x, p.z);
+		path.moveTo(p.x, p.y);
 		for (int j = 1; j < polygon.getPoints().size(); j++){
 			p = polygon.getPoint(j);
-			path.lineTo(p.x, p.z);
+			path.lineTo(p.x, p.y);
 		}
 		path.closePath();
 		return path;

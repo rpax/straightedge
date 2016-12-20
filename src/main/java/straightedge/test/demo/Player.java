@@ -104,7 +104,7 @@ public class Player implements TargetUser{
 	}
 
 	public void respawn(KPoint spawnPos){
-		this.pos.set(spawnPos);
+		this.pos.setCoords(spawnPos);
 		targetFinder.setFixedTarget(pos, true);
 		copyAndTransformPolygon();
 
@@ -187,13 +187,13 @@ public class Player implements TargetUser{
 			currentTargetPoint = pathPoints.get(i);
 			KPoint oldPos = new KPoint();
 			oldPos.x = pos.x;
-			oldPos.z = pos.z;
+			oldPos.y = pos.y;
 			//System.out.println(this.getClass().getSimpleName()+": targetX == "+targetX+", x == "+x+", targetY == "+targetY+", y == "+y);
-			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.z, pos.x, pos.z);
+			double distUntilTargetReached = KPoint.distance(currentTargetPoint.x, currentTargetPoint.y, pos.x, pos.y);
 			double timeUntilTargetReached = distUntilTargetReached/speed;
 			assert timeUntilTargetReached >= 0 : timeUntilTargetReached;
 			double xCoordToWorkOutAngle = currentTargetPoint.x - pos.x;
-			double yCoordToWorkOutAngle = currentTargetPoint.z - pos.z;
+			double yCoordToWorkOutAngle = currentTargetPoint.y - pos.y;
 			if (xCoordToWorkOutAngle != 0 || yCoordToWorkOutAngle != 0) {
 				moveAngle = KPoint.findAngle(0, 0, xCoordToWorkOutAngle, yCoordToWorkOutAngle);//(float)Math.atan(yCoordToWorkOutAngle/xCoordToWorkOutAngle);
 				speedX = Math.cos(moveAngle) * speed;
@@ -204,7 +204,7 @@ public class Player implements TargetUser{
 			}
 			if (secondsLeft >= timeUntilTargetReached){
 				pos.x = currentTargetPoint.x;
-				pos.z = currentTargetPoint.z;
+				pos.y = currentTargetPoint.y;
 				speedX = 0f;
 				speedY = 0f;
 				secondsLeft -= timeUntilTargetReached;
@@ -214,14 +214,14 @@ public class Player implements TargetUser{
 				i--;
 			}else{
 				pos.x = oldPos.x + secondsLeft * speedX;
-				pos.z = oldPos.z + secondsLeft * speedY;
+				pos.y = oldPos.y + secondsLeft * speedY;
 				secondsLeft = 0;
 				break;
 			}
 		}
 
 		// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-		cache.copyAndTransformEyeAndBoundaryPolygon(pos.x + smallAmount, pos.z + smallAmount, gun.angle);
+		cache.copyAndTransformEyeAndBoundaryPolygon(pos.x + smallAmount, pos.y + smallAmount, gun.angle);
 		visionFinder.calc(cache, world.allOccluders);
 
 		if (isBot()){
@@ -335,7 +335,7 @@ public class Player implements TargetUser{
 			for (int j = 0; j < picH; j++){
 				KPoint p = new KPoint();
 				p.x = originalBoundaryPolygonAABB.getX() + i;
-				p.z = originalBoundaryPolygonAABB.getY() + j;
+				p.y = originalBoundaryPolygonAABB.getY() + j;
 				KPoint boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(), cache.getOriginalEye().createPointToward(p, cache.getOriginalBoundaryPolygon().getRadius()*2));
 				double eyeToPixelDist = cache.getOriginalEye().distanceSq(p);
 				double eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSq(boundaryP);
@@ -375,7 +375,7 @@ public class Player implements TargetUser{
 			for (int j = 0; j < picH; j++){
 				KPoint p = new KPoint();
 				p.x = originalBoundaryPolygonAABB.getX() + i;
-				p.z = originalBoundaryPolygonAABB.getY() + j;
+				p.y = originalBoundaryPolygonAABB.getY() + j;
 				KPoint boundaryP = cache.getOriginalBoundaryPolygon().getClosestIntersectionToFirstFromSecond(cache.getOriginalEye(), cache.getOriginalEye().createPointToward(p, cache.getOriginalBoundaryPolygon().getRadius()*2));
 				double eyeToPixelDist = cache.getOriginalEye().distanceSq(p);
 				double eyeThruPixelToBoundaryDist =  cache.getOriginalEye().distanceSq(boundaryP);

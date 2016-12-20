@@ -197,7 +197,7 @@ public class VisionTestActiveRendering {
 					MouseEvent e = (MouseEvent)awtEvent;
 					if (e.getID() == MouseEvent.MOUSE_MOVED){
 						lastMouseMovePoint.x = e.getX();
-						lastMouseMovePoint.z = e.getY();
+						lastMouseMovePoint.y = e.getY();
 					}
 				}else if (awtEvent instanceof ComponentEvent){
 					ComponentEvent e = (ComponentEvent)awtEvent;
@@ -219,7 +219,7 @@ public class VisionTestActiveRendering {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		visionData.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.z + smallAmount);
+		visionData.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
 		visionData.boundaryPolygon.translateTo(visionData.eye);
 		visionFinder.calc(visionData, stationaryOccluders, movingOccluders);
 		/* Note that the above line is the fast way to process shadows since the
@@ -271,7 +271,7 @@ public class VisionTestActiveRendering {
 			}
 
 			if (visionData.visiblePolygon != null){
-				Point2D.Double center = new Point2D.Double(visionData.eye.x, visionData.eye.z);
+				Point2D.Double center = new Point2D.Double(visionData.eye.x, visionData.eye.y);
 				float[] dist = {0.0f, 1.0f};
 				float a = 0.9f;
 				float c = backGroundGrey;
@@ -289,7 +289,7 @@ public class VisionTestActiveRendering {
 			
 			g.setColor(Color.RED);
 			float r = 1f;
-			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.z - r, 2*r, 2*r));
+			g.fill(new Ellipse2D.Double(lastMouseMovePoint.x - r, lastMouseMovePoint.y - r, 2*r, 2*r));
 		}
 	}
 

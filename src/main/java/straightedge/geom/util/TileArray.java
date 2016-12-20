@@ -78,7 +78,7 @@ public class TileArray<T extends PolygonHolder>{
 		tiles = new Tile[numRows][numCols];
 		this.tileWidthAndHeight = tileWidthAndHeight;
 		this.botLeft = botLeft.copy();
-		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.z + numCols*tileWidthAndHeight);
+		topRight = new KPoint(botLeft.x + numRows*tileWidthAndHeight, botLeft.y + numCols*tileWidthAndHeight);
 		bloated = false;
 		for (int i = 0; i < numRows; i++){
 			for (int j = 0; j < numCols; j++){
@@ -89,9 +89,9 @@ public class TileArray<T extends PolygonHolder>{
 
 	public TileArray(KPoint botLeft, KPoint approxTopRight, float tileWidthAndHeight){
 		double minX = botLeft.x;
-		double minY = botLeft.z;
+		double minY = botLeft.y;
 		double maxX = approxTopRight.x;
-		double maxY = approxTopRight.z;
+		double maxY = approxTopRight.y;
 		this.numRows = (int)Math.ceil((maxX - minX)/tileWidthAndHeight);
 		this.numCols = (int)Math.ceil((maxY - minY)/tileWidthAndHeight);
 		init(botLeft, tileWidthAndHeight, numRows, numCols);
@@ -116,8 +116,8 @@ public class TileArray<T extends PolygonHolder>{
 
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((c.z - r) - botLeft.z)/tileWidthAndHeight;
-		double topRowIndex = ((c.z + r) - botLeft.z)/tileWidthAndHeight;
+		double botRowIndex = ((c.y - r) - botLeft.y)/tileWidthAndHeight;
+		double topRowIndex = ((c.y + r) - botLeft.y)/tileWidthAndHeight;
 //		System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex);
 
 		if (botRowIndex < 0){
@@ -182,8 +182,8 @@ public class TileArray<T extends PolygonHolder>{
 		double r = t.getPolygon().getRadius();
 		double leftColIndex = ((c.x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((c.z - r) - botLeft.z)/tileWidthAndHeight;
-		double topRowIndex = ((c.z + r) - botLeft.z)/tileWidthAndHeight;
+		double botRowIndex = ((c.y - r) - botLeft.y)/tileWidthAndHeight;
+		double topRowIndex = ((c.y + r) - botLeft.y)/tileWidthAndHeight;
 
 		if (botRowIndex < 0){
 			botRowIndex = 0;
@@ -245,7 +245,7 @@ public class TileArray<T extends PolygonHolder>{
 	}
 
 	public ArrayList<T> getAllWithin(KPoint point, double radius){
-		return getAllWithin(point.x, point.z, radius);
+		return getAllWithin(point.x, point.y, radius);
 	}
 
 	//	CodeTimer ct = new CodeTimer(this.getClass().getSimpleName()+": getAllWithin");
@@ -258,8 +258,8 @@ public class TileArray<T extends PolygonHolder>{
 
 		double leftColIndex = ((x - r) - botLeft.x)/tileWidthAndHeight;
 		double rightColIndex = ((x + r) - botLeft.x)/tileWidthAndHeight;
-		double botRowIndex = ((y - r) - botLeft.z)/tileWidthAndHeight;
-		double topRowIndex = ((y + r) - botLeft.z)/tileWidthAndHeight;
+		double botRowIndex = ((y - r) - botLeft.y)/tileWidthAndHeight;
+		double topRowIndex = ((y + r) - botLeft.y)/tileWidthAndHeight;
 //		System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex);
 
 //		ct.click("index checks");
@@ -303,7 +303,7 @@ public class TileArray<T extends PolygonHolder>{
 				}
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
+				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 					polygon.setTileArraySearchStatus(true, tracker);
 				}
@@ -314,7 +314,7 @@ public class TileArray<T extends PolygonHolder>{
 				KPoint polygonCenter = polygon.getCenter();
 				double radiusSumSq = (r + polygon.getRadius());
 				radiusSumSq *= radiusSumSq;
-				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
+				if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 					nearbyObstacles.add(t);
 				}
 			}
@@ -333,7 +333,7 @@ public class TileArray<T extends PolygonHolder>{
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
 						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
+						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 							polygon.setTileArraySearchStatus(true, tracker);
 						}
@@ -345,7 +345,7 @@ public class TileArray<T extends PolygonHolder>{
 						double radiusSumSq = (r + polygon.getRadius());
 						radiusSumSq *= radiusSumSq;
 						KPoint polygonCenter = polygon.getCenter();
-						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.z) < radiusSumSq){
+						if (KPoint.distanceSq(x,y,polygonCenter.x,polygonCenter.y) < radiusSumSq){
 							nearbyObstacles.add(t);
 						}
 					}
@@ -652,10 +652,10 @@ public class TileArray<T extends PolygonHolder>{
 			float width = 25;
 			float height = 25;
 			KPoint point = new KPoint(w*0.05f + rand.nextFloat()*w*0.9f, h*0.05f + rand.nextFloat()*h*0.9f);
-			points.add(new KPoint(point.x, point.z));
-			points.add(new KPoint(point.x, point.z + height));
-			points.add(new KPoint(point.x + width, point.z + height));
-			points.add(new KPoint(point.x + width, point.z));
+			points.add(new KPoint(point.x, point.y));
+			points.add(new KPoint(point.x, point.y + height));
+			points.add(new KPoint(point.x + width, point.y + height));
+			points.add(new KPoint(point.x + width, point.y));
 			KPolygon poly = new KPolygon(points);
 			poly.rotate(rand.nextFloat());
 			tileArray.add(poly);

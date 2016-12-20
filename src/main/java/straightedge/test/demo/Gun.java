@@ -118,7 +118,7 @@ public class Gun{
 			assert startTime <= endTime : startTime + ", " + endTime;
 
 			double xPosWhenFired = player.pos.x;
-			double yPosWhenFired = player.pos.z;
+			double yPosWhenFired = player.pos.y;
 			xPosWhenFired += (float) (length * Math.cos(angle));
 			yPosWhenFired += (float) (length * Math.sin(angle));
 			fire(seconds, startTime, player, xPosWhenFired, yPosWhenFired, angle, player.speedX, player.speedY);

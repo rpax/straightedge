@@ -239,8 +239,8 @@ public class CellArray {
 		KPoint botLeft = cells[0][0].getBotLeft().getPoint();//new KPoint(0,0);
 		double leftColIndex = ((c.x - r) - botLeft.x)/cellWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/cellWidthAndHeight;
-		double botRowIndex = ((c.z - r) - botLeft.z)/cellWidthAndHeight;
-		double topRowIndex = ((c.z + r) - botLeft.z)/cellWidthAndHeight;
+		double botRowIndex = ((c.y - r) - botLeft.y)/cellWidthAndHeight;
+		double topRowIndex = ((c.y + r) - botLeft.y)/cellWidthAndHeight;
 		//System.out.println(this.getClass().getSimpleName()+": c == "+c+botRowIndex+", leftColIndex == "+leftColIndex+", rightColIndex == "+rightColIndex+", botRowIndex == "+botRowIndex+", topRowIndex == "+topRowIndex);
 		if (botRowIndex < 0){
 			botRowIndex = 0;
