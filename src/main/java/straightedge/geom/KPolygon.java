@@ -147,7 +147,9 @@ public class KPolygon implements PolygonHolder, Shape {
 		radiusSq = polygon.getRadiusSq();
 		center = new Vector2f(polygon.getCenter());
 	}
-
+	public static KPolygon createRect(double x, double y, double x2, double y2){
+		return createRect((float) x, (float) y, (float) x2, (float) y2);
+	}
 	public static KPolygon createRect(float x, float y, float x2, float y2)
 	{
 		// make x and y the bottom left point.

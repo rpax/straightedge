@@ -10,9 +10,9 @@
 	<!-- Temporal -->
 	<repositories>
 		<repository>
-			<id>jme3-repo</id>
-			<name>jme3-repo</name>
-			<url>http://jcenter.bintray.com/</url>
+			<id>jme3-repo2</id>
+			<name>jme3-repo2</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
 		</repository>
 
 	</repositories>
@@ -64,9 +64,9 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.jmonkeyengine</groupId>
+			<groupId>com.massisframework.jme3</groupId>
 			<artifactId>jme3-core</artifactId>
-			<version>3.1.0-beta1</version>
+			<version>3.1.0-beta2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -93,20 +93,9 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>-->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-gpg-plugin</artifactId> 
+				<version>1.5</version> <executions> <execution> <id>sign-artifacts</id> <phase>verify</phase> 
+				<goals> <goal>sign</goal> </goals> </execution> </executions> </plugin> -->
 		</plugins>
 		<resources>
 			<resource>

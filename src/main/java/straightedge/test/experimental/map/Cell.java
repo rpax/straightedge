@@ -30,8 +30,7 @@
  */
 package straightedge.test.experimental.map;
 
-import straightedge.geom.KPoint;
-import straightedge.geom.KPolygon;
+import com.jme3.math.Vector2f;
 
 /**
  *
@@ -46,7 +45,7 @@ public class Cell {
 	Point botRight;
 	Point topRight;
 	Point topLeft;
-	KPoint center;
+	Vector2f center;
 
 	public Cell(CellArray cellArray, int row, int col){
 		this.cellArray = cellArray;
@@ -54,11 +53,11 @@ public class Cell {
 		this.col = col;
 	}
 
-	public KPoint getCenter() {
+	public Vector2f getCenter() {
 		return center;
 	}
 
-	public void setCenter(KPoint center) {
+	public void setCenter(Vector2f center) {
 		this.center = center;
 	}
 	

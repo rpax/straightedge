@@ -30,27 +30,27 @@
  */
 package straightedge.test.experimental.map;
 
-import straightedge.geom.*;
+import com.jme3.math.Vector2f;
 /**
  *
  * @author Keith
  */
 public class Point {
-	KPoint point;
+	Vector2f point;
 	Link upLink;
 	Link downLink;
 	Link leftLink;
 	Link rightLink;
 
-	public Point(KPoint point){
+	public Point(Vector2f point){
 		this.point = point;
 	}
 
-	public KPoint getPoint() {
+	public Vector2f getPoint() {
 		return point;
 	}
 
-	public void setPoint(KPoint point) {
+	public void setPoint(Vector2f point) {
 		this.point = point;
 	}
 

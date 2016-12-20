@@ -30,9 +30,6 @@
  */
 package straightedge.test.experimental.map;
 
-import straightedge.geom.*;
-import straightedge.geom.vision.*;
-import straightedge.geom.util.CodeTimer;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -40,11 +37,30 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.Transparency;
-import java.util.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.*;
+import java.awt.image.VolatileImage;
+import java.util.ArrayList;
+import java.util.Random;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.PolygonConverter;
+import straightedge.geom.util.CodeTimer;
+import straightedge.geom.vision.Occluder;
+import straightedge.geom.vision.OccluderImpl;
+import straightedge.geom.vision.VPOccluderOccluderIntersection;
+import straightedge.geom.vision.VisionData;
+import straightedge.geom.vision.VisionFinder;
 
 /**
  *
@@ -59,10 +75,10 @@ public class FogOfWarTestGrid {
 	final Object mutex = new Object();
 	ArrayList<AWTEvent> events = new ArrayList<AWTEvent>();
 	ArrayList<AWTEvent> eventsCopy = new ArrayList<AWTEvent>();
-	KPoint lastMouseMovePoint = new KPoint();
+	Vector2f lastMouseMovePoint = new Vector2f();
 
 	VisionFinder visionFinder;
-	double smallAmount = 0.0001f;
+	float smallAmount = 0.0001f;
 	VisionData performanceCache = null;
 	KPolygon visiblePolygon = null;
 
@@ -105,7 +121,7 @@ public class FogOfWarTestGrid {
 			float radius = 10;
 			KPolygon boundaryPolygon = KPolygon.createRegularPolygon(numPoints, radius);
 			// By making the eye (or light source) slightly offset from (0,0), it will prevent problems caused by collinearity.
-			KPoint eye = new KPoint(smallAmount, smallAmount);
+			Vector2f eye = new Vector2f(smallAmount, smallAmount);
 			performanceCache = new VisionData(eye, boundaryPolygon);
 			visionFinder = new VisionFinder();
 		}
@@ -146,8 +162,8 @@ public class FogOfWarTestGrid {
 		Random rand = new Random();
 		occluders = new ArrayList<OccluderImpl>();
 //		for (int i = 0; i < 4; i++){
-//			KPoint p = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
-//			KPoint p2 = new KPoint((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+//			Vector2f p = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
+//			Vector2f p2 = new Vector2f((float)rand.nextFloat()*frame.getWidth(), (float)rand.nextFloat()*frame.getHeight());
 //			float width = 10 + 30*rand.nextFloat();
 //			KPolygon rect = KPolygon.createRectangle(p, p2, width);
 //			occluders.add(new OccluderImpl(rect));
@@ -157,7 +173,7 @@ public class FogOfWarTestGrid {
 //		occluders.add(new OccluderImpl(KPolygon.createRectangle(70, 40, 70, 100, 20)));
 //		// make a star
 //		for (int i = 0; i < 4; i++){
-//			ArrayList<KPoint> pointList = new ArrayList<KPoint>();
+//			ArrayList<Vector2f> pointList = new ArrayList<Vector2f>();
 //			int numPoints = 4 + rand.nextInt(4)*2;
 //			double angleIncrement = Math.PI*2f/(numPoints*2);
 //			float rBig = 40 + rand.nextFloat()*90;
@@ -166,11 +182,11 @@ public class FogOfWarTestGrid {
 //			for (int k = 0; k < numPoints; k++){
 //				double x = rBig*Math.cos(currentAngle);
 //				double y = rBig*Math.sin(currentAngle);
-//				pointList.add(new KPoint((float)x, (float)y));
+//				pointList.add(new Vector2f((float)x, (float)y));
 //				currentAngle += angleIncrement;
 //				x = rSmall*Math.cos(currentAngle);
 //				y = rSmall*Math.sin(currentAngle);
-//				pointList.add(new KPoint((float)x, (float)y));
+//				pointList.add(new Vector2f((float)x, (float)y));
 //				currentAngle += angleIncrement;
 //			}
 //			KPolygon poly = new KPolygon(pointList);
@@ -219,7 +235,7 @@ public class FogOfWarTestGrid {
 		// Move the eye and boundaryPolygon to wherever they need to be.
 		// By making the eye slightly offset from its integer coordinate by smallAmount,
 		// it will prevent problems caused by collinearity.
-		performanceCache.eye.setCoords(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
+		performanceCache.eye.set(lastMouseMovePoint.x + smallAmount, lastMouseMovePoint.y + smallAmount);
 		performanceCache.boundaryPolygon.translateTo(performanceCache.eye);
 		visionFinder.calc(performanceCache, new ArrayList<Occluder>(0), new ArrayList<VPOccluderOccluderIntersection>(0), occluders);
 		visiblePolygon = performanceCache.visiblePolygon;
@@ -283,7 +299,7 @@ public class FogOfWarTestGrid {
 						if (cell.isDiscovered()){
 							continue;
 						}
-//						KPoint p = cell.getPolygon().getCenter();
+//						Vector2f p = cell.getPolygon().getCenter();
 //						g.fill(new Ellipse2D.Float(p.x - r, p.y - r, 2*r, 2*r));
 
 //						g.draw(cell.getPolygon());
@@ -300,8 +316,8 @@ public class FogOfWarTestGrid {
 							if (link != null){
 								if (link.isBorder()){
 									g.setColor(Color.BLUE);
-									KPoint p = link.getPoint().getPoint();
-									KPoint p2 = link.getPoint2().getPoint();
+									Vector2f p = link.getPoint().getPoint();
+									Vector2f p2 = link.getPoint2().getPoint();
 									//g.draw(new Line2D.Float(p.x, p.y, p2.x, p2.y));
 									g.drawLine((int)p.x, (int)p.y, (int)p2.x, (int)p2.y);
 								}
@@ -310,8 +326,8 @@ public class FogOfWarTestGrid {
 							if (link != null){
 								if (link.isBorder()){
 									g.setColor(Color.BLUE);
-									KPoint p = link.getPoint().getPoint();
-									KPoint p2 = link.getPoint2().getPoint();
+									Vector2f p = link.getPoint().getPoint();
+									Vector2f p2 = link.getPoint2().getPoint();
 									g.drawLine((int)p.x, (int)p.y, (int)p2.x, (int)p2.y);
 								}
 							}
@@ -319,8 +335,8 @@ public class FogOfWarTestGrid {
 							if (link != null){
 								if (link.isBorder()){
 									g.setColor(Color.BLUE);
-									KPoint p = link.getPoint().getPoint();
-									KPoint p2 = link.getPoint2().getPoint();
+									Vector2f p = link.getPoint().getPoint();
+									Vector2f p2 = link.getPoint2().getPoint();
 									g.drawLine((int)p.x, (int)p.y, (int)p2.x, (int)p2.y);
 								}
 							}
@@ -328,8 +344,8 @@ public class FogOfWarTestGrid {
 							if (link != null){
 								if (link.isBorder()){
 									g.setColor(Color.BLUE);
-									KPoint p = link.getPoint().getPoint();
-									KPoint p2 = link.getPoint2().getPoint();
+									Vector2f p = link.getPoint().getPoint();
+									Vector2f p2 = link.getPoint2().getPoint();
 									g.drawLine((int)p.x, (int)p.y, (int)p2.x, (int)p2.y);
 								}
 							}

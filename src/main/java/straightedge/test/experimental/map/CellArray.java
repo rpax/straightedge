@@ -30,9 +30,12 @@
  */
 package straightedge.test.experimental.map;
 
-import straightedge.geom.KPoint;
-import straightedge.geom.KPolygon;
 import java.util.ArrayList;
+
+import com.jme3.math.Vector2f;
+
+import straightedge.geom.KPolygon;
+import straightedge.geom.Vector2fUtils;
 
 /**
  *
@@ -71,7 +74,7 @@ public class CellArray {
 				Cell cell = cells[row][col];
 				float x = col*cellWidthAndHeight;
 				float y = row*cellWidthAndHeight;
-				Point botLeft = new Point(new KPoint(x, y));
+				Point botLeft = new Point(new Vector2f(x, y));
 				cell.setBotLeft(botLeft);
 				if (cell.getCellLeft() != null){
 					cell.getCellLeft().setBotRight(botLeft);
@@ -90,7 +93,7 @@ public class CellArray {
 			Cell cell = cells[row][col];
 			float x = col*cellWidthAndHeight;
 			float y = row*cellWidthAndHeight;
-			Point botRight = new Point(new KPoint(x + cellWidthAndHeight, y));
+			Point botRight = new Point(new Vector2f(x + cellWidthAndHeight, y));
 			cell.setBotRight(botRight);
 			if (row != 0){
 				cell.getCellDown().setTopRight(botRight);
@@ -103,7 +106,7 @@ public class CellArray {
 			Cell cell = cells[row][col];
 			float x = col*cellWidthAndHeight;
 			float y = row*cellWidthAndHeight;
-			Point topLeft = new Point(new KPoint(x, y + cellWidthAndHeight));
+			Point topLeft = new Point(new Vector2f(x, y + cellWidthAndHeight));
 			cell.setTopLeft(topLeft);
 			if (col != 0){
 				cell.getCellLeft().setTopRight(topLeft);
@@ -116,7 +119,7 @@ public class CellArray {
 			Cell cell = cells[row][col];
 			float x = col*cellWidthAndHeight;
 			float y = row*cellWidthAndHeight;
-			Point topRight = new Point(new KPoint(x + cellWidthAndHeight, y + cellWidthAndHeight));
+			Point topRight = new Point(new Vector2f(x + cellWidthAndHeight, y + cellWidthAndHeight));
 			cell.setTopRight(topRight);
 		}
 
@@ -209,7 +212,7 @@ public class CellArray {
 			for (int col = 0; col < numCols; col++){
 				Cell cell = cells[row][col];
 				//cell.makePolygon();
-				cell.setCenter(KPoint.midPoint(cell.getBotLeft().getPoint(), cell.getTopRight().getPoint()));
+				cell.setCenter(Vector2fUtils.midPoint(cell.getBotLeft().getPoint(), cell.getTopRight().getPoint()));
 			}
 		}
 		
@@ -234,9 +237,9 @@ public class CellArray {
 
 	ArrayList<Link> newBorderLinks = new ArrayList<Link>();
 	public void explore(KPolygon sightPolygon){
-		KPoint c = sightPolygon.getCenter();
+		Vector2f c = sightPolygon.getCenter();
 		double r = sightPolygon.getRadius();
-		KPoint botLeft = cells[0][0].getBotLeft().getPoint();//new KPoint(0,0);
+		Vector2f botLeft = cells[0][0].getBotLeft().getPoint();//new Vector2f(0,0);
 		double leftColIndex = ((c.x - r) - botLeft.x)/cellWidthAndHeight;
 		double rightColIndex = ((c.x + r) - botLeft.x)/cellWidthAndHeight;
 		double botRowIndex = ((c.y - r) - botLeft.y)/cellWidthAndHeight;
@@ -279,7 +282,7 @@ public class CellArray {
 				if (cell.isDiscovered() == false){
 					double sumRadiusSq = sightPolygon.getRadius() + cellRadiusSq;
 					sumRadiusSq *= sumRadiusSq;
-					if (c.distanceSq(cell.getCenter()) < sumRadiusSq){
+					if (c.distanceSquared(cell.getCenter()) < sumRadiusSq){
 						if (sightPolygon.contains(cell.getBotLeft().getPoint()) == true){
 							cell.setDiscovered(true);
 							if (cell.getCellDown() != null){
